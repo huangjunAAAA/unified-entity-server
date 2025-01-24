@@ -1,11 +1,13 @@
 package com.zjht.unified.data.storage.persist.mysql;
 
 import cn.hutool.core.util.StrUtil;
-import com.zjht.unified.data.common.core.constants.FieldConstants;
-import com.zjht.unified.data.common.core.util.MysqlDDLUtils;
+import com.zjht.unified.common.core.constants.FieldConstants;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
+
+import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.data.entity.RawData;
-import com.zjht.unified.data.common.core.domain.ddl.TblCol;
-import com.zjht.unified.data.common.core.domain.ddl.TblIndex;
+
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
 import com.zjht.unified.data.storage.service.IRawDataService;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,7 @@ public class MysqlStoreService extends AbstractStoreService {
     private MysqlDDLService mysqlDDLService;
 
 
-    public Long saveObject(Map<String,Object> data,String tbl, List<TblCol> def,List<TblIndex> indices,Long colpId, Long driverId){
+    public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId, Long driverId){
         createObjectTable(data,tbl,def,indices);
         MysqlDDLUtils.setJdbcType(def,data);
 //        data.put(FieldConstants.SYSTEM_ID,ref.getSystemId());

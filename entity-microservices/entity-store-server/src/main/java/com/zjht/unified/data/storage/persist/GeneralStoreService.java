@@ -1,7 +1,8 @@
 package com.zjht.unified.data.storage.persist;
 
 import com.wukong.core.util.SpringUtil;
-import com.zjht.unified.data.common.core.domain.store.StoreMessageDO;
+
+import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;

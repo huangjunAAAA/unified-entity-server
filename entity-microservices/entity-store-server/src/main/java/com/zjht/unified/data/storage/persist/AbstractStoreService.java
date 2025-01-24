@@ -1,11 +1,12 @@
 package com.zjht.unified.data.storage.persist;
 
 
-import com.zjht.unified.data.common.core.domain.store.StoreMessageDO;
-import com.zjht.unified.data.common.core.domain.ddl.TableCreateDDL;
-import com.zjht.unified.data.common.core.domain.ddl.TblCol;
-import com.zjht.unified.data.common.core.domain.ddl.TblIndex;
-import com.zjht.unified.data.common.core.util.MysqlDDLUtils;
+
+import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
+import com.zjht.unified.common.core.domain.store.StoreMessageDO;
+import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;

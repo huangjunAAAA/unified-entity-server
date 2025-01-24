@@ -1,10 +1,11 @@
 package com.zjht.unified.data.storage.persist.doris;
 
 import com.wukong.bigdata.kafka.config.BigdataKafkaProperties;
-import com.zjht.unified.data.common.core.domain.ddl.TableCreateDDL;
-import com.zjht.unified.data.common.core.domain.ddl.TblCol;
-import com.zjht.unified.data.common.core.domain.ddl.TblIndex;
-import com.zjht.unified.data.common.core.util.DorisDDLUtils;
+
+import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
+import com.zjht.unified.common.core.util.DorisDDLUtils;
 import com.zjht.unified.data.storage.persist.PersistConfig;
 import com.zjht.unified.data.storage.persist.TableDDLService;
 import freemarker.template.Template;

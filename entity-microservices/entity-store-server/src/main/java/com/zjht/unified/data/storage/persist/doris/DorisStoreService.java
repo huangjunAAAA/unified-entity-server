@@ -3,14 +3,15 @@ package com.zjht.unified.data.storage.persist.doris;
 import cn.hutool.core.util.StrUtil;
 import com.cobber.fta.dates.DateTimeParser;
 import com.wukong.core.weblog.utils.DateUtil;
-import com.zjht.unified.data.common.core.constants.Constants;
-import com.zjht.unified.data.common.core.constants.FieldConstants;
-import com.zjht.unified.data.common.core.constants.KafkaNames;
-import com.zjht.unified.data.common.core.util.DorisDDLUtils;
-import com.zjht.unified.data.common.core.util.JsonUtilUnderline;
-import com.zjht.unified.data.common.core.domain.ddl.TblCol;
-import com.zjht.unified.data.common.core.domain.ddl.TblIndex;
-import com.zjht.unified.data.common.core.util.MysqlDDLUtils;
+
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.FieldConstants;
+import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
+import com.zjht.unified.common.core.util.DorisDDLUtils;
+import com.zjht.unified.common.core.util.JsonUtilUnderline;
+import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
@@ -90,7 +91,7 @@ public class DorisStoreService extends AbstractStoreService {
     }
 
     public Long saveSimpleRawData(String val, String processedData,  String dataType, Date eventTime, Long colpId, Long driverId) {
-        String idName= Constants.DORIS_ID_PREFIX+FieldConstants.SIMPLE_DATA_TABLE;
+        String idName= Constants.DORIS_ID_PREFIX+ FieldConstants.SIMPLE_DATA_TABLE;
         Long id = redisTemplate.opsForValue().increment(idName);
         Map<String,Object> values=new HashMap<>();
         values.put("id",id);

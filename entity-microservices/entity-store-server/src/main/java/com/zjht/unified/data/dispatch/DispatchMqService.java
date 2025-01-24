@@ -1,8 +1,9 @@
 package com.zjht.unified.data.dispatch;
 
 import com.wukong.bigdata.storage.gather.client.GatherClient;
-import com.zjht.unified.data.common.core.constants.KafkaNames;
-import com.zjht.unified.data.common.core.domain.store.StoreMessageDO;
+
+import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -3,13 +3,14 @@ package com.zjht.unified.data.mq;
 
 import com.wukong.bigdata.common.model.KafkaMessageRecord;
 import com.wukong.core.weblog.utils.JsonUtil;
-import com.zjht.unified.data.common.core.constants.KafkaNames;
-import com.zjht.unified.data.common.core.domain.store.StoreMessageDO;
-import com.zjht.unified.data.common.core.util.StringUtils;
 
+
+import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import com.zjht.unified.data.dispatch.DispatchMqService;
 import com.zjht.unified.data.storage.persist.GeneralStoreService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;

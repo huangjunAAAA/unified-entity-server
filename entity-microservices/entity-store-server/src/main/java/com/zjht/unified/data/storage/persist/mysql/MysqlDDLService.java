@@ -1,9 +1,9 @@
 package com.zjht.unified.data.storage.persist.mysql;
 
-import com.zjht.unified.data.common.core.domain.ddl.TableCreateDDL;
-import com.zjht.unified.data.common.core.domain.ddl.TblCol;
-import com.zjht.unified.data.common.core.domain.ddl.TblIndex;
-import com.zjht.unified.data.common.core.util.MysqlDDLUtils;
+import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
+import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.data.storage.persist.TableDDLService;
 import org.springframework.stereotype.Service;
 
