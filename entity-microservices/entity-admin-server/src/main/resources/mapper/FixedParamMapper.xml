@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.unified.data.manage.mapper.FixedParamMapper">
+    
+		<resultMap id="fixedParamResultMap" type="com.zjht.unified.data.entity.FixedParam">
+        <result column="id" property="id"/>
+        <result column="owner_id" property="ownerId"/>
+        <result column="owner_type" property="ownerType"/>
+        <result column="param_name_en" property="paramNameEn"/>
+        <result column="param_name_zh" property="paramNameZh"/>
+        <result column="val" property="val"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="status" property="status"/>
+        <result column="original_id" property="originalId"/>
+        <result column="param_status" property="paramStatus"/>
+        <result column="must" property="must"/>
+        <result column="param_type" property="paramType"/>
+    </resultMap>
+</mapper>

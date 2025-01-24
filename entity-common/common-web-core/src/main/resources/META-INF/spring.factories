@@ -1,0 +1,8 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.zjht.unified.data.common.core.util.SpringUtils,\
+  com.zjht.unified.data.common.core.config.MyBatisPlusConfig,\
+  com.zjht.unified.data.common.core.handler.IntegratedExceptionHandler,\
+  com.zjht.unified.data.common.core.config.RestTemplateConfiguration
+
+
+  

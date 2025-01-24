@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: collect-admin-server
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 192.168.4.87:8848
+      config:
+        # 配置中心地址
+        server-addr: 192.168.4.87:8848
+        # 配置文件格式
+        file-extension: yaml
+        # 共享配置
+        shared-configs:
+          - de.${spring.cloud.nacos.config.file-extension}
+          - de-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>entity-common</artifactId>
+        <groupId>com.zjht.unified.data</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>common-log</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.wukong</groupId>
+            <artifactId>lib-authenticationCenter-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.wukong</groupId>
+                    <artifactId>lib-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.wukong</groupId>
+                    <artifactId>lib-authentication</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>

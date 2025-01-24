@@ -1,0 +1,9 @@
+package com.zjht.unified.data.storage.persist;
+
+import com.zjht.unified.data.common.core.domain.store.StoreMessageDO;
+
+import java.util.List;
+
+public interface IDeviceStore extends IPointStore{
+    List<Long> saveObjectPoint(StoreMessageDO val);
+}
