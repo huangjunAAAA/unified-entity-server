@@ -16,7 +16,7 @@ public class TableDataInfo<T> implements Serializable
     private long total;
 
     /** 列表数据 */
-    private List<T> rows;
+    private List<T> data;
 
     /** 消息状态码 */
     private int code;
@@ -44,7 +44,7 @@ public class TableDataInfo<T> implements Serializable
      */
     public TableDataInfo(List<T> list, int total)
     {
-        this.rows = list;
+        this.data = list;
         this.total = total;
     }
 
@@ -56,16 +56,6 @@ public class TableDataInfo<T> implements Serializable
     public void setTotal(long total)
     {
         this.total = total;
-    }
-
-    public List<T> getRows()
-    {
-        return rows;
-    }
-
-    public void setRows(List<T> rows)
-    {
-        this.rows = rows;
     }
 
     public int getCode()
@@ -86,5 +76,13 @@ public class TableDataInfo<T> implements Serializable
     public void setMsg(String msg)
     {
         this.msg = msg;
+    }
+
+    public List<T> getData() {
+        return data;
+    }
+
+    public void setData(List<T> data) {
+        this.data = data;
     }
 }

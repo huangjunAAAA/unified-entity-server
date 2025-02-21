@@ -1,6 +1,6 @@
 spring:
   application:
-    name: collect-admin-server
+    name: entity-admin-server
   profiles:
     active: dev
   main:

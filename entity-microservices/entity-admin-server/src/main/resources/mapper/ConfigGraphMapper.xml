@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.unified.mapper.ConfigGraphMapper">
+    
+		<resultMap id="configGraphResultMap" type="com.zjht.unified.entity.ConfigGraph">
+        <result column="id" property="id"/>
+        <result column="node_id" property="nodeId"/>
+        <result column="node_type" property="nodeType"/>
+        <result column="x" property="x"/>
+        <result column="y" property="y"/>
+        <result column="root_id" property="rootId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="prj_id" property="prjId"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="original_id" property="originalId"/>
+    </resultMap>
+</mapper>

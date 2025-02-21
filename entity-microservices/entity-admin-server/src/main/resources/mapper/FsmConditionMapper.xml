@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.unified.mapper.FsmConditionMapper">
+    
+		<resultMap id="fsmConditionResultMap" type="com.zjht.unified.entity.FsmCondition">
+        <result column="id" property="id"/>
+        <result column="condition_expr" property="conditionExpr"/>
+        <result column="condition_watcher" property="conditionWatcher"/>
+        <result column="fsm_id" property="fsmId"/>
+        <result column="script" property="script"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="original_id" property="originalId"/>
+    </resultMap>
+</mapper>

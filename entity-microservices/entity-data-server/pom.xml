@@ -81,7 +81,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>
-                        com.zjht.unified.CollectDataServiceApplication
+                        com.zjht.unified.UnifiedEntityDataServiceApplication
                     </mainClass>
                     <fork>true</fork>
                     <excludes>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.unified.mapper.ClsRelationMapper">
+    
+		<resultMap id="clsRelationResultMap" type="com.zjht.unified.entity.ClsRelation">
+        <result column="id" property="id"/>
+        <result column="field_id_from" property="fieldIdFrom"/>
+        <result column="field_id_to" property="fieldIdTo"/>
+        <result column="rel" property="rel"/>
+        <result column="n2n_tbl" property="n2nTbl"/>
+        <result column="n2n_from" property="n2nFrom"/>
+        <result column="n2n_to" property="n2nTo"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="original_id" property="originalId"/>
+        <result column="prj_id" property="prjId"/>
+    </resultMap>
+</mapper>

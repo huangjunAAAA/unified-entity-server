@@ -17,9 +17,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @MapperScan("com.zjht.**.mapper.**")
 @EnableAsync
 @Slf4j
-public class CollectDataServiceApplication {
+public class UnifiedEntityDataServiceApplication {
     public static void main(String[] args) throws Exception {
-        ConfigurableApplicationContext app = SpringApplication.run(CollectDataServiceApplication.class, args);
+        ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityDataServiceApplication.class, args);
         log.info("数据存储模块启动成功");
 
     }
