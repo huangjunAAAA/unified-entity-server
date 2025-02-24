@@ -23,14 +23,14 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
  * @author Chill
  */
 @Entity
-@Table(name = "ue_prj")
+@Table(name = "dbtable_alias")
 @Data
-@TableName("ue_prj")
+@TableName("dbtable_alias")
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "UePrj对象", description = "")
-public class UePrj extends BaseCopyEntity {
+@ApiModel(value = "DbtableAlias对象", description = "")
+public class DbtableAlias extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -7579097904541287894L;
+	private static final long serialVersionUID = 5136897673823247671L;
 
 
 
@@ -45,28 +45,20 @@ public class UePrj extends BaseCopyEntity {
 	private Long id;
 
 	 /**
-	 * 
+	 * 显示名称
 	 */
-	@ApiModelProperty(value = "")
-	@Column(name = "name")
-	@TableField(value = "name")  
-	private String name;
+	@ApiModelProperty(value = "显示名称")
+	@Column(name = "display_name")
+	@TableField(value = "display_name")  
+	private String displayName;
 
 	 /**
-	 * 
+	 * 表全名
 	 */
-	@ApiModelProperty(value = "")
-	@Column(name = "ui_prj_id")
-	@TableField(value = "ui_prj_id")  
-	private Long uiPrjId;
-
-	 /**
-	 * 版本号
-	 */
-	@ApiModelProperty(value = "版本号")
-	@Column(name = "version")
-	@TableField(value = "version")  
-	private String version;
+	@ApiModelProperty(value = "表全名")
+	@Column(name = "tbl_name")
+	@TableField(value = "tbl_name")  
+	private String tblName;
 
 	 /**
 	 * 原始ID

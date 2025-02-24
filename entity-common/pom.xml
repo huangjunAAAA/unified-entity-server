@@ -20,5 +20,6 @@
         <module>common-log</module>
         <module>common-core</module>
         <module>common-feign</module>
+        <module>google-v8</module>
     </modules>
 </project>

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FieldDef 领域对象", description = "")
 public class FieldDefDO {
 
-	private static final long serialVersionUID = -584427141191341350L;
+	private static final long serialVersionUID = -8892756820364411901L;
 
 
 	/**

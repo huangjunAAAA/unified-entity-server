@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FsmDef 领域对象", description = "")
 public class FsmDefDO {
 
-	private static final long serialVersionUID = -6954752741827331939L;
+	private static final long serialVersionUID = -8140876626060651850L;
 
 
 	/**

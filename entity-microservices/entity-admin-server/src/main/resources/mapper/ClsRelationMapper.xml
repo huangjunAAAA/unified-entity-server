@@ -19,5 +19,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_user" property="updateUser"/>
         <result column="original_id" property="originalId"/>
         <result column="prj_id" property="prjId"/>
+        <result column="script" property="script"/>
     </resultMap>
 </mapper>

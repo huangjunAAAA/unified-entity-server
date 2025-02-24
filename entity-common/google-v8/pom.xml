@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>entity-common</artifactId>
+        <groupId>com.zjht.unified.data</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>google-v8</artifactId>
+
+    <dependencies>
+        <!-- Core (Must-have) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- Node.js Linux (x86_64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-node-linux-x86_64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- Node.js Linux (arm64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-node-linux-arm64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- Node.js Mac OS (x86_64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-node-macos-x86_64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- Node.js Windows (x86_64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-node-windows-x86_64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- V8 Linux (x86_64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-v8-linux-x86_64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!-- V8 Linux (arm64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-v8-linux-arm64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+
+        <!-- V8 Windows (x86_64) -->
+        <dependency>
+            <groupId>com.caoccao.javet</groupId>
+            <artifactId>javet-v8-windows-x86_64</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>common-core</artifactId>
+            <groupId>com.zjht.unified.data</groupId>
+            <version>1.0.0</version>
+        </dependency>
+
+
+
+    </dependencies>
+
+</project>

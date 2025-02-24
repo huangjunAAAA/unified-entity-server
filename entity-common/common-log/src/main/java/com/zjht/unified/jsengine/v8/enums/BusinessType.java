@@ -1,4 +1,4 @@
-package com.zjht.unified.data.common.log.enums;
+package com.zjht.unified.jsengine.v8.enums;
 
 /**
  * 业务操作类型

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "ClazzDef 领域对象", description = "")
 public class ClazzDefDO {
 
-	private static final long serialVersionUID = -890136665126923917L;
+	private static final long serialVersionUID = 9190440786760841594L;
 
 
 	/**

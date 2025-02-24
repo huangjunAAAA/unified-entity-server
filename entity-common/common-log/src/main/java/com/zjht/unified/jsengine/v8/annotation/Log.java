@@ -1,8 +1,8 @@
-package com.zjht.unified.data.common.log.annotation;
+package com.zjht.unified.jsengine.v8.annotation;
 
 
 
-import com.zjht.unified.data.common.log.enums.BusinessType;
+import com.zjht.unified.jsengine.v8.enums.BusinessType;
 
 import java.lang.annotation.*;
 

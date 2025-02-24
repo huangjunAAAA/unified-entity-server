@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "FsmDef对象", description = "")
 public class FsmDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 3969837548705682087L;
+	private static final long serialVersionUID = 6772856779895040159L;
 
 
 
