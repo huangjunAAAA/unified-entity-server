@@ -10,4 +10,5 @@ import lombok.Data;
 @ApiModel(value = "DTO", description = "",parent = FieldDef.class)
 public class FieldDefCompositeDTO extends FieldDef {
   private Long originalId;
+  private ClsRelationCompositeDTO clsRelIdClsRelationComposite;
 }

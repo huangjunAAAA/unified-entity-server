@@ -23,6 +23,8 @@ import java.util.function.Function;
 public class FieldDefCompositeWrapper{
     public void visitComposite(FieldDefCompositeDTO fieldDef, Consumer<BaseEntity> visitor){
         visitor.accept(fieldDef);
+      	if(fieldDef.getClsRelIdClsRelationComposite()!=null)
+            visitor.accept(fieldDef.getClsRelIdClsRelationComposite());
     }
 
     public static FieldDefCompositeWrapper build() {
@@ -32,6 +34,8 @@ public class FieldDefCompositeWrapper{
     public FieldDefCompositeVO entityVO(FieldDefCompositeDTO fieldDef){
         FieldDefWrapper wrapper=FieldDefWrapper.build();
         FieldDefCompositeVO vo= (FieldDefCompositeVO)BeanCopyUtils.shallowCopy(wrapper.entityVO(fieldDef),new FieldDefCompositeVO(),null);
+      	if(fieldDef.getClsRelIdClsRelationComposite()!=null)
+           vo.setClsRelIdClsRelationComposite(ClsRelationCompositeWrapper.build().entityVO(fieldDef.getClsRelIdClsRelationComposite()));
 
         return vo;
     }

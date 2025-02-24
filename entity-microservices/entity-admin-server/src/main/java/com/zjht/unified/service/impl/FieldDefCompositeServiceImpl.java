@@ -41,6 +41,8 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
     @Autowired
     private IFieldDefService fieldDefService;
   
+    @Autowired
+    private IClsRelationCompositeService  clsRelationCompositeService;
     public Long submit(FieldDefCompositeDTO entity) {
         if(entity==null)
             return null;
@@ -53,6 +55,13 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
             BeanUtils.copyProperties(newestEntity,entity);
         }
         boolean updateRequired=false;
+        if(entity.getClsRelIdClsRelationComposite()!=null){
+            if(entity.getClsRelId()!=null)
+                entity.getClsRelIdClsRelationComposite().setId(entity.getClsRelId());
+            clsRelationCompositeService.submit(entity.getClsRelIdClsRelationComposite());
+           entity.setClsRelId(entity.getClsRelIdClsRelationComposite().getId());
+           updateRequired=true;
+        }
         if(FieldDefCompositeValidate.validateOnFlush(entity)||updateRequired)
           fieldDefService.updateById(entity);
         return entity.getId();
@@ -61,6 +70,8 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
     public void removeById(Long id) {
         FieldDefCompositeDTO oldEntity = selectById(id);
         if(oldEntity!=null){
+            if(oldEntity.getClsRelIdClsRelationComposite()!=null)
+                clsRelationCompositeService.removeById(oldEntity.getClsRelIdClsRelationComposite().getId());
         }
       fieldDefService.removeById(id);
     }
@@ -85,6 +96,7 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
           return null;
         FieldDefCompositeDTO fieldDefDTO=new FieldDefCompositeDTO();
         BeanUtils.copyProperties(fieldDef,fieldDefDTO);
+        fieldDefDTO.setClsRelIdClsRelationComposite(clsRelationCompositeService.selectById(fieldDef.getClsRelId()));
         return fieldDefDTO;
     }
 
@@ -116,6 +128,11 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
         entity.setOriginalId(entity.getId());
       	entity.setId(null);
         fieldDefService.save(entity);
+      if(entity.getClsRelIdClsRelationComposite()!=null)	{
+        entity.setClsRelIdClsRelationComposite(clsRelationCompositeService.deepCopy(entity.getClsRelIdClsRelationComposite()));
+        entity.setClsRelId(entity.getClsRelIdClsRelationComposite().getId());      
+      }
+        fieldDefService.updateById(entity);
         if(FieldDefCompositeValidate.validateOnCopy(entity))
           fieldDefService.updateById(entity);
         return entity;

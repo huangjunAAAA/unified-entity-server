@@ -1,19 +1,20 @@
 package com.zjht.unified.domain.composite;
 
-import com.zjht.unified.domain.simple.PrjDepDO;
-import com.zjht.unified.domain.simple.SentinelDefDO;
-import com.zjht.unified.domain.simple.StaticDefDO;
-import com.zjht.unified.domain.simple.ViewDefDO;
+import com.zjht.unified.domain.simple.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class RunPkgDO {
+public class PrjSpecDO implements Serializable {
+    private static final long serialVersionUID = 2349875437264738L;
     private List<ClazzDefCompositeDO> clazzList;
     private List<FsmDefCompositeDO> fsmList;
-    private List<PrjDepDO> prjDepList;
     private List<SentinelDefDO> sentinelDefList;
     private List<StaticDefDO> staticDefList;
     private List<ViewDefDO> viewDefList;
+    private List<PrjSpecDO> depPkgList;
+    private UiPrjDO uiPrj;
+    private UePrjDO uePrj;
 }

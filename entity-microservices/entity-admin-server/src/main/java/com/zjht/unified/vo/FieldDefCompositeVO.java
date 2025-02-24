@@ -10,4 +10,5 @@ import java.util.List;
 @Data
 @ApiModel(value = "VO", description = "",parent = FieldDef.class)
 public class FieldDefCompositeVO extends FieldDefVo{
+  private ClsRelationCompositeVO clsRelIdClsRelationComposite;
 }

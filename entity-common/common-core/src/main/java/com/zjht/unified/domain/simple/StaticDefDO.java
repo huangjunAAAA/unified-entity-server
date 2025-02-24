@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "StaticDef 领域对象", description = "")
 public class StaticDefDO {
 
-	private static final long serialVersionUID = -7332811976619827670L;
+	private static final long serialVersionUID = -8621355850148807848L;
 
 
 	/**
@@ -44,4 +44,9 @@ public class StaticDefDO {
 	 */
 	@ApiModelProperty(value = "原始ID")
 	private Long originalId;
+	 /**
+	 * 项目ID
+	 */
+	@ApiModelProperty(value = "项目ID")
+	private Long prjId;
 }
