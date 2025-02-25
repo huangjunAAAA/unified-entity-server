@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "Fileset对象", description = "")
 public class Fileset extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -7453049704852021100L;
+	private static final long serialVersionUID = 6442120511476480074L;
 
 
 

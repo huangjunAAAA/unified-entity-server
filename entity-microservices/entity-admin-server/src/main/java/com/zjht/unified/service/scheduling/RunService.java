@@ -6,10 +6,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
-import com.zjht.unified.domain.simple.SentinelDefDO;
-import com.zjht.unified.domain.simple.StaticDefDO;
-import com.zjht.unified.domain.simple.UePrjDO;
-import com.zjht.unified.domain.simple.ViewDefDO;
+import com.zjht.unified.domain.simple.*;
 import com.zjht.unified.dto.ClazzDefCompositeDTO;
 import com.zjht.unified.dto.FsmDefCompositeDTO;
 import com.zjht.unified.entity.*;
@@ -59,6 +56,9 @@ public class RunService {
 
     @Autowired
     private IPrjExportService prjExportService;
+
+    @Autowired
+    private IInitialInstanceService initialInstanceService;
 
     @Autowired
     private RemoteRT remoteRT;
@@ -139,6 +139,14 @@ public class RunService {
             });
         }
 
+        List<InitialInstance> iiList=initialInstanceService.list(new LambdaQueryWrapper<InitialInstance>().eq(InitialInstance::getPrjId, prjId));
+        if(CollectionUtils.isNotEmpty(iiList)){
+            target.setViewDefList(new ArrayList<>());
+            iiList.forEach(ss->{
+                InitialInstanceDO ssdo=JsonUtilExt.jsonCast(ss, InitialInstanceDO.class);
+                target.getInstanceList().add(ssdo);
+            });
+        }
         return target;
     }
 

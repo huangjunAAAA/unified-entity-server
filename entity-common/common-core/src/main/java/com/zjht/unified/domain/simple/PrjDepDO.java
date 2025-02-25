@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "PrjDep 领域对象", description = "")
 public class PrjDepDO {
 
-	private static final long serialVersionUID = -3115279354090705569L;
+	private static final long serialVersionUID = -7701555376201991884L;
 
 
 	/**

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "ClsRelation 领域对象", description = "")
 public class ClsRelationDO {
 
-	private static final long serialVersionUID = -4086939910702735161L;
+	private static final long serialVersionUID = -4097487895770976403L;
 
 
 	/**
@@ -24,6 +24,11 @@ public class ClsRelationDO {
 	 */
 	@ApiModelProperty(value = "")
 	private Long id;
+	 /**
+	 * 项目ID
+	 */
+	@ApiModelProperty(value = "项目ID")
+	private Long prjId;
 	 /**
 	 * 
 	 */
@@ -59,11 +64,6 @@ public class ClsRelationDO {
 	 */
 	@ApiModelProperty(value = "原始ID")
 	private Long originalId;
-	 /**
-	 * 项目ID
-	 */
-	@ApiModelProperty(value = "项目ID")
-	private Long prjId;
 	 /**
 	 * 自定义载入脚本
 	 */

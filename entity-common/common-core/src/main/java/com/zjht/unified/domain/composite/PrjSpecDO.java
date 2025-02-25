@@ -17,4 +17,5 @@ public class PrjSpecDO implements Serializable {
     private List<PrjSpecDO> depPkgList;
     private UiPrjDO uiPrj;
     private UePrjDO uePrj;
+    private List<InitialInstanceDO> instanceList;
 }
