@@ -2,6 +2,7 @@ package com.zjht.unified.service.scheduling;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zjht.unified.admin.utils.EntityDoUtils;
+import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
@@ -12,6 +13,7 @@ import com.zjht.unified.domain.simple.ViewDefDO;
 import com.zjht.unified.dto.ClazzDefCompositeDTO;
 import com.zjht.unified.dto.FsmDefCompositeDTO;
 import com.zjht.unified.entity.*;
+import com.zjht.unified.feign.RemoteRT;
 import com.zjht.unified.service.*;
 import com.zjht.unified.utils.JsonUtilExt;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,6 +59,18 @@ public class RunService {
 
     @Autowired
     private IPrjExportService prjExportService;
+
+    @Autowired
+    private RemoteRT remoteRT;
+
+    public R runSpec(PrjSpecDO spec){
+        return remoteRT.startProject(spec);
+    }
+
+    public R runProject(Long prjId){
+        PrjSpecDO spec = genPrjSpec(prjId);
+        return runSpec(spec);
+    }
 
     public PrjSpecDO genPrjSpec(Long prjId){
         PrjSpecDO prjSpec = genSinglePrjSpec(prjId);

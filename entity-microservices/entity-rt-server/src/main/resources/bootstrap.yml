@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: entity-rt-server
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: nacos.int:8848
+      config:
+        # 配置中心地址
+        server-addr: nacos.int:8848
+        # 配置文件格式
+        file-extension: yaml
+        # 共享配置
+        shared-configs:
+          - dc.${spring.cloud.nacos.config.file-extension}
+          - dc-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+
+
+
+
+
+

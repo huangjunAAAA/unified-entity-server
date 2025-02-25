@@ -20,6 +20,7 @@
         <module>entity-admin-server</module>
         <module>entity-store-server</module>
         <module>entity-data-server</module>
+        <module>entity-rt-server</module>
     </modules>
 
     <properties>

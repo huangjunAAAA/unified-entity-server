@@ -30,6 +30,6 @@ public class PkgController {
     @ApiOperation(value = "查询类方法定义列表")
     @PostMapping("/run")
     public R<String> run(@RequestParam Long prjId){
-        return null;
+        return runService.runProject(prjId);
     }
 }
