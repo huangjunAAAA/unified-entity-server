@@ -13,10 +13,10 @@ import java.math.BigDecimal;
  * @author Chill
  */
 @Data
-@ApiModel(value = "UePrj 领域对象", description = "")
-public class UePrjDO {
+@ApiModel(value = "InstancesData 领域对象", description = "")
+public class InstancesDataDO {
 
-	private static final long serialVersionUID = 2480414371383770709L;
+	private static final long serialVersionUID = 551965611404835973L;
 
 
 	/**
@@ -25,28 +25,33 @@ public class UePrjDO {
 	@ApiModelProperty(value = "")
 	private Long id;
 	 /**
-	 * 
+	 * 实例GUID
 	 */
-	@ApiModelProperty(value = "")
-	private String name;
-	 /**
-	 * 
-	 */
-	@ApiModelProperty(value = "")
-	private Long uiPrjId;
+	@ApiModelProperty(value = "实例GUID")
+	private String guid;
 	 /**
 	 * 版本号
 	 */
 	@ApiModelProperty(value = "版本号")
 	private String version;
 	 /**
+	 * 类ID
+	 */
+	@ApiModelProperty(value = "类ID")
+	private Long clazzId;
+	 /**
+	 * 项目ID
+	 */
+	@ApiModelProperty(value = "项目ID")
+	private Long prjId;
+	 /**
+	 * 归档状态
+	 */
+	@ApiModelProperty(value = "归档状态")
+	private Integer archiveStatus;
+	 /**
 	 * 原始ID
 	 */
 	@ApiModelProperty(value = "原始ID")
 	private Long originalId;
-	 /**
-	 * GUID
-	 */
-	@ApiModelProperty(value = "GUID")
-	private String guid;
 }

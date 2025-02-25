@@ -23,14 +23,14 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
  * @author Chill
  */
 @Entity
-@Table(name = "fsm_condition")
+@Table(name = "initial_instance")
 @Data
-@TableName("fsm_condition")
+@TableName("initial_instance")
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "FsmCondition对象", description = "")
-public class FsmCondition extends BaseCopyEntity {
+@ApiModel(value = "InitialInstance对象", description = "")
+public class InitialInstance extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -3684095909364348831L;
+	private static final long serialVersionUID = 1640207355549088036L;
 
 
 
@@ -45,36 +45,44 @@ public class FsmCondition extends BaseCopyEntity {
 	private Long id;
 
 	 /**
-	 * 条件表达式
+	 * 所属类id
 	 */
-	@ApiModelProperty(value = "条件表达式")
-	@Column(name = "condition_expr")
-	@TableField(value = "condition_expr")  
-	private String conditionExpr;
+	@ApiModelProperty(value = "所属类id")
+	@Column(name = "class_id")
+	@TableField(value = "class_id")  
+	private Long classId;
 
 	 /**
-	 * 被动模式watcher id
+	 * 所属类的guid
 	 */
-	@ApiModelProperty(value = "被动模式watcher id")
-	@Column(name = "condition_watcher")
-	@TableField(value = "condition_watcher")  
-	private Long conditionWatcher;
+	@ApiModelProperty(value = "所属类的guid")
+	@Column(name = "class_guid")
+	@TableField(value = "class_guid")  
+	private String classGuid;
 
 	 /**
-	 * 所属状态机id
+	 * 项目ID
 	 */
-	@ApiModelProperty(value = "所属状态机id")
-	@Column(name = "fsm_id")
-	@TableField(value = "fsm_id")  
-	private Long fsmId;
+	@ApiModelProperty(value = "项目ID")
+	@Column(name = "prj_id")
+	@TableField(value = "prj_id")  
+	private Long prjId;
 
 	 /**
-	 * 状态转换的脚本
+	 * 实例GUID
 	 */
-	@ApiModelProperty(value = "状态转换的脚本")
-	@Column(name = "script")
-	@TableField(value = "script")  
-	private String script;
+	@ApiModelProperty(value = "实例GUID")
+	@Column(name = "guid")
+	@TableField(value = "guid")  
+	private String guid;
+
+	 /**
+	 * 实例的所有属性值，json结构
+	 */
+	@ApiModelProperty(value = "实例的所有属性值，json结构")
+	@Column(name = "attr_value")
+	@TableField(value = "attr_value")  
+	private String attrValue;
 
 	 /**
 	 * 原始ID

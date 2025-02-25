@@ -13,10 +13,10 @@ import java.math.BigDecimal;
  * @author Chill
  */
 @Data
-@ApiModel(value = "FsmDef 领域对象", description = "")
-public class FsmDefDO {
+@ApiModel(value = "Timer 领域对象", description = "")
+public class TimerDO {
 
-	private static final long serialVersionUID = 1426129619577796347L;
+	private static final long serialVersionUID = 5697800607312008388L;
 
 
 	/**
@@ -30,19 +30,14 @@ public class FsmDefDO {
 	@ApiModelProperty(value = "GUID")
 	private String guid;
 	 /**
-	 * 名称
+	 * 版本号
 	 */
-	@ApiModelProperty(value = "名称")
-	private String name;
+	@ApiModelProperty(value = "版本号")
+	private String version;
 	 /**
-	 * 1 被动 2 定时器
+	 * 调用周期表达式
 	 */
-	@ApiModelProperty(value = "1 被动 2 定时器")
-	private Integer driver;
-	 /**
-	 * 定时器执行周期
-	 */
-	@ApiModelProperty(value = "定时器执行周期")
+	@ApiModelProperty(value = "调用周期表达式")
 	private String cron;
 	 /**
 	 * 线程模型

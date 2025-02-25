@@ -1,5 +1,7 @@
 package com.zjht.unified.config;
 
+import com.zjht.unified.service.ctx.TaskContext;
+
 public class RedisKeyName {
     public static final String RUNNING_PROJECT ="running:entity:";
     public static final String ATTR_REQ ="attr:req:";
@@ -30,7 +32,22 @@ public class RedisKeyName {
         return parts[parts.length-1];
     }
 
+    public static String getStaticKey(String ver){
+        return ver+"-static";
+    }
+
+    /**
+     * 用来存储属性的计算公式（如果有）
+     * @param guid
+     * @param ver
+     * @param attrName
+     * @return
+     */
     public static String getObjectAttrKey(String guid,String ver,String attrName){
         return ver+":"+guid+":"+attrName;
+    }
+
+    public static String getObjectKey(String guid,String ver){
+        return ver+":"+guid;
     }
 }

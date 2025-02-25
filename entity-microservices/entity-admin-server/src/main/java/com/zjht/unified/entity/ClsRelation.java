@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClsRelation对象", description = "")
 public class ClsRelation extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 7084936766234447418L;
+	private static final long serialVersionUID = 2466449324668404920L;
 
 
 

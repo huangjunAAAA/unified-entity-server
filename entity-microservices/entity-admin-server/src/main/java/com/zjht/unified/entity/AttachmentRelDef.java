@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "AttachmentRelDef对象", description = "")
 public class AttachmentRelDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -7516542987000399074L;
+	private static final long serialVersionUID = -831908623237093401L;
 
 
 

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FsmCondition 领域对象", description = "")
 public class FsmConditionDO {
 
-	private static final long serialVersionUID = -3180359306784359517L;
+	private static final long serialVersionUID = 2685322384741883098L;
 
 
 	/**

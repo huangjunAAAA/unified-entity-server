@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "SentinelDef对象", description = "")
 public class SentinelDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 8276377689449713847L;
+	private static final long serialVersionUID = -3229662822912750708L;
 
 
 

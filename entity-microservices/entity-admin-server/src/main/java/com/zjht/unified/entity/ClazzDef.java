@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClazzDef对象", description = "")
 public class ClazzDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 5551431666841711124L;
+	private static final long serialVersionUID = 1228738854206113722L;
 
 
 
@@ -139,4 +139,44 @@ public class ClazzDef extends BaseCopyEntity {
 	@Column(name = "original_id")
 	@TableField(value = "original_id")  
 	private Long originalId;
+
+	 /**
+	 * 修饰符
+	 */
+	@ApiModelProperty(value = "修饰符")
+	@Column(name = "modifer")
+	@TableField(value = "modifer")  
+	private String modifer;
+
+	 /**
+	 * pv的同义属性
+	 */
+	@ApiModelProperty(value = "pv的同义属性")
+	@Column(name = "pv_attr")
+	@TableField(value = "pv_attr")  
+	private String pvAttr;
+
+	 /**
+	 * 是否可继承
+	 */
+	@ApiModelProperty(value = "是否可继承")
+	@Column(name = "modifier")
+	@TableField(value = "modifier")  
+	private String modifier;
+
+	 /**
+	 * 继承的类是否可读基类
+	 */
+	@ApiModelProperty(value = "继承的类是否可读基类")
+	@Column(name = "inherit_read")
+	@TableField(value = "inherit_read")  
+	private Integer inheritRead;
+
+	 /**
+	 * 继承的类是否可写基类
+	 */
+	@ApiModelProperty(value = "继承的类是否可写基类")
+	@Column(name = "inherit_write")
+	@TableField(value = "inherit_write")  
+	private Integer inheritWrite;
 }
