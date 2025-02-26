@@ -9,5 +9,5 @@ import com.zjht.unified.service.ctx.TaskContext;
  * var b1=InstanceUtils.get(a.guid);
  */
 public interface IScriptEngine {
-    public void exec(String script, TaskContext ctx);
+    Object exec(String script, TaskContext ctx);
 }

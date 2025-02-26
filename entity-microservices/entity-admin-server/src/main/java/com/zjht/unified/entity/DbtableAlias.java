@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "DbtableAlias对象", description = "")
 public class DbtableAlias extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 1433646863269258815L;
+	private static final long serialVersionUID = 6601151385342306659L;
 
 
 

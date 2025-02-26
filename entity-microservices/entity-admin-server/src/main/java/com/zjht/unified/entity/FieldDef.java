@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "FieldDef对象", description = "")
 public class FieldDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 2078115601243910287L;
+	private static final long serialVersionUID = 7128293767687744784L;
 
 
 

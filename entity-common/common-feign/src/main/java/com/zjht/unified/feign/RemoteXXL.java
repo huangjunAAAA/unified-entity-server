@@ -19,6 +19,7 @@ public interface RemoteXXL {
     ReturnT removeJob(@RequestParam int id);
     @PostMapping("/xxl-job-admin/jobgroup/pageList")
     ReturnMap<XxlJobGroup> listJobGroup(@RequestParam Integer start, @RequestParam Integer length, @RequestParam String appname, @RequestParam String title);
+    ReturnMap<XxlJobInfo> listJobInfo(@RequestParam int start, @RequestParam int length, @RequestParam int jobGroup, @RequestParam String executorHandler, @RequestParam String author);
     @PostMapping(value="/xxl-job-admin/jobgroup/save",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     ReturnT addJobGroup(XxlJobGroup jobGroup);
     @PostMapping("/xxl-job-admin/jobinfo/start")

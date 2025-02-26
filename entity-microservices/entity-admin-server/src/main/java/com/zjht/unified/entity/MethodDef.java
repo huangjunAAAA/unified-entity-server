@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "MethodDef对象", description = "")
 public class MethodDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -4079039569950547273L;
+	private static final long serialVersionUID = -8591917617163495431L;
 
 
 

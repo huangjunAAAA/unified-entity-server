@@ -1,9 +1,11 @@
 package com.zjht.unified.service.ctx;
 
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
+import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.ClazzDefDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
+import com.zjht.unified.domain.simple.SentinelDefDO;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -18,4 +20,6 @@ public class TaskContext {
     private Map<String,ClazzDefCompositeDO> clazzMap=new HashMap<>();
     private Map<String,ClazzDefCompositeDO> clazzGUIDMap=new HashMap<>();
     private ConcurrentHashMap<String, ClazzDefCompositeDO> rtti=new ConcurrentHashMap<>();
+    private Map<String, SentinelDefDO> sentinelMap=new HashMap<>();
+    private Map<String, FsmDefCompositeDO> fsmMap=new HashMap<>();
 }

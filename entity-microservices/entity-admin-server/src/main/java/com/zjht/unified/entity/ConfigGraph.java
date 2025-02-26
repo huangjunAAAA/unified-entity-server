@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ConfigGraph对象", description = "")
 public class ConfigGraph extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 2307810867147251892L;
+	private static final long serialVersionUID = 7346421642484362901L;
 
 
 

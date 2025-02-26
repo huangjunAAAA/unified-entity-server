@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "FsmCondition对象", description = "")
 public class FsmCondition extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -3684095909364348831L;
+	private static final long serialVersionUID = -8193668985848961437L;
 
 
 
@@ -83,4 +83,20 @@ public class FsmCondition extends BaseCopyEntity {
 	@Column(name = "original_id")
 	@TableField(value = "original_id")  
 	private Long originalId;
+
+	 /**
+	 * 当前值
+	 */
+	@ApiModelProperty(value = "当前值")
+	@Column(name = "current_state")
+	@TableField(value = "current_state")  
+	private String currentState;
+
+	 /**
+	 * 转换后的值
+	 */
+	@ApiModelProperty(value = "转换后的值")
+	@Column(name = "next_state")
+	@TableField(value = "next_state")  
+	private String nextState;
 }

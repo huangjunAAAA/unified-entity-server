@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "MethodDef 领域对象", description = "")
 public class MethodDefDO {
 
-	private static final long serialVersionUID = 902292203665726478L;
+	private static final long serialVersionUID = -3866908990258316207L;
 
 
 	/**

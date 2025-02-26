@@ -23,8 +23,8 @@ public class RtContextService {
 
 
 
-    public TaskContext getRunningContext(String versionId){
-        Optional<TaskContext> find = getAllRunningContext().stream().filter(ctx -> ctx.getVer().equals(versionId)).findFirst();
+    public TaskContext getRunningContext(String ver){
+        Optional<TaskContext> find = getAllRunningContext().stream().filter(ctx -> ctx.getVer().equals(ver)).findFirst();
         if(find.isPresent())
             return find.get();
         return null;
@@ -36,9 +36,10 @@ public class RtContextService {
             return null;
 
         TaskContext running=new TaskContext();
+        if(ver==null){
+            ver=task.getUePrj().getGuid()+":"+System.currentTimeMillis();
+        }
         running.setVer(ver);
-
-        // TODO
 
         return running;
     }

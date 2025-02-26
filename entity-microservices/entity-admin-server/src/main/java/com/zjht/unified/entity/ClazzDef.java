@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClazzDef对象", description = "")
 public class ClazzDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 1228738854206113722L;
+	private static final long serialVersionUID = 6379718539817352989L;
 
 
 

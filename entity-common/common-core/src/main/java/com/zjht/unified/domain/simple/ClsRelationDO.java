@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "ClsRelation 领域对象", description = "")
 public class ClsRelationDO {
 
-	private static final long serialVersionUID = 1662434818347874465L;
+	private static final long serialVersionUID = -2844021428159274870L;
 
 
 	/**

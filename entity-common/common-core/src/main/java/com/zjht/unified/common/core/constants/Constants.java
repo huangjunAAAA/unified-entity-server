@@ -139,6 +139,7 @@ public class Constants {
     public static int FIELD_TYPE_TREE_NODE=5;
     public static int FIELD_TYPE_CLS_REL=6;
 
-
-
+    // 状态机驱动方式
+    public static int FSM_TIMER=2;
+    public static int FSM_WATCHER=1;
 }

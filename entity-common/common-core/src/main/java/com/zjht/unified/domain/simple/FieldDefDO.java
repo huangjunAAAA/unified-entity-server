@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FieldDef 领域对象", description = "")
 public class FieldDefDO {
 
-	private static final long serialVersionUID = -221396873305752334L;
+	private static final long serialVersionUID = -3457092972132026021L;
 
 
 	/**
@@ -64,11 +64,6 @@ public class FieldDefDO {
 	 */
 	@ApiModelProperty(value = "映射的字段名")
 	private String tblCol;
-	 /**
-	 * pv的同义属性
-	 */
-	@ApiModelProperty(value = "pv的同义属性")
-	private String pvAttr;
 	 /**
 	 * 显示名称
 	 */
