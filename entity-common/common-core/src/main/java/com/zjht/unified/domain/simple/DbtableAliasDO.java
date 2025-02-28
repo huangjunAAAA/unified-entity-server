@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "DbtableAlias 领域对象", description = "")
 public class DbtableAliasDO {
 
-	private static final long serialVersionUID = 5012146429925250373L;
+	private static final long serialVersionUID = 4220841635697643176L;
 
 
 	/**
@@ -44,4 +44,9 @@ public class DbtableAliasDO {
 	 */
 	@ApiModelProperty(value = "项目ID")
 	private Long prjId;
+	 /**
+	 * guid
+	 */
+	@ApiModelProperty(value = "guid")
+	private String guid;
 }

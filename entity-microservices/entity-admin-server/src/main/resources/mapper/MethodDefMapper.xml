@@ -19,5 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="original_id" property="originalId"/>
         <result column="desc" property="desc"/>
         <result column="display_name" property="displayName"/>
+        <result column="guid" property="guid"/>
+        <result column="clazz_guid" property="clazzGuid"/>
     </resultMap>
 </mapper>

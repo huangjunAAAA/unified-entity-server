@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "InstancesData 领域对象", description = "")
 public class InstancesDataDO {
 
-	private static final long serialVersionUID = -7333626927726907812L;
+	private static final long serialVersionUID = 1889186794754122063L;
 
 
 	/**

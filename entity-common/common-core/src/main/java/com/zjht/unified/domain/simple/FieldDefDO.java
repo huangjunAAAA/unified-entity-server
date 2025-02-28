@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FieldDef 领域对象", description = "")
 public class FieldDefDO {
 
-	private static final long serialVersionUID = 4855160455620781474L;
+	private static final long serialVersionUID = 3639167290021759642L;
 
 
 	/**
@@ -84,4 +84,14 @@ public class FieldDefDO {
 	 */
 	@ApiModelProperty(value = "是否锁定默认值")
 	private String defaultLock;
+	 /**
+	 * 类关系的guid
+	 */
+	@ApiModelProperty(value = "类关系的guid")
+	private String clsRelGuid;
+	 /**
+	 * 类的GUID
+	 */
+	@ApiModelProperty(value = "类的GUID")
+	private String classGuid;
 }

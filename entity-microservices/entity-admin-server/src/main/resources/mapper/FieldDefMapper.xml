@@ -23,5 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="cachable" property="cachable"/>
         <result column="cls_rel_id" property="clsRelId"/>
         <result column="default_lock" property="defaultLock"/>
+        <result column="cls_rel_guid" property="clsRelGuid"/>
+        <result column="class_guid" property="classGuid"/>
     </resultMap>
 </mapper>

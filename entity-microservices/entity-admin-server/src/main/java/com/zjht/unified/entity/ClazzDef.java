@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClazzDef对象", description = "")
 public class ClazzDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 3614817310798439569L;
+	private static final long serialVersionUID = -5419749685275313669L;
 
 
 
@@ -179,4 +179,12 @@ public class ClazzDef extends BaseCopyEntity {
 	@Column(name = "inherit_write")
 	@TableField(value = "inherit_write")  
 	private Integer inheritWrite;
+
+	 /**
+	 * 构建函数脚本
+	 */
+	@ApiModelProperty(value = "构建函数脚本")
+	@Column(name = "constructor")
+	@TableField(value = "constructor")  
+	private String constructor;
 }
