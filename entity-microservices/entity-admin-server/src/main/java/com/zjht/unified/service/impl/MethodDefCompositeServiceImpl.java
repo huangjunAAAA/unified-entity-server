@@ -40,6 +40,10 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
 
     @Autowired
     private IMethodDefService methodDefService;
+    @Autowired
+    private IMethodParamCompositeService methodParamCompositeService;
+  	@Autowired
+    private IMethodParamService methodParamService;
   
     public Long submit(MethodDefCompositeDTO entity) {
         if(entity==null)
@@ -52,6 +56,27 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
             MethodDef newestEntity= methodDefService.getById(entity.getId());
             BeanUtils.copyProperties(newestEntity,entity);
         }
+        MethodDefCompositeDTO oldEntity = selectById(entity.getId());
+        {
+            ListExtractionUtils<MethodParamCompositeDTO, Long> methodParamUtils = new ListExtractionUtils<>();
+            List<MethodParamCompositeDTO> newList = methodParamUtils.extractNew(entity.getMethodIdMethodParamList(), oldEntity ==
+            null ? null : oldEntity.getMethodIdMethodParamList(), MethodParamCompositeDTO::getId);
+            List<MethodParamCompositeDTO> updateList = methodParamUtils.extractUpdate(entity.getMethodIdMethodParamList(), oldEntity ==
+            null ? null : oldEntity.getMethodIdMethodParamList(), MethodParamCompositeDTO::getId);
+            List<Long> delList = methodParamUtils.extractDel(entity.getMethodIdMethodParamList(), oldEntity ==
+            null ? null : oldEntity.getMethodIdMethodParamList(), MethodParamCompositeDTO::getId);
+            if (CollectionUtils.isNotEmpty(delList)) {
+                methodParamCompositeService.batchRemove(delList);
+            }
+            if (CollectionUtils.isNotEmpty(newList)) {
+                newList.stream().forEach(t->{t.setMethodId(entity.getId());});
+                methodParamCompositeService.batchSubmit(newList);
+            }
+            if (CollectionUtils.isNotEmpty(updateList)) {
+                updateList.stream().forEach(t->{t.setMethodId(entity.getId());});
+                methodParamCompositeService.batchSubmit(updateList);
+            }
+        }
         boolean updateRequired=false;
         if(MethodDefCompositeValidate.validateOnFlush(entity)||updateRequired)
           methodDefService.updateById(entity);
@@ -61,6 +86,10 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
     public void removeById(Long id) {
         MethodDefCompositeDTO oldEntity = selectById(id);
         if(oldEntity!=null){
+            if(CollectionUtils.isNotEmpty(oldEntity.getMethodIdMethodParamList())){
+                List<Long> methodParamIdList = oldEntity.getMethodIdMethodParamList().stream().map(t -> t.getId()).collect(Collectors.toList());
+                methodParamCompositeService.batchRemove(methodParamIdList);
+            }
         }
       methodDefService.removeById(id);
     }
@@ -85,6 +114,9 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
           return null;
         MethodDefCompositeDTO methodDefDTO=new MethodDefCompositeDTO();
         BeanUtils.copyProperties(methodDef,methodDefDTO);
+        MethodParamCompositeDTO methodParamParam = new MethodParamCompositeDTO();
+        methodParamParam.setMethodId(id);
+        methodDefDTO.setMethodIdMethodParamList(methodParamCompositeService.selectList(methodParamParam));
         return methodDefDTO;
     }
 
@@ -116,6 +148,14 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
         entity.setOriginalId(entity.getId());
       	entity.setId(null);
         methodDefService.save(entity);
+        {
+            List<MethodParamCompositeDTO> methodParamList=entity.getMethodIdMethodParamList().stream().map(t->methodParamCompositeService.deepCopyById(t.getId())).collect(Collectors.toList());
+            methodParamList.stream().forEach(t->{
+              t.setMethodId(entity.getId());
+              methodParamService.updateById(t);
+            });
+            entity.setMethodIdMethodParamList(methodParamList);
+        }
         if(MethodDefCompositeValidate.validateOnCopy(entity))
           methodDefService.updateById(entity);
         return entity;

@@ -13,7 +13,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="clazz_id" property="clazzId"/>
         <result column="prj_id" property="prjId"/>
         <result column="tbl_col" property="tblCol"/>
-        <result column="pv_attr" property="pvAttr"/>
         <result column="display_name" property="displayName"/>
         <result column="status" property="status"/>
         <result column="create_time" property="createTime"/>
@@ -22,5 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_user" property="updateUser"/>
         <result column="original_id" property="originalId"/>
         <result column="cachable" property="cachable"/>
+        <result column="cls_rel_id" property="clsRelId"/>
+        <result column="default_lock" property="defaultLock"/>
     </resultMap>
 </mapper>

@@ -23,6 +23,9 @@ import java.util.function.Function;
 public class MethodDefCompositeWrapper{
     public void visitComposite(MethodDefCompositeDTO methodDef, Consumer<BaseEntity> visitor){
         visitor.accept(methodDef);
+      	if(CollectionUtils.isNotEmpty(methodDef.getMethodIdMethodParamList())){
+            methodDef.getMethodIdMethodParamList().stream().forEach(t -> MethodParamCompositeWrapper.build().visitComposite(t,visitor));
+        }
     }
 
     public static MethodDefCompositeWrapper build() {
@@ -32,6 +35,11 @@ public class MethodDefCompositeWrapper{
     public MethodDefCompositeVO entityVO(MethodDefCompositeDTO methodDef){
         MethodDefWrapper wrapper=MethodDefWrapper.build();
         MethodDefCompositeVO vo= (MethodDefCompositeVO)BeanCopyUtils.shallowCopy(wrapper.entityVO(methodDef),new MethodDefCompositeVO(),null);
+      	if(CollectionUtils.isNotEmpty(methodDef.getMethodIdMethodParamList())){
+      	    vo.setMethodIdMethodParamList(methodDef.getMethodIdMethodParamList().stream()
+                    .map(t -> MethodParamCompositeWrapper.build().entityVO(t))
+                    .collect(Collectors.toList()));
+      	}
 
         return vo;
     }

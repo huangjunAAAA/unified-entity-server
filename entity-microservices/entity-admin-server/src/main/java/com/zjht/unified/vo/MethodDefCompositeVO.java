@@ -10,4 +10,5 @@ import java.util.List;
 @Data
 @ApiModel(value = "VO", description = "",parent = MethodDef.class)
 public class MethodDefCompositeVO extends MethodDefVo{
+  private List<MethodParamCompositeVO> methodIdMethodParamList;
 }

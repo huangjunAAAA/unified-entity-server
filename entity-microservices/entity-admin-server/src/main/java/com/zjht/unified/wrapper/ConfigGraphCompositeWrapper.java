@@ -25,6 +25,8 @@ public class ConfigGraphCompositeWrapper{
         visitor.accept(configGraph);
       	if(configGraph.getNodeIdClazzDefComposite()!=null)
             visitor.accept(configGraph.getNodeIdClazzDefComposite());
+      	if(configGraph.getParentIdConfigGraphComposite()!=null)
+            visitor.accept(configGraph.getParentIdConfigGraphComposite());
       	if(configGraph.getNodeIdFsmDefComposite()!=null)
             visitor.accept(configGraph.getNodeIdFsmDefComposite());
       	if(configGraph.getNodeIdSentinelDefComposite()!=null)
@@ -42,6 +44,8 @@ public class ConfigGraphCompositeWrapper{
         ConfigGraphCompositeVO vo= (ConfigGraphCompositeVO)BeanCopyUtils.shallowCopy(wrapper.entityVO(configGraph),new ConfigGraphCompositeVO(),null);
       	if(configGraph.getNodeIdClazzDefComposite()!=null)
            vo.setNodeIdClazzDefComposite(ClazzDefCompositeWrapper.build().entityVO(configGraph.getNodeIdClazzDefComposite()));
+      	if(configGraph.getParentIdConfigGraphComposite()!=null)
+           vo.setParentIdConfigGraphComposite(ConfigGraphCompositeWrapper.build().entityVO(configGraph.getParentIdConfigGraphComposite()));
       	if(configGraph.getNodeIdFsmDefComposite()!=null)
            vo.setNodeIdFsmDefComposite(FsmDefCompositeWrapper.build().entityVO(configGraph.getNodeIdFsmDefComposite()));
       	if(configGraph.getNodeIdSentinelDefComposite()!=null)

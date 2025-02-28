@@ -44,6 +44,8 @@ public class ConfigGraphCompositeServiceImpl implements IConfigGraphCompositeSer
     @Autowired
     private IClazzDefCompositeService  clazzDefCompositeService;
     @Autowired
+    private IConfigGraphCompositeService  configGraphCompositeService;
+    @Autowired
     private IFsmDefCompositeService  fsmDefCompositeService;
     @Autowired
     private ISentinelDefCompositeService  sentinelDefCompositeService;
@@ -68,6 +70,13 @@ public class ConfigGraphCompositeServiceImpl implements IConfigGraphCompositeSer
            entity.setNodeId(entity.getNodeIdClazzDefComposite().getId());
            updateRequired=true;
            entity.setNodeType(ConfigGraphCompositeDTO.NODEID_NODETYPE_CLAZZDEF_SK);
+        }
+        if(entity.getParentIdConfigGraphComposite()!=null){
+            if(entity.getParentId()!=null)
+                entity.getParentIdConfigGraphComposite().setId(entity.getParentId());
+            configGraphCompositeService.submit(entity.getParentIdConfigGraphComposite());
+           entity.setParentId(entity.getParentIdConfigGraphComposite().getId());
+           updateRequired=true;
         }
         if(entity.getNodeIdFsmDefComposite()!=null){
             if(entity.getNodeId()!=null)
@@ -103,6 +112,8 @@ public class ConfigGraphCompositeServiceImpl implements IConfigGraphCompositeSer
         if(oldEntity!=null){
             if(oldEntity.getNodeIdClazzDefComposite()!=null)
                 clazzDefCompositeService.removeById(oldEntity.getNodeIdClazzDefComposite().getId());
+            if(oldEntity.getParentIdConfigGraphComposite()!=null)
+                configGraphCompositeService.removeById(oldEntity.getParentIdConfigGraphComposite().getId());
             if(oldEntity.getNodeIdFsmDefComposite()!=null)
                 fsmDefCompositeService.removeById(oldEntity.getNodeIdFsmDefComposite().getId());
             if(oldEntity.getNodeIdSentinelDefComposite()!=null)
@@ -135,6 +146,7 @@ public class ConfigGraphCompositeServiceImpl implements IConfigGraphCompositeSer
         BeanUtils.copyProperties(configGraph,configGraphDTO);
         if ( configGraph.getNodeType().equals(ConfigGraphCompositeDTO.NODEID_NODETYPE_CLAZZDEF_SK ))
         configGraphDTO.setNodeIdClazzDefComposite(clazzDefCompositeService.selectById(configGraph.getNodeId()));
+        configGraphDTO.setParentIdConfigGraphComposite(configGraphCompositeService.selectById(configGraph.getParentId()));
         if ( configGraph.getNodeType().equals(ConfigGraphCompositeDTO.NODEID_NODETYPE_FSMDEF_SK ))
         configGraphDTO.setNodeIdFsmDefComposite(fsmDefCompositeService.selectById(configGraph.getNodeId()));
         if ( configGraph.getNodeType().equals(ConfigGraphCompositeDTO.NODEID_NODETYPE_SENTINELDEF_SK ))
@@ -175,6 +187,10 @@ public class ConfigGraphCompositeServiceImpl implements IConfigGraphCompositeSer
       if(entity.getNodeIdClazzDefComposite()!=null)	{
         entity.setNodeIdClazzDefComposite(clazzDefCompositeService.deepCopy(entity.getNodeIdClazzDefComposite()));
         entity.setNodeId(entity.getNodeIdClazzDefComposite().getId());      
+      }
+      if(entity.getParentIdConfigGraphComposite()!=null)	{
+        entity.setParentIdConfigGraphComposite(configGraphCompositeService.deepCopy(entity.getParentIdConfigGraphComposite()));
+        entity.setParentId(entity.getParentIdConfigGraphComposite().getId());      
       }
       if(entity.getNodeIdFsmDefComposite()!=null)	{
         entity.setNodeIdFsmDefComposite(fsmDefCompositeService.deepCopy(entity.getNodeIdFsmDefComposite()));

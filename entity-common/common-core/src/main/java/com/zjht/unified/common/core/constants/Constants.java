@@ -32,6 +32,8 @@ public class Constants {
 
     public static final String JOB_DATA_KEY = "job_id";
 
+    public static final String DORIS_ID_PREFIX="DORIS:ID:";
+
     /**
      * 失败标记
      */

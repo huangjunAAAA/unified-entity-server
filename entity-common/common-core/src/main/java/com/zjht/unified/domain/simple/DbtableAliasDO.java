@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "DbtableAlias 领域对象", description = "")
 public class DbtableAliasDO {
 
-	private static final long serialVersionUID = -727189499873970914L;
+	private static final long serialVersionUID = 5012146429925250373L;
 
 
 	/**

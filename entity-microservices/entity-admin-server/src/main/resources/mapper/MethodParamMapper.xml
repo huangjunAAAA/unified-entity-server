@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjht.unified.mapper.MethodParamMapper">
+    
+		<resultMap id="methodParamResultMap" type="com.zjht.unified.entity.MethodParam">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="default_val" property="defaultVal"/>
+        <result column="sort" property="sort"/>
+        <result column="desc" property="desc"/>
+        <result column="method_id" property="methodId"/>
+        <result column="status" property="status"/>
+        <result column="prj_id" property="prjId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="original_id" property="originalId"/>
+    </resultMap>
+</mapper>

@@ -12,6 +12,7 @@ public class ConfigGraphCompositeDTO extends ConfigGraph {
   private Long originalId;
   private ClazzDefCompositeDTO nodeIdClazzDefComposite;
   public static final String NODEID_NODETYPE_CLAZZDEF_SK="sk-clazzDef-ConfigGraph-NODEID-nodeType";
+  private ConfigGraphCompositeDTO parentIdConfigGraphComposite;
   private FsmDefCompositeDTO nodeIdFsmDefComposite;
   public static final String NODEID_NODETYPE_FSMDEF_SK="sk-fsmDef-ConfigGraph-NODEID-nodeType";
   private SentinelDefCompositeDTO nodeIdSentinelDefComposite;

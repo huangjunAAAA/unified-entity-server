@@ -10,4 +10,5 @@ import lombok.Data;
 @ApiModel(value = "DTO", description = "",parent = MethodDef.class)
 public class MethodDefCompositeDTO extends MethodDef {
   private Long originalId;
+  private List<MethodParamCompositeDTO> methodIdMethodParamList;
 }

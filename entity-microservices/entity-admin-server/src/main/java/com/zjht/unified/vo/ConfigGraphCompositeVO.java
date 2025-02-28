@@ -11,6 +11,7 @@ import java.util.List;
 @ApiModel(value = "VO", description = "",parent = ConfigGraph.class)
 public class ConfigGraphCompositeVO extends ConfigGraphVo{
   private ClazzDefCompositeVO nodeIdClazzDefComposite;
+  private ConfigGraphCompositeVO parentIdConfigGraphComposite;
   private FsmDefCompositeVO nodeIdFsmDefComposite;
   private SentinelDefCompositeVO nodeIdSentinelDefComposite;
   private ViewDefCompositeVO nodeIdViewDefComposite;

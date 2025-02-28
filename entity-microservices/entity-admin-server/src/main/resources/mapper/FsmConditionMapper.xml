@@ -16,5 +16,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_time" property="updateTime"/>
         <result column="update_user" property="updateUser"/>
         <result column="original_id" property="originalId"/>
+        <result column="current_state" property="currentState"/>
+        <result column="next_state" property="nextState"/>
     </resultMap>
 </mapper>

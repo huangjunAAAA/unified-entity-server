@@ -11,5 +11,5 @@ import lombok.Data;
 public class ClazzDefCompositeDO extends ClazzDefDO {
   private Long originalId;
   private List<FieldDefCompositeDO> clazzIdFieldDefList;
-  private List<MethodDefDO> clazzIdMethodDefList;
+  private List<MethodDefCompositeDO> clazzIdMethodDefList;
 }
