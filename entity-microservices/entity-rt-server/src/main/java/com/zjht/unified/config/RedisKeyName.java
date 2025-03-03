@@ -50,4 +50,8 @@ public class RedisKeyName {
     public static String getObjectKey(String guid,String ver){
         return ver+":"+guid;
     }
+
+    public static String getObjectRtKey(String guid,String ver){
+        return ver+":rt:"+guid;
+    }
 }

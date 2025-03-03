@@ -6,8 +6,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.InstanceFieldDO;
-import com.zjht.unified.domain.simple.InstancesDataDO;
-import com.zjht.unified.utils.JsonUtilExt;
+import com.zjht.unified.domain.runtime.UnifiedObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -30,12 +28,29 @@ public class RtRedisObjectStorageService {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    public void setObject(TaskContext ctx, UnifiedObject uo){
+        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),uo.getGuid());
+        redisTemplate.opsForValue().setIfAbsent(key,uo);
+    }
 
+    public UnifiedObject getObject(TaskContext ctx, String guid){
+        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),guid);
+        return (UnifiedObject) redisTemplate.opsForValue().get(key);
+    }
 
     public void setObjectAttrValue(TaskContext ctx, String guid, String attrName, Object val, boolean dispatch){
         log.info("set attr:"+guid+"."+attrName+"=>["+val+"]");
         String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
         redisTemplate.opsForHash().put(key,attrName,val);
+        if(val instanceof  UnifiedObject){
+            setObject(ctx, (UnifiedObject) val);
+        }
+    }
+
+    public void delObjectAttr(TaskContext ctx,String guid,String attrName){
+        log.info("delete attr:"+guid+"."+attrName);
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+        redisTemplate.opsForHash().delete(key,attrName);
     }
 
     public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName){
@@ -85,7 +100,7 @@ public class RtRedisObjectStorageService {
 
     public void initializeInstances(TaskContext ctx, PrjSpecDO spec){
         spec.getInstanceList().forEach(inst->{
-            ctx.getRtti().put(inst.getGuid(),ctx.getClazzGUIDMap().get(inst.getClassGuid()));
+            setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid()));
             if(StringUtils.isNotBlank(inst.getAttrValue())){
                 List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
                 fdlst.forEach(fd->{

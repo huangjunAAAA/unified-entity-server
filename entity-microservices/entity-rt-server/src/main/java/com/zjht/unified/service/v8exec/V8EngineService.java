@@ -7,7 +7,9 @@ import com.caoccao.javet.interop.engine.IJavetEngine;
 import com.caoccao.javet.interop.engine.IJavetEnginePool;
 import com.caoccao.javet.interop.engine.JavetEnginePool;
 import com.caoccao.javet.values.reference.V8ValueObject;
+import com.wukong.core.util.ThreadLocalUtil;
 import com.zjht.unified.common.core.util.SpringUtils;
+import com.zjht.unified.common.core.util.UUID;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.composite.MethodDefCompositeDO;
@@ -19,6 +21,7 @@ import groovy.util.logging.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
 
 
@@ -31,83 +34,14 @@ import java.util.HashMap;
 public class V8EngineService implements IScriptEngine {
 
     private static final Logger log = LoggerFactory.getLogger(V8EngineService.class);
-    @Autowired
-    private RtRedisObjectStorageService rtRedisObjectStorageService;
-
 
     private static final IJavetEnginePool<V8Runtime> javetEnginePool = new JavetEnginePool<>();
 
-    public void executeSimpleScript(String script) {
-        try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
-            V8Runtime v8Runtime = javetEngine.getV8Runtime();
-            JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
-            consoleInterceptor.register(v8Runtime.getGlobalObject());
-            v8Runtime.getExecutor(script).executeVoid();
-            consoleInterceptor.unregister(v8Runtime.getGlobalObject());
-            v8Runtime.lowMemoryNotification();
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
-    }
-
-    public Boolean executeScriptContext(String script, TaskContext taskContext) {
-        try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
-            V8Runtime v8Runtime = javetEngine.getV8Runtime();
-            v8Runtime.setConverter(new JavetProxyConverter());
-            JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
-            consoleInterceptor.register(v8Runtime.getGlobalObject());
-
-            ClassUtils classUtils = new ClassUtils(v8Runtime, taskContext);
-            classUtils.setRedisService(rtRedisObjectStorageService);
-            try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
-                v8Runtime.getGlobalObject().set("ClassUtils", v8ValueObject);
-                v8ValueObject.bind(classUtils);
-            }
-
-            v8Runtime.getExecutor(script).executeVoid();
-
-            consoleInterceptor.unregister(v8Runtime.getGlobalObject());
-            v8Runtime.lowMemoryNotification();
-            return true;
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-            return false;
-        }
-    }
-
-    public Object executeScriptReturn(String script, TaskContext taskContext) {
-        try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
-            V8Runtime v8Runtime = javetEngine.getV8Runtime();
-            v8Runtime.setConverter(new JavetProxyConverter());
-            JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
-            consoleInterceptor.register(v8Runtime.getGlobalObject());
-
-//            ClassUtils classUtils = new ClassUtils(v8Runtime, taskContext);
-//            classUtils.setRedisService(rtRedisObjectStorageService);
-//            try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
-//                v8Runtime.getGlobalObject().set("ClassUtils", v8ValueObject);
-//                v8ValueObject.bind(classUtils);
-//            }
-
-            Object o = v8Runtime.getExecutor(script).executeObject();
-
-            consoleInterceptor.unregister(v8Runtime.getGlobalObject());
-            v8Runtime.lowMemoryNotification();
-            return o;
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-            return null;
-        }
-    }
-
     public void test2() {
-        Object o = executeScriptReturn(" 1+2", new TaskContext());
+        Object o = exec(" 1+2", new TaskContext());
         System.out.println("o = " + o);
 
     }
-
-
-
 
 
     public void test() {
@@ -137,6 +71,7 @@ public class V8EngineService implements IScriptEngine {
          */
         ClazzDefCompositeDO clazzDefCompositeDO = new ClazzDefCompositeDO();
         clazzDefCompositeDO.setName("ClassA");
+        clazzDefCompositeDO.setGuid(UUID.fastUUID().toString());
 
 
 
@@ -156,7 +91,7 @@ public class V8EngineService implements IScriptEngine {
 
         taskContext.setClazzMap(clazzMap);
 
-        SpringUtils.getBean(V8EngineService.class).executeScriptContext(
+        SpringUtils.getBean(V8EngineService.class).exec(
 //                "console.log(1+1);" +
 //                        " var a=ClassUtils.new('ClassA'); "+
 //                        "console.log(a.name); "
@@ -164,13 +99,73 @@ public class V8EngineService implements IScriptEngine {
                         "var b  = ClassUtils.new(\"ClassA\")\n;" +
                         "a.f1 = b ;\n" +
                         "b.f2 = 3;\n" +
-                        "console.log(a.f1.f2) "
+                        "console.log(\"111111111111111111111111\");\n"+
+                        "console.log(\"\"+a.f1.f2);"
                 , taskContext);
 
     }
 
     @Override
     public Object exec(String script, TaskContext ctx) {
-        return executeScriptContext(script, ctx);
+        try {
+            V8Runtime v8Runtime = getRuntime(ctx);
+            Object o = v8Runtime.getExecutor(script).executeObject();
+            clearThreadRuntime();
+            return o;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return null;
+    }
+
+    public static V8Runtime getRuntime(TaskContext taskContext){
+        V8Runtime rt = ThreadLocalUtil.get("V8Runtime");
+        if(rt==null) {
+            try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
+                V8Runtime v8Runtime = javetEngine.getV8Runtime();
+                JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
+                consoleInterceptor.register(v8Runtime.getGlobalObject());
+                registerUtils(v8Runtime,taskContext);
+                ThreadLocalUtil.put("V8Runtime", v8Runtime);
+                ThreadLocalUtil.put("console", consoleInterceptor);
+                return v8Runtime;
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            return null;
+        }else{
+            return rt;
+        }
+    }
+
+    public static void clearThreadRuntime(){
+        V8Runtime rt = ThreadLocalUtil.get("V8Runtime");
+        if(rt==null)
+            return;
+        JavetStandardConsoleInterceptor console=ThreadLocalUtil.get("console");
+        if(console==null)
+            return;
+        ThreadLocalUtil.clear();
+        try{
+            console.unregister(rt.getGlobalObject());
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+    }
+
+    private static void registerUtils(V8Runtime v8Runtime,TaskContext taskContext) throws Exception{
+        ClassUtils classUtils = new ClassUtils(taskContext);
+        AutowireCapableBeanFactory autowireCapableBeanFactory=SpringUtils.getApplicationContext().getAutowireCapableBeanFactory();
+        autowireCapableBeanFactory.autowireBean(classUtils);
+        try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
+            v8Runtime.getGlobalObject().set("ClassUtils", v8ValueObject);
+            v8ValueObject.bind(classUtils);
+        }
+
+        InstanceUtils instanceUtils=new InstanceUtils(taskContext);
+        try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
+            v8Runtime.getGlobalObject().set("InstanceUtils", v8ValueObject);
+            v8ValueObject.bind(instanceUtils);
+        }
     }
 }
