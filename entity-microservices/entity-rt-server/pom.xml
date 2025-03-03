@@ -72,6 +72,14 @@
             <artifactId>system-client</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zjht.unified.data</groupId>
+            <artifactId>google-v8</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+
+
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
