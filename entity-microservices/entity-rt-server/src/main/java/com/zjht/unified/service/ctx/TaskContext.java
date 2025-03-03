@@ -6,6 +6,7 @@ import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.ClazzDefDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
+import com.zjht.unified.service.v8exec.ProxyObject;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -22,4 +23,5 @@ public class TaskContext {
     private ConcurrentHashMap<String, ClazzDefCompositeDO> rtti=new ConcurrentHashMap<>();
     private Map<String, SentinelDefDO> sentinelMap=new HashMap<>();
     private Map<String, FsmDefCompositeDO> fsmMap=new HashMap<>();
+    private Map<String, ProxyObject> pobjMap = new HashMap<>();
 }
