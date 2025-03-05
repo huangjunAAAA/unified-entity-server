@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "SentinelData 领域对象", description = "")
 public class SentinelDataDO {
 
-	private static final long serialVersionUID = 3397904633011694548L;
+	private static final long serialVersionUID = 2591473454525304914L;
 
 
 	/**

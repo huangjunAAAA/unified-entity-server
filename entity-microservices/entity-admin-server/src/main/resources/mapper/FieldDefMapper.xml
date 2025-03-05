@@ -25,5 +25,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="default_lock" property="defaultLock"/>
         <result column="cls_rel_guid" property="clsRelGuid"/>
         <result column="class_guid" property="classGuid"/>
+        <result column="guid" property="guid"/>
     </resultMap>
 </mapper>

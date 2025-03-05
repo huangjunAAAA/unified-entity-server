@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClsRelation对象", description = "")
 public class ClsRelation extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -5613090311821669866L;
+	private static final long serialVersionUID = -8039087389555827015L;
 
 
 
@@ -43,22 +43,6 @@ public class ClsRelation extends BaseCopyEntity {
 	@TableId(value = "id", type = IdType.AUTO)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	 /**
-	 * 
-	 */
-	@ApiModelProperty(value = "")
-	@Column(name = "field_id_from")
-	@TableField(value = "field_id_from")  
-	private Long fieldIdFrom;
-
-	 /**
-	 * 
-	 */
-	@ApiModelProperty(value = "")
-	@Column(name = "field_id_to")
-	@TableField(value = "field_id_to")  
-	private Long fieldIdTo;
 
 	 /**
 	 * 1 一对一 2 1对多 3 多对1 4 多对多
@@ -115,4 +99,28 @@ public class ClsRelation extends BaseCopyEntity {
 	@Column(name = "script")
 	@TableField(value = "script")  
 	private String script;
+
+	 /**
+	 * 字段的GUID，来自方向
+	 */
+	@ApiModelProperty(value = "字段的GUID，来自方向")
+	@Column(name = "field_id_from")
+	@TableField(value = "field_id_from")  
+	private String fieldIdFrom;
+
+	 /**
+	 * 字段的GUID，去方向
+	 */
+	@ApiModelProperty(value = "字段的GUID，去方向")
+	@Column(name = "field_id_to")
+	@TableField(value = "field_id_to")  
+	private String fieldIdTo;
+
+	 /**
+	 * 关系的GUID
+	 */
+	@ApiModelProperty(value = "关系的GUID")
+	@Column(name = "guid")
+	@TableField(value = "guid")  
+	private String guid;
 }
