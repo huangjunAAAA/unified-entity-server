@@ -45,6 +45,9 @@ public class RtRedisObjectStorageService {
         if(val instanceof  UnifiedObject){
             setObject(ctx, (UnifiedObject) val);
         }
+        if (dispatch) {
+
+        }
     }
 
     public void delObjectAttr(TaskContext ctx,String guid,String attrName){
@@ -100,7 +103,7 @@ public class RtRedisObjectStorageService {
 
     public void initializeInstances(TaskContext ctx, PrjSpecDO spec){
         spec.getInstanceList().forEach(inst->{
-            setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid()));
+            setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true));
             if(StringUtils.isNotBlank(inst.getAttrValue())){
                 List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
                 fdlst.forEach(fd->{

@@ -1,5 +1,8 @@
 package com.zjht.unified.service.v8exec;
 
+import com.wukong.bigdata.storage.gather.client.GatherClient;
+import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
@@ -16,7 +19,16 @@ public class V8RttiService {
     @Autowired
     private RtRedisObjectStorageService redisObjectStorageService;
 
-    public ProxyObject createNewObject(ClazzDefCompositeDO classDef, TaskContext taskContext){
+    @Autowired
+    private GatherClient gather;
+
+
+    public void test() {
+        gather.addRecordAsString(KafkaNames.DRIVER_RAWDATA_TO_STORE,false,"key","table","你好",System.currentTimeMillis());
+    }
+
+
+    public ProxyObject createNewObject(ClazzDefCompositeDO classDef, TaskContext taskContext, Boolean isPersist){
         String guid = UUID.randomUUID().toString();
         ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid());
 
@@ -26,7 +38,14 @@ public class V8RttiService {
             redisObjectStorageService.setObjectAttrValue(taskContext, guid, fieldDefCompositeDO.getName(), fieldDefCompositeDO.getInitValue(), false);
         }
 
-        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid()));
+        if (isPersist) {
+//            gather.addRecordAsString();
+            EntityStoreMessageDO entityStoreMessageDO = new EntityStoreMessageDO();
+            gather.addRecordAsString(KafkaNames.DRIVER_RAWDATA_TO_STORE,false,"key","table",entityStoreMessageDO,System.currentTimeMillis());
+
+        }
+
+        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(),isPersist));
         return proxyObject;
     }
 

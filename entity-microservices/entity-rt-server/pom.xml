@@ -78,6 +78,11 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.wukong</groupId>
+            <artifactId>lib-bigdata-gather-client</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
 
 
     </dependencies>

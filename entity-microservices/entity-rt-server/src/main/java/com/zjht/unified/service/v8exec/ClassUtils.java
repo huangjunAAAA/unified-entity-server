@@ -44,10 +44,25 @@ public class ClassUtils {
             return null;
         }
 
-        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext);
+        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);
         return new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
     }
+
+    @V8Function(name = "newPersist")
+    public V8Value newPersistInstance(String className) throws Exception {
+        ClazzDefCompositeDO classDef = taskContext.getClazzMap().get(className);
+        if (classDef == null) {
+            log.error("ClassName not found in ClazzMap:  {}",className);
+            return null;
+        }
+
+        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, true);
+        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);
+        return new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+    }
+
+
 }
 
 
