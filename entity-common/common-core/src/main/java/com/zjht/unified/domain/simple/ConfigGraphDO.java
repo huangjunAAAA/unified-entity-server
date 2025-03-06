@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "ConfigGraph 领域对象", description = "")
 public class ConfigGraphDO {
 
-	private static final long serialVersionUID = 1510767970629732197L;
+	private static final long serialVersionUID = 7800102842731245267L;
 
 
 	/**

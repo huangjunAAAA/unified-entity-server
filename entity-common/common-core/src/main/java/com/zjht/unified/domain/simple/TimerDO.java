@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "Timer 领域对象", description = "")
 public class TimerDO {
 
-	private static final long serialVersionUID = 2330400002587345274L;
+	private static final long serialVersionUID = 8269408278133000542L;
 
 
 	/**

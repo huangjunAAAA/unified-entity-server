@@ -25,8 +25,10 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.service.v8exec.model.ClsDf;
 import groovy.util.logging.Slf4j;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -127,6 +129,10 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
             return getV8Runtime().createV8ValueUndefined();
         if ("guid".equalsIgnoreCase(key))
             return convertToV8Value(guid);
+        if("cls".equalsIgnoreCase(key)){
+            ClazzDefCompositeDO cls = taskContext.getClazzGUIDMap().get(clazzGUID);
+            return V8BeanUtils.toV8Value(getV8Runtime(), ClsDf.from(cls,taskContext));
+        }
 
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         Object objectAttrValue = rtRedisObjectStorageService.getObjectAttrValue(taskContext, guid, key);

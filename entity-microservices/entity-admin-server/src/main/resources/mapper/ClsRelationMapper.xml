@@ -6,8 +6,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
 		<resultMap id="clsRelationResultMap" type="com.zjht.unified.entity.ClsRelation">
         <result column="id" property="id"/>
-        <result column="field_id_from" property="fieldIdFrom"/>
-        <result column="field_id_to" property="fieldIdTo"/>
         <result column="rel" property="rel"/>
         <result column="n2n_tbl" property="n2nTbl"/>
         <result column="n2n_from" property="n2nFrom"/>
@@ -20,5 +18,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="original_id" property="originalId"/>
         <result column="prj_id" property="prjId"/>
         <result column="script" property="script"/>
+        <result column="field_id_from" property="fieldIdFrom"/>
+        <result column="field_id_to" property="fieldIdTo"/>
+        <result column="guid" property="guid"/>
     </resultMap>
 </mapper>

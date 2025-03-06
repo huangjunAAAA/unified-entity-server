@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "InitialInstance对象", description = "")
 public class InitialInstance extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 45014708890848929L;
+	private static final long serialVersionUID = -9137989213982076610L;
 
 
 

@@ -38,7 +38,7 @@ public class V8EngineService implements IScriptEngine {
     private static final IJavetEnginePool<V8Runtime> javetEnginePool = new JavetEnginePool<>();
 
     public void test2() {
-        Object o = exec(" 1+2", new TaskContext());
+        Object o = exec(" var a=1", new TaskContext());
         System.out.println("o = " + o);
 
     }

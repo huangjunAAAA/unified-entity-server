@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UePrj对象", description = "")
 public class UePrj extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -3122797004767061133L;
+	private static final long serialVersionUID = 6026921752578752557L;
 
 
 

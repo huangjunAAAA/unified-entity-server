@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "PrjExport对象", description = "")
 public class PrjExport extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -4168819344784582150L;
+	private static final long serialVersionUID = 4875140443743774385L;
 
 
 
