@@ -2,6 +2,7 @@ package com.zjht.unified.data.storage.persist;
 
 import com.wukong.core.util.SpringUtil;
 
+import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,15 +19,14 @@ public class GeneralStoreService implements IDeviceStore,IPointStore, Applicatio
 
     private IDeviceStore deviceStore;
 
-    @Resource
 
     @Override
-    public List<Long> saveObjectPoint(StoreMessageDO val) {
+    public List<Long> saveObjectPoint(EntityStoreMessageDO val) {
         return deviceStore.saveObjectPoint(val);
     }
 
     @Override
-    public Long saveSimplePoint(StoreMessageDO val) {
+    public Long saveSimplePoint(EntityStoreMessageDO val) {
         return deviceStore.saveSimplePoint(val);
     }
 

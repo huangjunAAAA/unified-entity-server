@@ -14,7 +14,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -59,6 +61,14 @@ public class RtRedisObjectStorageService {
     public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName){
         String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
         return redisTemplate.opsForHash().get(key,attrName);
+    }
+
+    public Map<String, Object> getObjectAttrValueMap(TaskContext ctx, String guid){
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+        Map<Object, Object> kvMap = redisTemplate.opsForHash().entries(key);
+        Map<String, Object> resultMap = new HashMap<>();
+        kvMap.forEach((k, v) -> resultMap.put(String.valueOf(k), v));
+        return resultMap;
     }
 
     public String getAttrDef(TaskContext ctx, String guid, String attrName){

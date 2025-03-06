@@ -13,7 +13,9 @@ import com.zjht.unified.common.core.util.UUID;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.composite.MethodDefCompositeDO;
+import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
+import com.zjht.unified.domain.simple.UiPrjDO;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -59,6 +61,7 @@ public class V8EngineService implements IScriptEngine {
         TaskContext taskContext = new TaskContext();
         HashMap<String, MethodDefDO> objectObjectHashMap = new HashMap<>();
         HashMap<String, ClazzDefCompositeDO> clazzMap = new HashMap<>();
+        HashMap<String, ClazzDefCompositeDO> clazzgGUIDMap = new HashMap<>();
 
         /**
          * @Data
@@ -71,7 +74,9 @@ public class V8EngineService implements IScriptEngine {
          */
         ClazzDefCompositeDO clazzDefCompositeDO = new ClazzDefCompositeDO();
         clazzDefCompositeDO.setName("ClassA");
-        clazzDefCompositeDO.setGuid(UUID.fastUUID().toString());
+        clazzDefCompositeDO.setTbl("test_tbl");
+        String clsGuid = UUID.fastUUID().toString();
+        clazzDefCompositeDO.setGuid(clsGuid);
 
 
 
@@ -80,27 +85,48 @@ public class V8EngineService implements IScriptEngine {
 
         ArrayList<FieldDefCompositeDO> fileds = new ArrayList<>();
         FieldDefCompositeDO fieldDefCompositeDO = new FieldDefCompositeDO();
-        fieldDefCompositeDO.setName("a1");
-        fieldDefCompositeDO.setType("java.lang.String");
-        fieldDefCompositeDO.setInitValue("stra1");
+        fieldDefCompositeDO.setName("name");
+        fieldDefCompositeDO.setTblCol("name_col");
+        fieldDefCompositeDO.setDisplayName("姓名");
+        fieldDefCompositeDO.setType("String");
+        fieldDefCompositeDO.setInitValue("张三");
         fileds.add(fieldDefCompositeDO);
+
+
+        FieldDefCompositeDO fieldDefCompositeDO2 = new FieldDefCompositeDO();
+        fieldDefCompositeDO2.setName("age");
+        fieldDefCompositeDO2.setTblCol("age_col");
+        fieldDefCompositeDO2.setDisplayName("年龄");
+        fieldDefCompositeDO2.setType("int");
+        fieldDefCompositeDO2.setInitValue("18");
+        fileds.add(fieldDefCompositeDO2);
+
 
         clazzDefCompositeDO.setClazzIdFieldDefList(fileds);
         clazzDefCompositeDO.setClazzIdMethodDefList(methods);
         clazzMap.put("ClassA",clazzDefCompositeDO);
+        clazzgGUIDMap.put(clsGuid,clazzDefCompositeDO);
 
         taskContext.setClazzMap(clazzMap);
+        taskContext.setClazzGUIDMap(clazzgGUIDMap);
 
-        SpringUtils.getBean(V8EngineService.class).exec(
-//                "console.log(1+1);" +
-//                        " var a=ClassUtils.new('ClassA'); "+
-//                        "console.log(a.name); "
-                "var a =ClassUtils.new(\"ClassA\");\n" +
-                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
-                        "a.f1 = b ;\n" +
-                        "b.f2 = 3;\n" +
-                        "console.log(\"111111111111111111111111\");\n"+
-                        "console.log(\"\"+a.f1.f2);"
+        UiPrjDO uiPrjDO = new UiPrjDO();
+
+        uiPrjDO.setId(66L);
+
+        PrjSpecDO prjSpecDO = new PrjSpecDO();
+        prjSpecDO.setUiPrj(uiPrjDO);
+
+        taskContext.setPrjSpec(prjSpecDO);
+
+        exec(
+//                "var a =ClassUtils.new(\"ClassA\");\n" +
+//                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
+//                        "a.f1 = b ;\n" +
+//                        "b.f2 = 3;\n" +
+//                        "console.log(\"111111111111111111111111\");\n"+
+//                        "console.log(\"\"+a.f1.f2);"
+                "var a = ClassUtils.newPersist(\"ClassA\")"
                 , taskContext);
 
     }

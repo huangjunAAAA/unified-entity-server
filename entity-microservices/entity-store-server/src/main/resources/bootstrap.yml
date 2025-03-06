@@ -1,6 +1,6 @@
 spring:
   application:
-    name: collect-store-server
+    name: entity-store-server
   profiles:
     active: dev
   main:
@@ -9,10 +9,10 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 192.168.4.87:8848
+        server-addr: 192.168.4.89:8848
       config:
         # 配置中心地址
-        server-addr: 192.168.4.87:8848
+        server-addr: 192.168.4.89:8848
         # 配置文件格式
         file-extension: yaml
         # 共享配置

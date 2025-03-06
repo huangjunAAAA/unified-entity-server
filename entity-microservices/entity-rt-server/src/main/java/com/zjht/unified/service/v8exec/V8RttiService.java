@@ -1,13 +1,18 @@
 package com.zjht.unified.service.v8exec;
 
+import com.google.common.collect.Lists;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.ddl.TblCol;
+import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
+import com.zjht.unified.common.core.util.JsonUtilExt;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.utils.StoreUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +44,9 @@ public class V8RttiService {
         }
 
         if (isPersist) {
-//            gather.addRecordAsString();
-            EntityStoreMessageDO entityStoreMessageDO = new EntityStoreMessageDO();
-            gather.addRecordAsString(KafkaNames.DRIVER_RAWDATA_TO_STORE,false,"key","table",entityStoreMessageDO,System.currentTimeMillis());
-
+            Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid);
+            EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap);
+            gather.addRecordAsString(KafkaNames.DRIVER_RAWDATA_TO_STORE,false,"key","table",messageDO,System.currentTimeMillis());
         }
 
         redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(),isPersist));

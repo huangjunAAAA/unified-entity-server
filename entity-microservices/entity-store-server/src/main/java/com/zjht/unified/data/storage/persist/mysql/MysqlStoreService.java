@@ -29,18 +29,19 @@ public class MysqlStoreService extends AbstractStoreService {
     private MysqlDDLService mysqlDDLService;
 
 
-    public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId, Long driverId){
+    public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId){
         createObjectTable(data,tbl,def,indices);
         MysqlDDLUtils.setJdbcType(def,data);
 //        data.put(FieldConstants.SYSTEM_ID,ref.getSystemId());
 //        data.put(FieldConstants.DEVICE_ID,ref.getDeviceId());
 //        data.put(FieldConstants.POINT_ID,ref.getPointId());
         data.put(FieldConstants.PROJECT_ID,colpId);
-        data.put(FieldConstants.DRIVER_ID,driverId);
+//        data.put(FieldConstants.DRIVER_ID,driverId);
         String insertSQL = mysqlDDLService.insert(tbl, data, def)+";";
         String lastId="SELECT LAST_INSERT_ID();";
-        Map<String, Object> m = jdbcTemplate.queryForMap(insertSQL + lastId);
-        return Long.parseLong(m.values().iterator().next().toString());
+        jdbcTemplate.update(insertSQL);
+        Long lastInsertId = jdbcTemplate.queryForObject(lastId, Long.class);
+        return lastInsertId;
     }
 
     @Override

@@ -48,6 +48,11 @@ public class DorisStoreService extends AbstractStoreService {
     private Admin admin;
 
 
+    @Override
+    public Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices, Long colpId) {
+        return 0L;
+    }
+
     private final Map<String,Boolean> streamRoutineExistence=new HashMap<>();
 
     private static final Map<String, String> timeFmt=new HashMap<>();
