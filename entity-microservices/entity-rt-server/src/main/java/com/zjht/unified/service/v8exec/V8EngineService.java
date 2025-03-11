@@ -109,6 +109,7 @@ public class V8EngineService implements IScriptEngine {
 
         taskContext.setClazzMap(clazzMap);
         taskContext.setClazzGUIDMap(clazzgGUIDMap);
+//        taskContext.set
 
         UiPrjDO uiPrjDO = new UiPrjDO();
 
@@ -126,7 +127,8 @@ public class V8EngineService implements IScriptEngine {
 //                        "b.f2 = 3;\n" +
 //                        "console.log(\"111111111111111111111111\");\n"+
 //                        "console.log(\"\"+a.f1.f2);"
-                "var a = ClassUtils.newPersist(\"ClassA\")"
+                "var a = ClassUtils.newPersist(\"ClassA\");"+
+                "a.name = \"张三new\";"
                 , taskContext);
 
     }
@@ -189,6 +191,7 @@ public class V8EngineService implements IScriptEngine {
         }
 
         InstanceUtils instanceUtils=new InstanceUtils(taskContext);
+        autowireCapableBeanFactory.autowireBean(instanceUtils);
         try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
             v8Runtime.getGlobalObject().set("InstanceUtils", v8ValueObject);
             v8ValueObject.bind(instanceUtils);
