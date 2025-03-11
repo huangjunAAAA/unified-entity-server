@@ -24,6 +24,7 @@ import com.wukong.core.util.ThreadLocalUtil;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
+import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
@@ -35,10 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Data
@@ -162,7 +160,15 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
         Object o = convertFromV8Value(value);
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         if (o != null) {
-            rtRedisObjectStorageService.setObjectAttrValue(taskContext, this.guid, key, o, false);
+            UnifiedObject object = rtRedisObjectStorageService.getObject(taskContext, guid);
+            boolean dispatch = false;
+            if (object.getPersistTag()) {
+                ClazzDefCompositeDO clazzDefCompositeDO = this.getTaskContext().getClazzGUIDMap().get(clazzGUID);
+                List<FieldDefCompositeDO> clazzIdFieldDefList = clazzDefCompositeDO.getClazzIdFieldDefList();
+                String finalKey = key;
+                dispatch = clazzIdFieldDefList.stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(finalKey));
+            }
+            rtRedisObjectStorageService.setObjectAttrValue(taskContext, this.guid, key, o, dispatch);
         } else {
             rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key);
         }

@@ -1,12 +1,17 @@
 package com.zjht.unified.service.ctx;
 
 
+import com.google.common.collect.Maps;
+import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.wukong.core.weblog.utils.JsonUtil;
 import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.KafkaNames;
+import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.InstanceFieldDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.utils.StoreUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,10 @@ public class RtRedisObjectStorageService {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private GatherClient gather;
+
+
     public void setObject(TaskContext ctx, UnifiedObject uo){
         String key=RedisKeyName.getObjectRtKey(ctx.getVer(),uo.getGuid());
         redisTemplate.opsForValue().setIfAbsent(key,uo);
@@ -48,7 +57,14 @@ public class RtRedisObjectStorageService {
             setObject(ctx, (UnifiedObject) val);
         }
         if (dispatch) {
+            HashMap<String, Object> kvMap = Maps.newHashMap();
+            kvMap.put(attrName,val);
+            kvMap.put("guid", guid);
+            UnifiedObject object = getObject(ctx, guid);
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(ctx.getClazzGUIDMap().get(object.getClazzGUID()), ctx, kvMap, false);
+            log.info("send update message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_FIELD_STORE,storeMessageDO);
 
+            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA,"update",storeMessageDO,System.currentTimeMillis());
         }
     }
 
@@ -68,6 +84,7 @@ public class RtRedisObjectStorageService {
         Map<Object, Object> kvMap = redisTemplate.opsForHash().entries(key);
         Map<String, Object> resultMap = new HashMap<>();
         kvMap.forEach((k, v) -> resultMap.put(String.valueOf(k), v));
+        resultMap.put("guid", guid);
         return resultMap;
     }
 

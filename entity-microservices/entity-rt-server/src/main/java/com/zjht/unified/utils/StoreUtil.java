@@ -17,25 +17,47 @@ import java.util.Map;
 @Slf4j
 public class StoreUtil {
 
-    public static EntityStoreMessageDO getStoreMessageDO(ClazzDefCompositeDO classDef, TaskContext taskContext , Map<String, Object> kvMap) {
+    public static EntityStoreMessageDO getStoreMessageDO(ClazzDefCompositeDO classDef, TaskContext taskContext , Map<String, Object> kvMap, boolean saveFlag) {
         EntityStoreMessageDO messageDO = new EntityStoreMessageDO();
 
         ArrayList<TblCol> cols = Lists.newArrayList();
         ArrayList<TblIndex> indices = Lists.newArrayList();
         messageDO.setTblName( classDef.getTbl());
         Map<String, Object> newKvMap = new HashMap<>();
-        for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
-            TblCol col = new TblCol();
-            col.setNameEn(fieldDef.getTblCol());
-            col.setNameZh(fieldDef.getDisplayName());
-            col.setType(fieldDef.getType());
-            col.setJdbcType(null);
-            col.setIsPK(0);
-            col.setIsTempstamp(0);
-            cols.add(col);
-            if (kvMap.containsKey(fieldDef.getName())) {
-                newKvMap.put(fieldDef.getTblCol(), kvMap.get(fieldDef.getName()));
+        if (saveFlag) {
+            for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
+                TblCol col = new TblCol();
+                col.setNameEn(fieldDef.getTblCol());
+                col.setNameZh(fieldDef.getDisplayName());
+                col.setType(fieldDef.getType());
+                col.setJdbcType(null);
+                col.setIsPK(0);
+                col.setIsTempstamp(0);
+                cols.add(col);
+                if (kvMap.containsKey(fieldDef.getName())) {
+                    newKvMap.put(fieldDef.getTblCol(), kvMap.get(fieldDef.getName()));
+                }
             }
+        } else {
+            for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
+                if (kvMap.containsKey(fieldDef.getName())) {
+                    newKvMap.put(fieldDef.getTblCol(), kvMap.get(fieldDef.getName()));
+                    TblCol col = new TblCol();
+                    col.setNameEn(fieldDef.getTblCol());
+                    col.setNameZh(fieldDef.getDisplayName());
+                    col.setType(fieldDef.getType());
+                    col.setJdbcType(null);
+                    col.setIsPK(0);
+                    col.setIsTempstamp(0);
+                    cols.add(col);
+                }
+            }
+        }
+        if (kvMap.containsKey("guid")) {
+            newKvMap.put("guid",kvMap.get("guid"));
+        }
+        if (kvMap.containsKey("clazz_guid")) {
+            newKvMap.put("clazz_guid",kvMap.get("clazz_guid"));
         }
         messageDO.setCols(cols);
         messageDO.setIndices(indices);

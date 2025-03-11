@@ -4,7 +4,9 @@ public class FieldConstants {
     public static final String POINT_ID="point_id";
     public static final String DEVICE_ID="device_id";
     public static final String SYSTEM_ID="sys_id";
-    public static final String PROJECT_ID="colp_id";
+    public static final String PROJECT_ID="prj_id";
+    public static final String GUID="guid";
+    public static final String CLAZZ_GUID="clazz_guid";
     public static final String DRIVER_ID="driver_id";
     public static final String DATATIME="data_time";
     public static final String DATACOUNT="kount";

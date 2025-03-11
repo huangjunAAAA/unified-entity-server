@@ -13,11 +13,13 @@ import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.utils.StoreUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class V8RttiService {
 
@@ -45,8 +47,10 @@ public class V8RttiService {
 
         if (isPersist) {
             Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid);
-            EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap);
-            gather.addRecordAsString(KafkaNames.DRIVER_RAWDATA_TO_STORE,false,"key","table",messageDO,System.currentTimeMillis());
+            objectAttrValueMap.put("clazz_guid",classDef.getGuid());
+            EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap,true);
+            log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
+            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
         }
 
         redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(),isPersist));
@@ -62,6 +66,7 @@ public class V8RttiService {
         if(uo!=null){
             ProxyObject proxyObject = new ProxyObject(ctx,uo.getGuid(),uo.getClazzGUID());
             return proxyObject;
+
         }
         return null;
     }
