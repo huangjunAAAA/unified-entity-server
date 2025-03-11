@@ -3,7 +3,6 @@ package com.zjht.unified.data.storage.persist;
 import com.wukong.core.util.SpringUtil;
 
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
-import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
@@ -29,6 +28,12 @@ public class GeneralStoreService implements IDeviceStore,IPointStore, Applicatio
     public Long saveSimplePoint(EntityStoreMessageDO val) {
         return deviceStore.saveSimplePoint(val);
     }
+
+    @Override
+    public List<Integer> updateEntity(EntityStoreMessageDO val) {
+        return deviceStore.updateEntity(val);
+    }
+
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

@@ -10,6 +10,7 @@ import com.zjht.unified.data.entity.RawData;
 
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
 import com.zjht.unified.data.storage.service.IRawDataService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component("mysql-store")
 public class MysqlStoreService extends AbstractStoreService {
 
@@ -42,6 +44,16 @@ public class MysqlStoreService extends AbstractStoreService {
         jdbcTemplate.update(insertSQL);
         Long lastInsertId = jdbcTemplate.queryForObject(lastId, Long.class);
         return lastInsertId;
+    }
+
+    @Override
+    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
+        MysqlDDLUtils.setJdbcType(colDef,vals);
+        MysqlDDLUtils.addUpdateConditionColumns(colDef);
+        String updateSql = mysqlDDLService.update(tbl, vals, colDef);
+        log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
+        int update = jdbcTemplate.update(updateSql);
+        return update;
     }
 
     @Override

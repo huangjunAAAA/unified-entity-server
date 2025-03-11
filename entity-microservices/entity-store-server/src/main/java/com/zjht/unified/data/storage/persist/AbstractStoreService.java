@@ -6,10 +6,8 @@ import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
-import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
@@ -25,6 +23,23 @@ public abstract class AbstractStoreService implements IDeviceStore {
     protected JdbcTemplate jdbcTemplate;
 
     protected TableDDLService ddlService;
+
+    @Override
+    public List<Integer> updateEntity(EntityStoreMessageDO sMsg) {
+        List<TblCol> colDef = sMsg.getCols();
+        List<Integer> ids=new ArrayList<>();
+        if(colDef!=null){
+            List<Map<String,Object>> data= EntityStoreMessageDO.getDataAsObjectList(sMsg);
+            List<TblIndex> indices = sMsg.getIndices();
+
+            for (Iterator<Map<String, Object>> iterator = data.iterator(); iterator.hasNext(); ) {
+                Map<String, Object> vals =  iterator.next();
+                int id=updateObject(vals,sMsg.getTblName(),colDef);
+                ids.add(id);
+            }
+        }
+        return ids;
+    }
 
     @Override
     public List<Long> saveObjectPoint(EntityStoreMessageDO sMsg) {
@@ -76,6 +91,8 @@ public abstract class AbstractStoreService implements IDeviceStore {
     }
 
     public abstract Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices,Long colpId);
+
+    public abstract int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef);
 
     private final Map<String,Boolean> tableExistence=new HashMap<>();
 

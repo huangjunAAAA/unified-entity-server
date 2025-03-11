@@ -16,6 +16,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.ConsumerSeekAware;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -33,19 +34,26 @@ public class KafkaConsumerListener implements ConsumerSeekAware {
     @Autowired
     private DispatchMqService dispatchMqService;
 
-    @KafkaListener(topics = {KafkaNames.GATHER_PREFIX+KafkaNames.DRIVER_RAWDATA_TO_STORE,KafkaNames.GATHER_PREFIX+KafkaNames.RT_DERIVEDDATA_TO_STORE}, concurrency = "1", properties = {"auto.offset.reset:latest"})
-    public void onMessage(String message) {
-        log.info("收到消息：{}",message);
+    @KafkaListener(topics = {KafkaNames.GATHER_PREFIX+KafkaNames.UNIFIED_ENTITY_TO_STORE,KafkaNames.GATHER_PREFIX+KafkaNames.UNIFIED_ENTITY_FIELD_STORE}, concurrency = "1", properties = {"auto.offset.reset:latest"})
+    public void onMessage(String message,@Header("kafka_receivedTopic") String topic) {
+        log.info("收到消息，来自 topic：{}，内容：{}", topic, message);
         if(StringUtils.isEmpty(message))
             return;
         KafkaMessageRecord kMsg = JsonUtil.parse(message, KafkaMessageRecord.class);
         if(kMsg==null|| kMsg.getData()==null)
             return;
 
-
         EntityStoreMessageDO sMsg = JsonUtil.parse(kMsg.getData().toString(), EntityStoreMessageDO.class);
-        List<Long> longs = storeService.saveObjectPoint(sMsg);
-        System.out.println("save object  return ids = " + longs);
+        if (kMsg.getTable().equals("save")) {
+            List<Long> longs = storeService.saveObjectPoint(sMsg);
+            log.info(" table : {} save object  return ids {} " , sMsg.getTblName(),longs);
+        } else if (kMsg.getTable().equals("update")) {
+            List<Integer> integers = storeService.updateEntity(sMsg);
+            log.info("table : {} update object  return  {} " ,sMsg.getTblName(), integers);
+        }
+
+
+
 //        if(sMsg.getProtocol().equals("http")){
 //            List<Long> ids = storeService.saveObjectPoint(sMsg);
 //            sMsg.getExtras().put("ids",ids);

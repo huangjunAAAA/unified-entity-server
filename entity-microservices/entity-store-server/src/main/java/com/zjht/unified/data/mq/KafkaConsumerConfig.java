@@ -20,7 +20,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
-        String storage="collect-storage";
+        String storage="entity-storage";
         KafkaProperties myKafkaProperties = JSON.parseObject(JSON.toJSONString(this.properties), KafkaProperties.class);
         myKafkaProperties.getConsumer().setGroupId(storage);
         return new DefaultKafkaConsumerFactory<>(myKafkaProperties.buildConsumerProperties());

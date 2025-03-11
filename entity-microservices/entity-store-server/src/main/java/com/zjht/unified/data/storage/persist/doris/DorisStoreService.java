@@ -53,6 +53,11 @@ public class DorisStoreService extends AbstractStoreService {
         return 0L;
     }
 
+    @Override
+    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
+        return 0;
+    }
+
     private final Map<String,Boolean> streamRoutineExistence=new HashMap<>();
 
     private static final Map<String, String> timeFmt=new HashMap<>();

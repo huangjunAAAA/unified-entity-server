@@ -21,4 +21,9 @@ public class MysqlDDLService implements TableDDLService {
     public String insert(String tbl, Map<String, Object> data, List<TblCol> def) {
         return MysqlDDLUtils.insert(tbl,data,def);
     }
+
+    public String update(String tbl, Map<String, Object> data, List<TblCol> def) {
+        return MysqlDDLUtils.update(tbl,data,def);
+    }
+
 }
