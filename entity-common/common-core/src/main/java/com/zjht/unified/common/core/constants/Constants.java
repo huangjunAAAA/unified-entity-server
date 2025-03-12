@@ -144,4 +144,269 @@ public class Constants {
     // 状态机驱动方式
     public static int FSM_TIMER=2;
     public static int FSM_WATCHER=1;
+
+
+    /**
+     * 文件所属类型
+     */
+    public static final String FILE_TYPE_PROJECT_EXTRA = "project-extra";
+    public static final String FILE_TYPE_PROJECT_NODE_MODULE="project-node-module-";
+
+    /**
+     * 方案类型
+     */
+    public static final String PLAN_TYPE_SYNC = "1"; //同步
+    public static final String PLAN_TYPE_OUTPUT = "2";//输出
+
+    /**
+     * 方案操作类型
+     */
+    public static final String OPERTOR_TYPE_GRAB = "1"; //抓取
+    public static final String OPERTOR_TYPE_PUSH = "2"; //推送
+    public static final String OPERTOR_TYPE_IMPORT = "3"; //导入
+
+    /**
+     * 文案更新类型
+     */
+    public static final String UPDATE_TYPE_INSERT = "1"; //新增
+    public static final String UPDATE_TYEP_UPDATE = "2"; //更新
+
+    /**
+     * 方案范围类型
+     */
+    public static final String SCOPE_TYPE_AREA = "1";
+    public static final String SCOPE_TYPE_MANUFACTURER = "2";
+    public static final String SCOPE_TYPE_CATEGORY = "3";
+
+
+    /**
+     * 配置类型
+     */
+    public static final String PROCESS_TYPE_API = "1";
+    public static final String PROCESS_TYPE_SDK = "2";
+    public static final String PROCESS_TYPE_IMPORT = "3";
+
+    /**
+     * token类型
+     */
+    public static final String TOKEN_TYPE_HEADER = "1";
+    public static final String TOKEN_TYPE_PARAM = "2";
+
+
+
+
+
+    /**
+     * sdk请求标识
+     */
+    public static final String SDK_REQUEST_TYPE_NORMAL = "1";
+    public static final String SDK_REQUEST_TYPE_JSON = "2";
+
+    /**
+     * 状态
+     */
+    public static final int STATUS_CONFIGURE = 1 ; // 正常
+    public static final int STATUS_DEPLOY= 2 ; // 发布中
+
+
+    /**
+     * 过期时间类型
+     */
+    public static final String EXPRIRED_TYPE_MILLISECONDS = "1";
+    public static final String EXPRIRED_TYPE_SECONDS = "2";
+    public static final String EXPRIRED_TYPE_MINUTE = "3";
+    public static final String EXPRIRED_TYPE_HOUR = "4";
+    public static final String EXPRIRED_TYPE_DAY = "5";
+
+
+    public static final int DATA_SOURCE_IMPORT=1;
+    public static final int DATA_SOURCE_MANUAL=2;
+
+    /**
+     * 分组成员类型
+     */
+    public static final int MEMBER_TYPE_NODE=1;
+    public static final int MEMBER_TYPE_OTHER=3;
+    public static final int MEMBER_TYPE_CONNECTOR=1;
+    public static final int MEMBER_TYPE_PIPE=2;
+
+    /**
+     * 对象类型
+     */
+    public static final String OBJECT_TYPE_EQUIPMENT = "1";
+    public static final String OBJECT_TYPE_CATEGORY = "2";
+    public static final String OBJECT_TYPE_AREA = "3";
+    public static final String OBJECT_TYPE_WARNRECORD = "4";
+
+    /**
+     * 在线状态
+     */
+    public static final String ONLINE_STATUS_ON = "1";
+    public static final String ONLINE_STATUS_OFF = "2";
+
+    /**
+     * 区域来源
+     */
+
+    public static final String SOURCEBY_ADD = "1";
+    public static final String SOURCEBY_API = "2";
+
+    /**
+     * 报警配置类型
+     */
+    public static final String WARN_TYPE_BUSI = "1";
+    public static final String WARN_TYPE_MEG = "2";
+
+    /**
+     * 报警消息类型
+     */
+    public static final String WARN_RECORD_TYPE_LOCAL = "1";
+    public static final String WARN_RECORD_TYPE_THRID = "2";
+
+    /**
+     * 报警消息状态
+     */
+    public static final String WARN_STATUS_UNCONFIRMED = "1";
+    public static final String WARN_STATUS_CONFIRMED = "2"; //已确认
+    /**
+     * 报警消息来源
+     */
+    public static final String THRID_SYSTEM_LOCAL = "local";
+    public static final String THRID_SYSTEM_INTELLIGENCE = "intelligence";
+    public static final String THRID_SYSTEM_UNIVIEW = "uniview";
+
+    /**
+     * 指令开关
+     */
+    public static final String INSTRUCTIONS_OPEN = "2";
+    public static final String INSTRUCTIONS_CLOSED = "1";
+
+    /**
+     * 设备开关状态
+     */
+    public static final String ACTIVE_STATUS_ON = "1";
+    public static final String ACTIVE_STATUS_OFF = "0";
+
+    /**
+     * 报警
+     */
+    //报警级别字典
+    public static final String WARN_LEVEL_DiCT = "warn_level";
+    //业务类型
+    public static final String WARN_BUSINESS_PASSENGER = "1";//客流
+
+
+    //报警规则比较方式
+    public static final String WARN_RULE_COMPARETYPE_GT = "1";
+    public static final String WARN_RULE_COMPARETYPE_EQ = "2";
+    public static final String WARN_RULE_COMPARETYPE_LT = "3";
+
+    public static final int CELLID_NODE =0;
+    public static final int CELLID_EDGE =1;
+    public static final int CELLID_LAYER =2;
+    public static final int CELLID_SELECTOR=3;
+
+    public static final int BINDING_SOURCE_LIVEFEED=1;
+    public static final int BINDING_SOURCE_SELECTOR=2;
+    public static final int BINDING_SOURCE_DRAWING=3;
+
+    public static final int NODETYPE_START=0;
+    public static final int NODETYPE_END=1;
+    public static final int NODETYPE_REGULAR=2;
+    public static final int NODETYPE_VIRTUAL=3;
+
+    public static final int DRAWING_STATUS_DELETED=0;
+    public static final int DRAWING_STATUS_NORMAL=1;
+    public static final int DRAWING_STATUS_LOCKED=2;
+
+    //    public static final int DRAWING_TYPE_DEFAULT=1;
+    public static final int DRAWING_TYPE_NORMAL=2;
+    public static final int DRAWING_TYPE_COMMONINUSE=3;
+    public static final int DRAWING_TYPE_PREVIEW=4;
+
+    public static final int ACCESS_ADMIN=2;
+    public static final int ACCESS_RW=1;
+    public static final int NO_ACCESS=0;
+    public static final int INVALID_ACCESS=4;
+
+    public static final String BINDTYPE_LIVEFEED="livefeed";
+    public static final String BINDTYPE_BIZ_SYSTEM="biz_sys";
+
+    public  static final String CellClick = "cell:click"; // 图元单击
+    public  static final String CellDblclick = "cell:dblclick"; // 图元双击
+    public  static final String CellContextmenu = "cell:contextmenu"; // 图元右键
+    public  static final String CellMouseenter = "cell:mouseenter"; // 图元鼠标移入
+    public  static final String CellMouseleave = "cell:mouseleave";
+
+    public static final Integer FEEDBACK_TYPE_DATA=1;
+
+    public static final Integer FEEDBACK_TYPE_UIEVENT=2;
+
+    public static final Integer FEEDBACK_TYPE_REGISTER=3;
+
+    public static final Integer FEEDBACK_TYPE_RELOAD=4;
+
+    public static final String SDP_DIRECTORY="Directory";
+
+    public static final String SDP_SYSTEM="System";
+
+    public static final String SDP_DEVICE="Device";
+
+    public static final String SDP_POINT="Point";
+
+    public static final String SDP_TEMPLATE="SDP:TEMPLATE";
+
+    public static final String SDP_ATTR="SDP:ATTR";
+
+    public static final String SDP_UDA="SDP:UDA";
+
+
+    public static final String SDP_POINT_TYPE_ANALOG="TYPE_A";
+    public static final String SDP_POINT_TYPE_DIGIAL="TYPE_S";
+    public static final String SDP_POINT_TYPE_GEO="TYPE_G";
+    public static final String SDP_POINT_TYPE_TEXT="TYPE_T";
+    public static final String SDP_POINT_TYPE_STREAM="TYPE_M";
+    public static final String SDP_POINT_TYPE_CRAWL="TYPE_C";
+    public static final String SDP_POINT_TYPE_RECORD="TYPE_R";
+    public static final String SDP_POINT_TYPE_SWITCH="TYPE_D";
+
+    public static final String SDP_DEVICE_TYPE_FIXED="DEVICE_FD";
+    public static final String SDP_DEVICE_TYPE_MOBILE="DEVICE_MD";
+    public static final String SDP_DEVICE_TYPE_DISCOVERABLE="DEVICE_DD";
+    public static final String SDP_DEVICE_TYPE_ENTITY_DYNAMIC="DEVICE_ED";
+    public static final String SDP_DEVICE_TYPE_LOGICAL="DEVICE_LD";
+    public static final String SDP_DEVICE_TYPE_SPECIAL="DEVICE_SD";
+
+    public static final String AGGR_COUNT ="kount";
+    public static final String AGGR_MIN ="min";
+    public static final String AGGR_MAX ="max";
+    public static final String AGGR_AVERAGE ="avg";
+    public static final String AGGR_SUM ="sum";
+    public static final String COL_DATA_TIME="data_time";
+
+    public static final String ED_RULE_SQL="sql";
+    public static final String ED_DERIVED_DEVICE_ID_SEQ="ed_derived_id";
+    public static final String ED_DERIVED_POINT_ID_SEQ="ed_point_id";
+
+    public static final String EXCHANGE_NAME="external-exchange";
+    public static final String EXTERNAL_ALERT_QUEUE="external-alert-list";
+    public static final String EXTERNAL_ALERT_QUEUE_KEY="external-alert-key";
+
+    public static final String ALERT_TRIGGER_RANGE="range";
+    public static final String ALERT_TRIGGER_SWITCH="switch";
+    public static final String ALERT_TRIGGER_ENUM="enum";
+    public static final String ALERT_TRIGGER_NON_ENUM="non-enum";
+
+    public static final Integer VIDEO_STREAM=1;
+    public static final Integer AUDIO_STREAM=2;
+    public static final Integer PICTURE=3;
+
+    public static final String DISCOVERABLE_DEVICE_ID_SEQ="discoverable_device_id";
+    public static final String DISCOVERABLE_POINT_ID_SEQ="discoverable_point_id";
+
+    public static final String SDP_TEMPLATE_TYPE_GENERAL="sdp";
+    public static final String SDP_TEMPLATE_TYPE_ED="ed";
+
+    public static final String HOLDING_REGISTER="1";
+    public static final String DATA_INFER_REGISTER="2";
 }

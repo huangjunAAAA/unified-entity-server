@@ -2,34 +2,73 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.wukong.infrastructure.bom</groupId>
-        <artifactId>wukong-bom</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <relativePath></relativePath>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.zjht.unified.data</groupId>
-    <version>1.0.0</version>
-    <artifactId>entity-microservices</artifactId>
-    <packaging>pom</packaging>
-    <description>
-        微服务
-    </description>
-    <modules>
-        <module>entity-admin-server</module>
-        <module>entity-store-server</module>
-        <module>entity-data-server</module>
-        <module>entity-rt-server</module>
-        <module>ui-server</module>
-    </modules>
+    <parent>
+        <artifactId>entity-microservices</artifactId>
+        <groupId>com.zjht.unified.data</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <artifactId>ui-server</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <jackson.verson>2.12.4</jackson.verson>
     </properties>
+
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.gavlyukovskiy</groupId>
+            <artifactId>p6spy-spring-boot-starter</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.34</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.zjht.ui</groupId>-->
+<!--            <artifactId>ui-web-core</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.zjht.unified.data</groupId>
+            <artifactId>common-web-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -161,7 +200,7 @@
         <dependency>
             <groupId>com.wukong</groupId>
             <artifactId>lib-authenticationCenter-core</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.wukong</groupId>
@@ -185,7 +224,106 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+
+        <!-- Quartz -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.wukong</groupId>-->
+        <!--            <artifactId>lib-authenticationCenter-core</artifactId>-->
+        <!--            <version>0.0.1-SNAPSHOT</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>com.wukong</groupId>-->
+        <!--                    <artifactId>lib-client</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>com.wukong</groupId>-->
+        <!--                    <artifactId>lib-authentication</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.2.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger.parser.v3/swagger-parser -->
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>2.0.27</version>
+        </dependency>
+
+
+<!--        <dependency>-->
+<!--            <groupId>com.zjht.ui</groupId>-->
+<!--            <artifactId>ui-feign</artifactId>-->
+<!--            <version>1.0.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.zjht.unified.data</groupId>
+            <artifactId>common-feign</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wukong</groupId>
+            <artifactId>lib-dal</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.11</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-models -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>1.6.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zjht.infrastructure</groupId>
+            <artifactId>system-client</artifactId>
+        </dependency>
+
+
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>central</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </repository>
+        <repository>
+            <id>spring</id>
+            <name>spring</name>
+            <url>https://maven.aliyun.com/repository/spring</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <id>wukong.mirror</id>
+            <name>zjprivate</name>
+            <url>https://wukong.zjht100.com:10013/repository/maven-group/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -193,6 +331,25 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.4.6</version>
+                <configuration>
+                    <mainClass>
+                        com.zjht.ui.UnifiedUIApplication
+                    </mainClass>
+                    <fork>true</fork>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -208,16 +365,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.zjht.unified.data</groupId>
-                <artifactId>unified-entity-server</artifactId>
-                <type>pom</type>
-                <version>1.0.0</version>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
