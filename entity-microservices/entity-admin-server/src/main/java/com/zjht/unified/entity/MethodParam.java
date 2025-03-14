@@ -80,8 +80,8 @@ public class MethodParam extends BaseCopyEntity {
 	 * 参数说明
 	 */
 	@ApiModelProperty(value = "参数说明")
-	@Column(name = "`desc`")
-	@TableField(value = "`desc`")
+	@Column(name = "description")
+	@TableField(value = "description")
 	private String desc;
 
 	 /**

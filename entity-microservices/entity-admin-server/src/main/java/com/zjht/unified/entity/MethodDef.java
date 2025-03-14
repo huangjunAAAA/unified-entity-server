@@ -96,8 +96,8 @@ public class MethodDef extends BaseCopyEntity {
 	 * 方法说明
 	 */
 	@ApiModelProperty(value = "方法说明")
-	@Column(name = "desc")
-	@TableField(value = "desc")  
+	@Column(name = "description")
+	@TableField(value = "description")
 	private String desc;
 
 	 /**
