@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="type" property="type"/>
         <result column="default_val" property="defaultVal"/>
         <result column="sort" property="sort"/>
-        <result column="description" property="desc"/>
+        <result column="description" property="description"/>
         <result column="method_id" property="methodId"/>
         <result column="status" property="status"/>
         <result column="prj_id" property="prjId"/>
