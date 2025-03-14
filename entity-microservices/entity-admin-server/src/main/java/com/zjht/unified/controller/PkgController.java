@@ -5,6 +5,7 @@ import com.zjht.unified.common.core.domain.PageDomain;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
+import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.entity.MethodDef;
 import com.zjht.unified.service.scheduling.RunService;
 import com.zjht.unified.vo.MethodDefVo;
@@ -31,5 +32,12 @@ public class PkgController {
     @PostMapping("/run")
     public R<String> run(@RequestParam Long prjId){
         return runService.runProject(prjId);
+    }
+
+
+    @ApiOperation(value = "genPrjSpec")
+    @PostMapping("/genPrjSpec")
+    public R<PrjSpecDO> genPrjSpec(@RequestParam Long prjId) {
+        return R.ok(runService.genPrjSpec(prjId));
     }
 }

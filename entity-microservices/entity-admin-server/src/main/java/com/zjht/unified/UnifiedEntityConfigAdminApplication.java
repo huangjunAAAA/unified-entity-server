@@ -22,7 +22,7 @@ import java.util.*;
 @Slf4j
 public class UnifiedEntityConfigAdminApplication {
     public static void main(String[] args) throws Exception {
-//        ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityConfigAdminApplication.class, args);
+        ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityConfigAdminApplication.class, args);
         log.info("统一实体组态模块启动成功");
 
         Map<Object,Object> allSettings=new LinkedHashMap<>();

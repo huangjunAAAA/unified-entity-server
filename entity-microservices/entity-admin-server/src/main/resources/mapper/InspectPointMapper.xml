@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.unified.data.manage.mapper.InspectPointMapper">
-    <select id="XXinspectPointSearch">
-        select p.id,p.name pname,d.name dname, d.parent_id ,i.type, p.io_setting_id from sdp_general p, sdp_general d, point_info i where p.parent_id=d.id and p.category='Point' and p.point_info_id=i.id and p.name like ? and d.name like ? and i.type=? and i.input=? and p.status>0 and d.status>0 and i.status>0 and d.category='Device'
-    </select>
-</mapper>
