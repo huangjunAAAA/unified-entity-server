@@ -48,7 +48,7 @@ public class MethodParamDO {
 	 * 参数说明
 	 */
 	@ApiModelProperty(value = "参数说明")
-	private String desc;
+	private String description;
 	 /**
 	 * 方法ID
 	 */

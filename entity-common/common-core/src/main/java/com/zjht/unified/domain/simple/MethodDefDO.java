@@ -58,7 +58,7 @@ public class MethodDefDO {
 	 * 方法说明
 	 */
 	@ApiModelProperty(value = "方法说明")
-	private String desc;
+	private String description;
 	 /**
 	 * 显示名称
 	 */
