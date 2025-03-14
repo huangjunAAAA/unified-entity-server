@@ -8,8 +8,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -55,6 +58,14 @@ public class UnifiedEntityConfigAdminApplication {
         String guid= UUID.randomUUID().toString();
         int newInstance=0;
         int inherit=1;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(180000);//单位为ms
+        factory.setConnectTimeout(5000);//单位为ms
+        return new RestTemplate(factory);
     }
 
 }
