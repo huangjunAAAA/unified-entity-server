@@ -55,7 +55,6 @@ public class ClassUtils {
             V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);
             return new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
         }
-        return null;
     }
 
 

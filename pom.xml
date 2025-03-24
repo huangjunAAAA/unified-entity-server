@@ -170,7 +170,7 @@
             </snapshots>
             <id>wukong.mirror</id>
             <name>zjprivate</name>
-            <url>http://wukong.zjht100.com:10005/repository/maven-group/</url>
+            <url>https://wukong.zjht100.com:10013/repository/maven-group/</url>
         </repository>
     </repositories>
 </project>
