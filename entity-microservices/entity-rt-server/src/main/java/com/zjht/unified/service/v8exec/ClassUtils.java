@@ -4,6 +4,7 @@ import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
+import com.caoccao.javet.values.primitive.V8ValueString;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.caoccao.javet.exceptions.JavetException;
 import com.wukong.core.util.ThreadLocalUtil;
@@ -78,6 +79,7 @@ public class ClassUtils {
         return null;
     }
 
+    @V8Function(name = "getClass")
     public V8Value getClassObject(V8ValueObject obj){
         try {
             return obj.get("cls");
@@ -87,6 +89,16 @@ public class ClassUtils {
         return obj.getV8Runtime().createV8ValueNull();
     }
 
+    @V8Function(name = "getClassByName")
+    public V8Value getClassObjectByName(V8ValueString clsName){
+        ClazzDefCompositeDO clsObj = taskContext.getClazzMap().get(clsName);
+        if(clsObj!=null){
+            return convertClassObject(clsObj,clsName.getV8Runtime());
+        }
+        return clsName.getV8Runtime().createV8ValueNull();
+    }
+
+    @V8Function(name = "getClassByGuid")
     public V8Value getClassObject(String guid){
         ClazzDefCompositeDO clsObj = CoreClazzDef.getCoreClassObject(guid);
         if(clsObj==null){
