@@ -90,8 +90,8 @@ public class ClassUtils {
     }
 
     @V8Function(name = "getClassByName")
-    public V8Value getClassObjectByName(V8ValueString clsName){
-        ClazzDefCompositeDO clsObj = taskContext.getClazzMap().get(clsName);
+    public V8Value getClassObjectByName(V8ValueObject clsName){
+        ClazzDefCompositeDO clsObj = taskContext.getClazzMap().get(clsName.toString());
         if(clsObj!=null){
             return convertClassObject(clsObj,clsName.getV8Runtime());
         }
