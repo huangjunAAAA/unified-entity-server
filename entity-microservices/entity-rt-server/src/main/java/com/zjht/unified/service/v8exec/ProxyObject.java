@@ -51,6 +51,8 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
         this.clazzGUID = clazzGUID;
     }
 
+    private Map<String,Object> snapshot;
+
     private TaskContext taskContext;
 
     private String guid;
@@ -132,6 +134,12 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
             return V8BeanUtils.toV8Value(getV8Runtime(), ClsDf.from(cls,taskContext));
         }
 
+        if(snapshot!=null){
+            Object t = snapshot.get(key);
+            if(t!=null)
+                return convertToV8Value(t);
+        }
+
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         Object objectAttrValue = rtRedisObjectStorageService.getObjectAttrValue(taskContext, guid, key);
         if (Objects.nonNull(objectAttrValue)) {
@@ -173,6 +181,9 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
             rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key);
         }
 
+        if(snapshot!=null){
+            snapshot.remove(key);
+        }
         return getV8Runtime().createV8ValueBoolean(true);
     }
 

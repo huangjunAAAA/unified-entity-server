@@ -13,8 +13,8 @@ import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
-import groovy.util.logging.Slf4j;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Slf4j
 public class ClassUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(ClassUtils.class);
+
     private TaskContext taskContext;
 
     @Autowired
@@ -43,7 +43,7 @@ public class ClassUtils {
     public V8Value newInstance(String className) throws Exception {
         String cguid = CoreClazzDef.getCoreClassGuid(className);
         if(cguid!=null){
-
+            return V8EngineService.getRuntime(taskContext).createV8ValueNull();
         }else {
             ClazzDefCompositeDO classDef = taskContext.getClazzMap().get(className);
             if (classDef == null) {
