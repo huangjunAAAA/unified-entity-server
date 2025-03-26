@@ -114,4 +114,17 @@ public class ClazzDefDO {
 	 */
 	@ApiModelProperty(value = "构建函数脚本")
 	private String constructor;
+
+	/**
+	 * 所属项目GUID
+	 */
+	@ApiModelProperty
+	private String prjGuid;
+
+	/**
+	 * 所属项目版本号
+	 */
+	@ApiModelProperty
+	private String prjVer;
+
 }

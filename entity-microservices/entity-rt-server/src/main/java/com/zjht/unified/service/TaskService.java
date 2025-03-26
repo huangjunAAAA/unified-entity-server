@@ -53,8 +53,8 @@ public class TaskService {
                 fsmService.initFsm(ctx,sf);
                 if (sf.getDriver() == Constants.FSM_TIMER){
                     timerService.createFSM(ctx, sf);
-                    ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, sf.getGuid(), sf);
                 }
+                ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, sf.getGuid(), sf);
             });
         }
     }
