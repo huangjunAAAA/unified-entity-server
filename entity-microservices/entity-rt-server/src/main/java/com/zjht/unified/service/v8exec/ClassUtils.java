@@ -41,7 +41,7 @@ public class ClassUtils {
     }
 
     @V8Function(name = "new")
-    public V8Value newInstance(String className) throws Exception {
+    public V8Value newInstance(String className, V8Value... args) throws Exception {
         String cguid = CoreClazzDef.getCoreClassGuid(className);
         if(cguid!=null){
             return V8EngineService.getRuntime(taskContext).createV8ValueNull();
@@ -60,7 +60,7 @@ public class ClassUtils {
 
 
     @V8Function(name = "newPersist")
-    public V8Value newPersistInstance(String className) throws Exception {
+    public V8Value newPersistInstance(String className,V8Value... args) throws Exception {
         ClazzDefCompositeDO classDef = taskContext.getClazzMap().get(className);
         if (classDef == null) {
             log.error("ClassName not found in ClazzMap:  {}",className);
