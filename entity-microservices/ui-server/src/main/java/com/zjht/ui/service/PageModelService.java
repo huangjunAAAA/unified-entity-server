@@ -1,14 +1,13 @@
-package com.zjht.unified.service;
+package com.zjht.ui.service;
 
+import com.zjht.ui.entity.UiPage;
 import com.zjht.unified.domain.exchange.CID;
 import com.zjht.unified.domain.exchange.Cell;
 import com.zjht.unified.domain.exchange.PageSpec;
 import com.zjht.unified.utils.PageModelUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PageModelService {
@@ -36,7 +35,7 @@ public class PageModelService {
         return null;
     }
 
-    public List<Cell> queryCellAcrossPage(Cell cell) {
+    public List<Cell> queryCell(Cell cell) {
 
         return null;
     }
@@ -45,7 +44,19 @@ public class PageModelService {
         return null;
     }
 
+    public PageSpec getPage(Long id, String guid) {
+        return null;
+    }
+
     public PageSpec savePage(PageSpec page) {
+        return null;
+    }
+
+    public PageSpec convertToPageSpec(UiPage uiPage) {
+        return null;
+    }
+
+    public UiPage convertToUiPage(PageSpec pageSpec) {
         return null;
     }
 }
