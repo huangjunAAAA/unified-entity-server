@@ -73,12 +73,6 @@ public class ClassUtils {
     }
 
 
-
-    public V8Value newCoreInstance(String guid){
-
-        return null;
-    }
-
     @V8Function(name = "getClass")
     public V8Value getClassObject(V8ValueObject obj){
         try {
