@@ -118,7 +118,7 @@ public class V8EngineService implements IScriptEngine {
         PrjSpecDO prjSpecDO = new PrjSpecDO();
         prjSpecDO.setUiPrj(uiPrjDO);
 
-        taskContext.setPrjSpec(prjSpecDO);
+        taskContext.getPrjContextProvider().setPrjectContext(prjSpecDO);
 
         exec(
 //                "var a =ClassUtils.new(\"ClassA\");\n" +

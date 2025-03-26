@@ -44,7 +44,7 @@ public class RecordUtils {
         String sql = "SELECT * FROM " + tableName + " WHERE " + whereClause;
 
         // Step 3: Execute the query using RemoteStore
-        List<Map<String, Object>> results = remoteStore.query(taskContext.getVer(), taskContext.getPrjSpec().getUePrj().getId()+"", sql);
+        List<Map<String, Object>> results = remoteStore.query(taskContext.getVer(), taskContext.getPrjId()+"", sql);
 
         // Step 4: Convert results to V8ValueArray
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);
@@ -70,7 +70,7 @@ public class RecordUtils {
     @V8Function(name="sql")
     public V8ValueArray sql(String sql, String clsName) throws JavetException {
         // Step 1: Execute the SQL query using RemoteStore
-        List<Map<String, Object>> results = remoteStore.query(taskContext.getVer(), taskContext.getPrjSpec().getUePrj().getId()+"", sql);
+        List<Map<String, Object>> results = remoteStore.query(taskContext.getVer(), taskContext.getPrjId()+"", sql);
 
         // Step 2: Convert results to V8ValueArray
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);

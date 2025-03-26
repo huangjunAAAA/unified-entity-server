@@ -36,6 +36,8 @@ public class RtContextService {
             return null;
 
         TaskContext running=new TaskContext();
+        running.setPrjId(""+task.getUePrj().getId());
+        running.getPrjContextProvider().setPrjectContext(task);
         if(ver==null){
             ver=task.getUePrj().getGuid()+":"+System.currentTimeMillis();
         }
@@ -52,7 +54,7 @@ public class RtContextService {
     }
 
     public void saveRunningContext(TaskContext ctx){
-        Object prjId=ctx.getPrjSpec().getUePrj().getId();
+        Object prjId=ctx.getPrjId();
         String k = RedisKeyName.getEntityProjectKey(prjId);
         redisTemplate.opsForValue().set(k, ctx);
         redisTemplate.opsForHash().put(RedisKeyName.ALL_RUNNING_PROJECT,prjId.toString(),ctx.getVer());

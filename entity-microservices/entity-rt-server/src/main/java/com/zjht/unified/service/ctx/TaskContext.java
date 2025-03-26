@@ -6,6 +6,7 @@ import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 
+import com.zjht.unified.service.ctx.unifiedentity.UnifiedPrjContext;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -14,7 +15,8 @@ import java.util.Map;
 @Data
 public class TaskContext {
     private String ver;
-    private PrjSpecDO prjSpec;
+    private String prjId;
+    private PrjContextProvider prjContextProvider=new UnifiedPrjContext();
     private Map<String, MethodDefDO> methods=new HashMap<>();
     private Map<String,ClazzDefCompositeDO> clazzMap=new HashMap<>();
     private Map<String,ClazzDefCompositeDO> clazzGUIDMap=new HashMap<>();
