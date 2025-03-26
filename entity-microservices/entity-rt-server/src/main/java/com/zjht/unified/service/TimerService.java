@@ -13,6 +13,7 @@ import com.zjht.unified.feign.model.ReturnT;
 import com.zjht.unified.feign.model.XxlJobGroup;
 import com.zjht.unified.feign.model.XxlJobInfo;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.service.ctx.UnifiedEntityStatics;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -150,7 +151,7 @@ public class TimerService {
             param = XxlJobHelper.getJobParam();
         DVal id = JsonUtil.parse(param, DVal.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        SentinelDefDO ss = ctx.getSentinelMap().get(id.getGuid());
+        SentinelDefDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL,id.getGuid());
         scriptEngine.exec(ss.getBody(),ctx);
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
@@ -161,7 +162,7 @@ public class TimerService {
             param = XxlJobHelper.getJobParam();
         DVal id = JsonUtil.parse(param, DVal.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        FsmDefCompositeDO ss = ctx.getFsmMap().get(id.getGuid());
+        FsmDefCompositeDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_FSM,id.getGuid());
         fsmService.evalFsm(ctx,ss);
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }

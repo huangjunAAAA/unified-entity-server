@@ -18,6 +18,5 @@ public class TaskContext {
     private Map<String, MethodDefDO> methods=new HashMap<>();
     private Map<String,ClazzDefCompositeDO> clazzMap=new HashMap<>();
     private Map<String,ClazzDefCompositeDO> clazzGUIDMap=new HashMap<>();
-    private Map<String, SentinelDefDO> sentinelMap=new HashMap<>();
-    private Map<String, FsmDefCompositeDO> fsmMap=new HashMap<>();
+    public StaticMgmt staticMgmt=new UnifiedEntityStatics();
 }

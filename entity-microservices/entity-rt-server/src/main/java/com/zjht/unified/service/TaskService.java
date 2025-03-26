@@ -5,6 +5,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.service.ctx.UnifiedEntityStatics;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +44,17 @@ public class TaskService {
         if (CollectionUtils.isNotEmpty(spec.getSentinelDefList())) {
             spec.getSentinelDefList().forEach(ss -> {
                 timerService.createSentinel(ctx, ss);
+                ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL, ss.getGuid(), ss);
             });
         }
 
         if (CollectionUtils.isNotEmpty(spec.getFsmList())) {
             spec.getFsmList().forEach(sf -> {
                 fsmService.initFsm(ctx,sf);
-                if (sf.getDriver() == Constants.FSM_TIMER)
+                if (sf.getDriver() == Constants.FSM_TIMER){
                     timerService.createFSM(ctx, sf);
+                    ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, sf.getGuid(), sf);
+                }
             });
         }
     }
