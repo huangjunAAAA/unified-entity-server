@@ -1,4 +1,4 @@
-package com.zjht.unified.common.core.domain.component;
+package com.zjht.unified.domain.exchange;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
  * 不同的type值指示paramData是不同的用法
  */
 @Data
-public class FuncField extends SimpleField{
+public class FuncField extends SimpleField {
     /**
      * 数据的样例
      */
