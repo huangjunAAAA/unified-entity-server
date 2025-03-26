@@ -13,6 +13,7 @@ import com.zjht.unified.entity.*;
 import com.zjht.unified.feign.RemoteRT;
 import com.zjht.unified.service.*;
 import com.zjht.unified.utils.JsonUtilExt;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,6 +99,8 @@ public class RunService {
             clazzDefList.forEach(cdf -> {
                 ClazzDefCompositeDTO cc = clazzDefCompositeService.selectById(cdf.getId());
                 ClazzDefCompositeDO cdfDo = EntityDoUtils.convert(cc);
+                cdfDo.setPrjGuid(prj.getGuid());
+                cdfDo.setPrjVer(prj.getVersion());
                 target.getClazzList().add(cdfDo);
             });
         }
