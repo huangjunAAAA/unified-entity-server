@@ -10,15 +10,18 @@ public class PageSpec {
     @JsonProperty("cell")
     private Cell cell;
 
+    @JsonProperty("route")
+    private String route;
+    @JsonProperty("source_id")
+    private CID sourceId;
+    @JsonProperty("rprj_id")
+    private Long rprjId;
+
+
     public PageSpec() {
     }
 
     public PageSpec(CID pageId) {
         this.pageId = pageId;
-    }
-
-    public PageSpec(CID pageId, Cell cell) {
-        this.pageId = pageId;
-        this.cell = cell;
     }
 }
