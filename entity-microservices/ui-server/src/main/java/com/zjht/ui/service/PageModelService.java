@@ -63,7 +63,7 @@ public class PageModelService {
                 delCell(c.getId(), c.getGuid(),true);
             }
         }
-        uiComponentService.removeById(id);
+        uiComponentCompositeService.removeById(id);
     }
 
     public void moveCell(Cell parentCell, Cell cell) {
@@ -81,7 +81,11 @@ public class PageModelService {
      * @return
      */
     public Cell getCellByGuid(CID cellId) {
+        if(cellId==null)
+            return null;
         if(cellId.getId()==null){
+            if(cellId.getGuid()==null)
+                return null;
             UiComponent cc = uiComponentService.getOne(new LambdaQueryWrapper<UiComponent>().eq(UiComponent::getGuid, cellId.getGuid()));
             if(cc!=null){
                 UiComponentCompositeDTO uiComponentCompositeDTO = uiComponentCompositeService.selectById(cc.getId());
@@ -124,10 +128,7 @@ public class PageModelService {
         List<UiComponent> lst = uiComponentService.list(Wrappers.query(cc));
         List<Cell> cellLst = lst.stream()
                 .map(c -> withChildren? convertUiComponentToCellWithChildren(uiComponentCompositeService.selectById(c.getId())):convertUiComponentToCell(uiComponentCompositeService.selectById(c.getId())))
-                .collect(Collectors.toList());
-        cellLst.forEach(c->{
-
-        });
+                .filter(c->c!=null).collect(Collectors.toList());
         return cellLst;
     }
 
@@ -169,15 +170,15 @@ public class PageModelService {
         // Convert UiComponent list to a tree structure and set the root node to PageSpec's cell
         if (uiPage.getPageIdUiComponentList() != null) {
             // First, build a map of components by their ID for quick lookup
-            Map<Long, Cell> componentMap = new HashMap<>();
+            Map<CID, Cell> componentMap = new HashMap<>();
             for (UiComponentCompositeDTO uiComponent : uiPage.getPageIdUiComponentList()) {
                 Cell cell = convertUiComponentToCell(uiComponent);
-                componentMap.put(uiComponent.getId(), cell);
+                componentMap.put(new CID(uiComponent.getId(),uiComponent.getGuid()), cell);
             }
 
             componentMap.values().stream().forEach(cell -> {
                 if (cell.getParentId() != null) {
-                    Cell parentCell = componentMap.get(cell.getParentId().getId());
+                    Cell parentCell = componentMap.get(cell.getParentId());
                     if (parentCell != null) {
                         cell.getParentId().setGuid(parentCell.getId().getGuid());
                     }
@@ -187,13 +188,13 @@ public class PageModelService {
             // Then, build the tree structure by setting parent-child relationships
             Cell rootCell = null;
             for (UiComponentCompositeDTO uiComponent : uiPage.getPageIdUiComponentList()) {
-                Cell cell = componentMap.get(uiComponent.getId());
+                Cell cell = componentMap.get(new CID(uiComponent.getId(),uiComponent.getGuid()));
                 if (uiComponent.getParentId() == null) {
                     // This is the root component
                     rootCell = cell;
                 } else {
                     // Find the parent and add this cell as a child
-                    Cell parentCell = componentMap.get(uiComponent.getParentId());
+                    Cell parentCell = componentMap.get(new CID(uiComponent.getParentId(),null));
                     if (parentCell != null) {
                         parentCell.getChildren().add(cell);
                     }
@@ -231,18 +232,22 @@ public class PageModelService {
         if(uiComponent==null)
             return null;
         UiComponentCompositeDTO cc = uiComponentCompositeService.selectById(uiComponent.getId());
+        if(cc==null)
+            return null;
         Cell root=convertUiComponentToCell(cc);
         List<UiComponent> cList = uiComponentService.list(new LambdaQueryWrapper<UiComponent>().eq(UiComponent::getParentId, uiComponent.getId()));
-
-        cList.forEach(c->{
-            UiComponentCompositeDTO subc = uiComponentCompositeService.selectById(c.getId());
-            Cell subroot=convertUiComponentToCellWithChildren(subc);
-            root.getChildren().add(subroot);
-        });
+        if(cList!=null)
+            cList.forEach(c->{
+                UiComponentCompositeDTO subc = uiComponentCompositeService.selectById(c.getId());
+                if(subc!=null) {
+                    Cell subroot = convertUiComponentToCellWithChildren(subc);
+                    root.getChildren().add(subroot);
+                }
+            });
         return root;
     }
 
-    private Cell convertUiComponentToCell(UiComponentCompositeDTO uiComponent) {
+    public Cell convertUiComponentToCell(UiComponentCompositeDTO uiComponent) {
         Cell cell = new Cell();
         cell.setId(new CID(uiComponent.getId(), uiComponent.getGuid()));
         cell.setLayout(uiComponent.getLayoutData());
