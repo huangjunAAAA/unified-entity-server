@@ -409,4 +409,7 @@ public class Constants {
 
     public static final String HOLDING_REGISTER="1";
     public static final String DATA_INFER_REGISTER="2";
+
+    public static final String EVENT_TYPE_CONTEXT="context";
+    public static final String EVENT_TYPE_REGULAR="event";
 }

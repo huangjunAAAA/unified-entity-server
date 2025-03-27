@@ -8,14 +8,14 @@ import java.util.Objects;
 @Data
 public class CID {
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     @JsonProperty("guid")
     private String guid;
 
     public CID() {
     }
 
-    public CID(Integer id, String guid) {
+    public CID(Long id, String guid) {
         this.id = id;
         this.guid = guid;
     }

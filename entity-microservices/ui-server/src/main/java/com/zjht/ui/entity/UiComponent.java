@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiComponent对象", description = "")
 public class UiComponent extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -8738053806867096047L;
+	private static final long serialVersionUID = -2377852755008209209L;
 
 
 
@@ -219,4 +219,12 @@ public class UiComponent extends BaseCopyEntity {
 	@Column(name = "render_data")
 	@TableField(value = "render_data")  
 	private String renderData;
+
+	 /**
+	 * zIndex
+	 */
+	@ApiModelProperty(value = "zIndex")
+	@Column(name = "z_index")
+	@TableField(value = "z_index")  
+	private Integer zIndex;
 }

@@ -25,7 +25,7 @@ public class Cell {
     @JsonProperty("dynamic_container")
     private int dynamicContainer;
     @JsonProperty("component_ref")
-    private int componentRef;
+    private Long componentRef;
     @JsonProperty("render")
     private Render render;
     @JsonProperty("sort")
@@ -42,7 +42,7 @@ public class Cell {
     public Cell() {
     }
 
-    public Cell(CID id, String layout, String css, int zIndex, List<Cell> children, int dynamicContainer, int componentRef, Render render, int sort, Map<String, List<Script>> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
+    public Cell(CID id, String layout, String css, int zIndex, List<Cell> children, int dynamicContainer, Long componentRef, Render render, int sort, Map<String, List<Script>> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
         this.id = id;
         this.layout = layout;
         this.css = css;

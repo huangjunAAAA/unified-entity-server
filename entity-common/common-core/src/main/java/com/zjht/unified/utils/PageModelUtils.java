@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PageModelUtils {
     public static Cell newCell(PageSpec page, CID parentGuid) {
         Cell newCell = new Cell();
-        CID newCID = new CID(-1, UUID.randomUUID().toString());
+        CID newCID = new CID(null, UUID.randomUUID().toString());
         newCell.setId(newCID);
 
         if (page != null && parentGuid != null) {
