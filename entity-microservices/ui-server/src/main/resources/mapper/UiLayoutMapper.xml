@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.ui.mapper.UiLayoutMapper">
+<mapper namespace="com.zjht.unified.mapper.UiLayoutMapper">
     
 		<resultMap id="uiLayoutResultMap" type="com.zjht.ui.entity.UiLayout">
         <result column="id" property="id"/>

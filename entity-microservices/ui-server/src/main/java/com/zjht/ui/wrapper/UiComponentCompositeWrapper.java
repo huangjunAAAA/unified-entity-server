@@ -26,6 +26,9 @@ public class UiComponentCompositeWrapper{
       	if(CollectionUtils.isNotEmpty(uiComponent.getBelongtoIdFilesetList())){
             uiComponent.getBelongtoIdFilesetList().stream().forEach(t -> FilesetCompositeWrapper.build().visitComposite(t,visitor));
         }
+      	if(CollectionUtils.isNotEmpty(uiComponent.getComponentIdUiEventHandleList())){
+            uiComponent.getComponentIdUiEventHandleList().stream().forEach(t -> UiEventHandleCompositeWrapper.build().visitComposite(t,visitor));
+        }
     }
 
     public static UiComponentCompositeWrapper build() {
@@ -38,6 +41,11 @@ public class UiComponentCompositeWrapper{
       	if(CollectionUtils.isNotEmpty(uiComponent.getBelongtoIdFilesetList())){
       	    vo.setBelongtoIdFilesetList(uiComponent.getBelongtoIdFilesetList().stream()
                     .map(t -> FilesetCompositeWrapper.build().entityVO(t))
+                    .collect(Collectors.toList()));
+      	}
+      	if(CollectionUtils.isNotEmpty(uiComponent.getComponentIdUiEventHandleList())){
+      	    vo.setComponentIdUiEventHandleList(uiComponent.getComponentIdUiEventHandleList().stream()
+                    .map(t -> UiEventHandleCompositeWrapper.build().entityVO(t))
                     .collect(Collectors.toList()));
       	}
 

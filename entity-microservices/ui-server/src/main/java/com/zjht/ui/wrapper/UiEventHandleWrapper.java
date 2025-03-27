@@ -7,9 +7,9 @@ import com.google.gson.reflect.TypeToken;
 import com.zjht.unified.common.core.json.GsonUtil;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.infrastructure.system.client.RemoteDictService;
-import com.zjht.ui.entity.UiComponent;
+import com.zjht.ui.entity.UiEventHandle;
 import com.zjht.infrastructure.system.entity.SysDictDataDO;
-import com.zjht.ui.vo.UiComponentVo;
+import com.zjht.ui.vo.UiEventHandleVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class UiComponentWrapper {
+public class UiEventHandleWrapper {
 
 
     protected static RestTemplate restTemplate;
@@ -31,39 +31,39 @@ public class UiComponentWrapper {
 	
 	protected static List<String> dicttypeLst;
 
-    public static UiComponentWrapper build() {
+    public static UiEventHandleWrapper build() {
         if(restTemplate==null){
 			restTemplate = SpringUtils.getBean(RestTemplate.class);
 			remoteDictService = SpringUtils.getBean(RemoteDictService.class);
 			Set<String> set = new HashSet<>();
 			dicttypeLst = new ArrayList<>(set);
         }
-        return new UiComponentWrapper();
+        return new UiEventHandleWrapper();
     }
 
-    public UiComponentVo entityVO(UiComponent uiComponent) {
-        if (uiComponent == null)
+    public UiEventHandleVo entityVO(UiEventHandle uiEventHandle) {
+        if (uiEventHandle == null)
             return null;
-        UiComponentVo uiComponentVo = new UiComponentVo();
-        BeanUtils.copyProperties(uiComponent, uiComponentVo);
-        ArrayList<UiComponentVo> collect = new ArrayList<UiComponentVo>();
-        collect.add(uiComponentVo);
+        UiEventHandleVo uiEventHandleVo = new UiEventHandleVo();
+        BeanUtils.copyProperties(uiEventHandle, uiEventHandleVo);
+        ArrayList<UiEventHandleVo> collect = new ArrayList<UiEventHandleVo>();
+        collect.add(uiEventHandleVo);
         
 		translateDict(collect);
-        return uiComponentVo;
+        return uiEventHandleVo;
     }
 
-    public List<UiComponentVo> entityVOList(List<UiComponent> list) {
-        List<UiComponentVo> collect = list.stream().map(entity -> {
-            UiComponentVo uiComponentVo = new UiComponentVo();
-            BeanUtils.copyProperties(entity, uiComponentVo);
-            return uiComponentVo;
+    public List<UiEventHandleVo> entityVOList(List<UiEventHandle> list) {
+        List<UiEventHandleVo> collect = list.stream().map(entity -> {
+            UiEventHandleVo uiEventHandleVo = new UiEventHandleVo();
+            BeanUtils.copyProperties(entity, uiEventHandleVo);
+            return uiEventHandleVo;
         }).collect(Collectors.toList());
 		collect=translateDict(collect);
         return collect;
     }
 	
-	public List<UiComponentVo> translateDict(List<UiComponentVo> list){
+	public List<UiEventHandleVo> translateDict(List<UiEventHandleVo> list){
         if (CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(dicttypeLst))
             return list;
 
@@ -84,8 +84,8 @@ public class UiComponentWrapper {
         return list;
     }
 	
-    public IPage<UiComponentVo> pageVO(IPage<UiComponent> source) {
-        Page<UiComponentVo> page = new Page<UiComponentVo>();
+    public IPage<UiEventHandleVo> pageVO(IPage<UiEventHandle> source) {
+        Page<UiEventHandleVo> page = new Page<UiEventHandleVo>();
         BeanUtils.copyProperties(source, page, "records");
         try {
             page.setRecords(entityVOList(source.getRecords()));
@@ -95,11 +95,11 @@ public class UiComponentWrapper {
         return page;
     }
   
-  	public void validateUiComponent(UiComponent uiComponent){
+  	public void validateUiEventHandle(UiEventHandle uiEventHandle){
       
     }
 
-    public void initUiComponent(UiComponent uiComponent){
+    public void initUiEventHandle(UiEventHandle uiEventHandle){
       
     }
 }

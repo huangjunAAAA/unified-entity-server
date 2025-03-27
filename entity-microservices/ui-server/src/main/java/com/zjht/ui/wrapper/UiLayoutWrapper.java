@@ -2,14 +2,20 @@ package com.zjht.ui.wrapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zjht.unified.common.core.constants.Constants;
+import com.google.gson.reflect.TypeToken;
+import com.zjht.unified.common.core.json.GsonUtil;
+import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.infrastructure.system.client.RemoteDictService;
 import com.zjht.ui.entity.UiLayout;
 import com.zjht.infrastructure.system.entity.SysDictDataDO;
 import com.zjht.ui.vo.UiLayoutVo;
-import com.zjht.unified.common.core.util.SpringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;

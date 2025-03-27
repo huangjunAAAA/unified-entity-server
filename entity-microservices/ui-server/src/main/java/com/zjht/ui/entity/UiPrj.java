@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.wukong.core.mp.base.BaseUserEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import java.util.Date;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import javax.persistence.*;
 
 import com.zjht.unified.common.core.entity.BaseCopyEntity;
@@ -27,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiPrj对象", description = "")
 public class UiPrj extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 5323798019244786737L;
+	private static final long serialVersionUID = -3286509278434406472L;
 
 
 

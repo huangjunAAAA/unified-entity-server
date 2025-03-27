@@ -12,4 +12,5 @@ public class UiComponentCompositeDTO extends UiComponent {
   private Long originalId;
   private List<FilesetCompositeDTO> belongtoIdFilesetList;
   public static final String BELONGTOID_BELONGTOTYPE_FILESET_FK="fk-fileset-UiComponent-BELONGTOID-belongtoType";
+  private List<UiEventHandleCompositeDTO> componentIdUiEventHandleList;
 }

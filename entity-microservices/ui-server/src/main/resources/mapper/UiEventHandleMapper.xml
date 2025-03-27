@@ -2,22 +2,22 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.unified.mapper.UiPageMapper">
+<mapper namespace="com.zjht.unified.mapper.UiEventHandleMapper">
     
-		<resultMap id="uiPageResultMap" type="com.zjht.ui.entity.UiPage">
+		<resultMap id="uiEventHandleResultMap" type="com.zjht.ui.entity.UiEventHandle">
         <result column="id" property="id"/>
-        <result column="name" property="name"/>
-        <result column="path" property="path"/>
-        <result column="layout_id" property="layoutId"/>
-        <result column="route" property="route"/>
-        <result column="page_source_id" property="pageSourceId"/>
+        <result column="event_code" property="eventCode"/>
+        <result column="event_type" property="eventType"/>
+        <result column="type" property="type"/>
+        <result column="sort" property="sort"/>
+        <result column="target_data" property="targetData"/>
+        <result column="content" property="content"/>
+        <result column="component_id" property="componentId"/>
         <result column="status" property="status"/>
         <result column="create_time" property="createTime"/>
         <result column="create_user" property="createUser"/>
         <result column="update_time" property="updateTime"/>
         <result column="update_user" property="updateUser"/>
-        <result column="rprj_id" property="rprjId"/>
         <result column="original_id" property="originalId"/>
-        <result column="guid" property="guid"/>
     </resultMap>
 </mapper>

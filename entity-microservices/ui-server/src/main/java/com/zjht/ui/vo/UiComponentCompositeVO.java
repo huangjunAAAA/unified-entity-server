@@ -11,4 +11,5 @@ import java.util.List;
 @ApiModel(value = "VO", description = "",parent = UiComponent.class)
 public class UiComponentCompositeVO extends UiComponentVo{
   private List<FilesetCompositeVO> belongtoIdFilesetList;
+  private List<UiEventHandleCompositeVO> componentIdUiEventHandleList;
 }
