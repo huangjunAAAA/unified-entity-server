@@ -1,9 +1,9 @@
 import com.wukong.core.weblog.utils.JsonUtil;
-import com.zjht.unified.common.core.domain.component.CollectionField;
-import com.zjht.unified.common.core.domain.component.ComponentSpec;
-import com.zjht.unified.common.core.domain.component.CustomizeOptions;
-import com.zjht.unified.common.core.domain.FieldLocator;
-import com.zjht.unified.common.core.domain.component.SimpleField;
+import com.zjht.unified.domain.exchange.CollectionField;
+import com.zjht.unified.domain.exchange.ComponentSpec;
+import com.zjht.unified.domain.exchange.CustomizeOptions;
+import com.zjht.unified.common.core.domain.misc.FieldLocator;
+import com.zjht.unified.domain.exchange.SimpleField;
 
 import java.util.ArrayList;
 import java.util.List;

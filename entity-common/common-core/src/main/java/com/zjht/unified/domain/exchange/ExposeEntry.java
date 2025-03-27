@@ -1,8 +1,7 @@
-package com.zjht.unified.common.core.domain.component;
+package com.zjht.unified.domain.exchange;
 
 
 import lombok.Data;
-
 
 
 @Data
