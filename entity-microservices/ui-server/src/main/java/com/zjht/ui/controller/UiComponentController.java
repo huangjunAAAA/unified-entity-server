@@ -4,18 +4,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
-import com.zjht.unified.common.core.constants.Constants;
-import com.zjht.unified.common.core.constants.DeleteConstants;
-import com.zjht.unified.common.core.controller.BaseController;
-import com.zjht.unified.common.core.domain.PageDomain;
-import com.zjht.unified.common.core.domain.R;
-import com.zjht.unified.common.core.domain.TableDataInfo;
-import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
 import com.zjht.ui.vo.UiComponentVo;
 import com.zjht.ui.wrapper.UiComponentWrapper;
 import com.zjht.ui.entity.UiComponent;
 import com.zjht.ui.service.IUiComponentService;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.controller.BaseController;
+import com.zjht.unified.common.core.domain.PageDomain;
+import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.TableDataInfo;
+import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -31,19 +30,19 @@ import java.util.Arrays;
  *
  * @author wangy
  */
-@Api(value = "组件表(uiComponent)维护",tags = {"组件表(uiComponent)维护"})
+@Api(value = "组件表维护",tags = {"组件表维护"})
 @RestController
 @RequestMapping("/uiComponent")
-public class UiComponentController extends BaseController{
+public class UiComponentController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UiComponentController.class);
 	@Autowired
     private IUiComponentService uiComponentService;
 	
 	/**
-     * 查询组件表(uiComponent)列表, 对象形式
+     * 查询组件表列表, 对象形式
      */
-    @ApiOperation(value = "查询组件表(uiComponent)列表")
+    @ApiOperation(value = "查询组件表列表")
     @PostMapping("/list-ext")
     public TableDataInfo<UiComponentVo> listExt(@RequestBody BaseQueryDTO<UiComponent> uiComponent)
     {
@@ -51,9 +50,9 @@ public class UiComponentController extends BaseController{
     }
 	
 	/**
-     * 查询组件表(uiComponent)列表
+     * 查询组件表列表
      */
-    @ApiOperation(value = "查询组件表(uiComponent)列表")
+    @ApiOperation(value = "查询组件表列表")
     @GetMapping("/list")
     public TableDataInfo<UiComponentVo> list(UiComponent uiComponent, PageDomain  pageDomain)
     {
@@ -69,9 +68,9 @@ public class UiComponentController extends BaseController{
     }
 
     /**
-     * 获取组件表(uiComponent)详细信息
+     * 获取组件表详细信息
      */
-    @ApiOperation(value = "获取组件表(uiComponent)详细信息")
+    @ApiOperation(value = "获取组件表详细信息")
     @GetMapping(value = "/{id}")
     public R<UiComponentVo> getInfo(@PathVariable("id") Long id)
     {
@@ -81,9 +80,9 @@ public class UiComponentController extends BaseController{
 
 
     /**
-     * 新增组件表(uiComponent)
+     * 新增组件表
      */
-    @ApiOperation(value = "新增组件表(uiComponent)")
+    @ApiOperation(value = "新增组件表")
     @PostMapping
     public R<Long> add(@RequestBody UiComponent uiComponent)
     {
@@ -94,9 +93,9 @@ public class UiComponentController extends BaseController{
     }
 
     /**
-     * 修改组件表(uiComponent)
+     * 修改组件表
      */
-    @ApiOperation(value = "修改组件表(uiComponent)")
+    @ApiOperation(value = "修改组件表")
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody UiComponent uiComponent)
     {
@@ -107,9 +106,9 @@ public class UiComponentController extends BaseController{
     }
 
     /**
-     * 删除组件表(uiComponent)
+     * 删除组件表
      */
-    @ApiOperation(value = "删除组件表(uiComponent)")
+    @ApiOperation(value = "删除组件表")
 	@PostMapping("/delete/{ids}")
     public R<Integer> remove(@PathVariable Long[] ids)
     {
@@ -120,9 +119,9 @@ public class UiComponentController extends BaseController{
 	
 	
 	 /**
-     * 组件表(uiComponent)的动态字典
+     * 组件表的动态字典
      */
-    @ApiOperation(value = "组件表(uiComponent)的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
+    @ApiOperation(value = "组件表的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
     @PostMapping("/dict")
     public List<UiComponent> dict(@RequestBody List<Long> ids) {
 		List<UiComponent> data = uiComponentService.listByIds(ids);

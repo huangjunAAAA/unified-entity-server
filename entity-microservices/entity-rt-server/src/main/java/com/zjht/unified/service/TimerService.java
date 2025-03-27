@@ -1,6 +1,5 @@
 package com.zjht.unified.service;
 
-import com.alibaba.fastjson.JSON;
 import com.wukong.core.weblog.utils.JsonUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -53,9 +52,6 @@ public class TimerService {
     public void createSentinel(TaskContext ctx, SentinelDefDO sentinel){
         Integer jgid = getJgId(ctx);
         ReturnMap<XxlJobInfo> jobList = remoteXXL.listJobInfo(0, Integer.MAX_VALUE, jgid, SENTINEL_EXEC_METHOD, ctx.getVer());
-        ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL, sentinel.getGuid(), sentinel);
-        rtContextService.saveRunningContext(ctx);
-
         if(CollectionUtils.isEmpty(jobList.getData())) {
             String param = JsonUtilUnderline.toJson(new DVal(ctx.getVer(), sentinel.getGuid()));
             XxlJobInfo jInfo = createJobInfo(jgid, sentinel.getCron(), SENTINEL_EXEC_METHOD, 3, ctx.getVer(), param);
@@ -71,9 +67,6 @@ public class TimerService {
     public void createFSM(TaskContext ctx, FsmDefDO fsmDef){
         Integer jgid = getJgId(ctx);
         ReturnMap<XxlJobInfo> jobList = remoteXXL.listJobInfo(0, Integer.MAX_VALUE, jgid, FSM_EXEC_METHOD, ctx.getVer());
-        ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, fsmDef.getGuid(), fsmDef);
-        rtContextService.saveRunningContext(ctx);
-
         if(CollectionUtils.isEmpty(jobList.getData())) {
             String param = JsonUtilUnderline.toJson(new DVal(ctx.getVer(), fsmDef.getGuid()));
             XxlJobInfo jInfo = createJobInfo(jgid, fsmDef.getCron(), FSM_EXEC_METHOD, 3, ctx.getVer(), param);
@@ -129,7 +122,6 @@ public class TimerService {
             jobInfo.setExecutorFailRetryCount(3);
         jobInfo.setGlueRemark("GLUE代码初始化");
         jobInfo.setExecutorParam(params);
-        jobInfo.setJobDesc(execName);
         return jobInfo;
     }
 
@@ -159,7 +151,6 @@ public class TimerService {
             param = XxlJobHelper.getJobParam();
         DVal id = JsonUtil.parse(param, DVal.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        log.info("entinel-exec job get ctx:{}",ctx);
         SentinelDefDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL,id.getGuid());
         scriptEngine.exec(ss.getBody(),ctx);
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;

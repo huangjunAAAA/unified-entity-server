@@ -4,18 +4,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
-import com.zjht.unified.common.core.constants.Constants;
-import com.zjht.unified.common.core.constants.DeleteConstants;
-import com.zjht.unified.common.core.controller.BaseController;
-import com.zjht.unified.common.core.domain.PageDomain;
-import com.zjht.unified.common.core.domain.R;
-import com.zjht.unified.common.core.domain.TableDataInfo;
-import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
 import com.zjht.ui.vo.UiLayoutVo;
 import com.zjht.ui.wrapper.UiLayoutWrapper;
 import com.zjht.ui.entity.UiLayout;
 import com.zjht.ui.service.IUiLayoutService;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.controller.BaseController;
+import com.zjht.unified.common.core.domain.PageDomain;
+import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.TableDataInfo;
+import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -31,19 +30,19 @@ import java.util.Arrays;
  *
  * @author wangy
  */
-@Api(value = "页面布局(uiLayout)维护",tags = {"页面布局(uiLayout)维护"})
+@Api(value = "页面布局维护",tags = {"页面布局维护"})
 @RestController
 @RequestMapping("/uiLayout")
-public class UiLayoutController extends BaseController{
+public class UiLayoutController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UiLayoutController.class);
 	@Autowired
     private IUiLayoutService uiLayoutService;
 	
 	/**
-     * 查询页面布局(uiLayout)列表, 对象形式
+     * 查询页面布局列表, 对象形式
      */
-    @ApiOperation(value = "查询页面布局(uiLayout)列表")
+    @ApiOperation(value = "查询页面布局列表")
     @PostMapping("/list-ext")
     public TableDataInfo<UiLayoutVo> listExt(@RequestBody BaseQueryDTO<UiLayout> uiLayout)
     {
@@ -51,11 +50,11 @@ public class UiLayoutController extends BaseController{
     }
 	
 	/**
-     * 查询页面布局(uiLayout)列表
+     * 查询页面布局列表
      */
-    @ApiOperation(value = "查询页面布局(uiLayout)列表")
+    @ApiOperation(value = "查询页面布局列表")
     @GetMapping("/list")
-    public TableDataInfo<UiLayoutVo> list(UiLayout uiLayout, PageDomain  pageDomain)
+    public TableDataInfo<UiLayoutVo> list(UiLayout uiLayout, PageDomain pageDomain)
     {
 		TableDataInfo<UiLayoutVo> dataInfo = new TableDataInfo();
         Page<UiLayout> page = new Page<>(pageDomain.getPageNum(),pageDomain.getPageSize());
@@ -69,9 +68,9 @@ public class UiLayoutController extends BaseController{
     }
 
     /**
-     * 获取页面布局(uiLayout)详细信息
+     * 获取页面布局详细信息
      */
-    @ApiOperation(value = "获取页面布局(uiLayout)详细信息")
+    @ApiOperation(value = "获取页面布局详细信息")
     @GetMapping(value = "/{id}")
     public R<UiLayoutVo> getInfo(@PathVariable("id") Long id)
     {
@@ -81,9 +80,9 @@ public class UiLayoutController extends BaseController{
 
 
     /**
-     * 新增页面布局(uiLayout)
+     * 新增页面布局
      */
-    @ApiOperation(value = "新增页面布局(uiLayout)")
+    @ApiOperation(value = "新增页面布局")
     @PostMapping
     public R<Long> add(@RequestBody UiLayout uiLayout)
     {
@@ -94,9 +93,9 @@ public class UiLayoutController extends BaseController{
     }
 
     /**
-     * 修改页面布局(uiLayout)
+     * 修改页面布局
      */
-    @ApiOperation(value = "修改页面布局(uiLayout)")
+    @ApiOperation(value = "修改页面布局")
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody UiLayout uiLayout)
     {
@@ -107,9 +106,9 @@ public class UiLayoutController extends BaseController{
     }
 
     /**
-     * 删除页面布局(uiLayout)
+     * 删除页面布局
      */
-    @ApiOperation(value = "删除页面布局(uiLayout)")
+    @ApiOperation(value = "删除页面布局")
 	@PostMapping("/delete/{ids}")
     public R<Integer> remove(@PathVariable Long[] ids)
     {
@@ -120,9 +119,9 @@ public class UiLayoutController extends BaseController{
 	
 	
 	 /**
-     * 页面布局(uiLayout)的动态字典
+     * 页面布局的动态字典
      */
-    @ApiOperation(value = "页面布局(uiLayout)的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
+    @ApiOperation(value = "页面布局的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
     @PostMapping("/dict")
     public List<UiLayout> dict(@RequestBody List<Long> ids) {
 		List<UiLayout> data = uiLayoutService.listByIds(ids);

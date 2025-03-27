@@ -4,17 +4,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.wukong.core.mp.base.BaseUserEntity;
-import com.zjht.unified.common.core.entity.BaseCopyEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
-import java.time.LocalDateTime;
-import java.math.BigDecimal;
+
 import javax.persistence.*;
 
+import com.zjht.unified.common.core.entity.BaseCopyEntity;
 
 
 /**
@@ -30,7 +27,7 @@ import javax.persistence.*;
 @ApiModel(value = "UiComponent对象", description = "")
 public class UiComponent extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -4075769605072267896L;
+	private static final long serialVersionUID = -6120888256622867312L;
 
 
 
@@ -53,6 +50,14 @@ public class UiComponent extends BaseCopyEntity {
 	private String name;
 
 	 /**
+	 * 组件文件地址
+	 */
+	@ApiModelProperty(value = "组件文件地址")
+	@Column(name = "path")
+	@TableField(value = "path")  
+	private String path;
+
+	 /**
 	 * 组件接入规格（json）
 	 */
 	@ApiModelProperty(value = "组件接入规格（json）")
@@ -67,6 +72,14 @@ public class UiComponent extends BaseCopyEntity {
 	@Column(name = "component_type")
 	@TableField(value = "component_type")  
 	private String componentType;
+
+	 /**
+	 * 是否可见
+	 */
+	@ApiModelProperty(value = "是否可见")
+	@Column(name = "visible")
+	@TableField(value = "visible")  
+	private Integer visible;
 
 	 /**
 	 * 页面ID
@@ -163,60 +176,4 @@ public class UiComponent extends BaseCopyEntity {
 	@Column(name = "original_id")
 	@TableField(value = "original_id")  
 	private Long originalId;
-
-	 /**
-	 * 
-	 */
-	@ApiModelProperty(value = "")
-	@Column(name = "guid")
-	@TableField(value = "guid")  
-	private String guid;
-
-	 /**
-	 * 组件的css
-	 */
-	@ApiModelProperty(value = "组件的css")
-	@Column(name = "css_data")
-	@TableField(value = "css_data")  
-	private String cssData;
-
-	 /**
-	 * 源组件ID
-	 */
-	@ApiModelProperty(value = "源组件ID")
-	@Column(name = "component_ref")
-	@TableField(value = "component_ref")  
-	private Long componentRef;
-
-	 /**
-	 * 排序
-	 */
-	@ApiModelProperty(value = "排序")
-	@Column(name = "sort")
-	@TableField(value = "sort")  
-	private Integer sort;
-
-	 /**
-	 * 是否动态容器
-	 */
-	@ApiModelProperty(value = "是否动态容器")
-	@Column(name = "dynamic_container")
-	@TableField(value = "dynamic_container")  
-	private Integer dynamicContainer;
-
-	 /**
-	 * 动态元素的关联容器ID
-	 */
-	@ApiModelProperty(value = "动态元素的关联容器ID")
-	@Column(name = "dynamic_attached")
-	@TableField(value = "dynamic_attached")  
-	private Long dynamicAttached;
-
-	 /**
-	 * 所有的Render数据统一序列化为json字符串保存在这个字段
-	 */
-	@ApiModelProperty(value = "所有的Render数据统一序列化为json字符串保存在这个字段")
-	@Column(name = "render_data")
-	@TableField(value = "render_data")  
-	private String renderData;
 }

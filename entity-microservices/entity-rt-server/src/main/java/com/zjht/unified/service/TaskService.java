@@ -44,6 +44,7 @@ public class TaskService {
         if (CollectionUtils.isNotEmpty(spec.getSentinelDefList())) {
             spec.getSentinelDefList().forEach(ss -> {
                 timerService.createSentinel(ctx, ss);
+                ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL, ss.getGuid(), ss);
             });
         }
 
@@ -53,6 +54,7 @@ public class TaskService {
                 if (sf.getDriver() == Constants.FSM_TIMER){
                     timerService.createFSM(ctx, sf);
                 }
+                ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, sf.getGuid(), sf);
             });
         }
     }

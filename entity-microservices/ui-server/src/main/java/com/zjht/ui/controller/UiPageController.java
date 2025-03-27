@@ -4,18 +4,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
-import com.zjht.unified.common.core.constants.Constants;
-import com.zjht.unified.common.core.constants.DeleteConstants;
-import com.zjht.unified.common.core.controller.BaseController;
-import com.zjht.unified.common.core.domain.PageDomain;
-import com.zjht.unified.common.core.domain.R;
-import com.zjht.unified.common.core.domain.TableDataInfo;
-import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
 import com.zjht.ui.vo.UiPageVo;
 import com.zjht.ui.wrapper.UiPageWrapper;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.service.IUiPageService;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.controller.BaseController;
+import com.zjht.unified.common.core.domain.PageDomain;
+import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.TableDataInfo;
+import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -31,19 +30,19 @@ import java.util.Arrays;
  *
  * @author wangy
  */
-@Api(value = "页面表(uiPage)维护",tags = {"页面表(uiPage)维护"})
+@Api(value = "页面表维护",tags = {"页面表维护"})
 @RestController
 @RequestMapping("/uiPage")
-public class UiPageController extends BaseController{
+public class UiPageController extends BaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UiPageController.class);
 	@Autowired
     private IUiPageService uiPageService;
 	
 	/**
-     * 查询页面表(uiPage)列表, 对象形式
+     * 查询页面表列表, 对象形式
      */
-    @ApiOperation(value = "查询页面表(uiPage)列表")
+    @ApiOperation(value = "查询页面表列表")
     @PostMapping("/list-ext")
     public TableDataInfo<UiPageVo> listExt(@RequestBody BaseQueryDTO<UiPage> uiPage)
     {
@@ -51,9 +50,9 @@ public class UiPageController extends BaseController{
     }
 	
 	/**
-     * 查询页面表(uiPage)列表
+     * 查询页面表列表
      */
-    @ApiOperation(value = "查询页面表(uiPage)列表")
+    @ApiOperation(value = "查询页面表列表")
     @GetMapping("/list")
     public TableDataInfo<UiPageVo> list(UiPage uiPage, PageDomain  pageDomain)
     {
@@ -69,9 +68,9 @@ public class UiPageController extends BaseController{
     }
 
     /**
-     * 获取页面表(uiPage)详细信息
+     * 获取页面表详细信息
      */
-    @ApiOperation(value = "获取页面表(uiPage)详细信息")
+    @ApiOperation(value = "获取页面表详细信息")
     @GetMapping(value = "/{id}")
     public R<UiPageVo> getInfo(@PathVariable("id") Long id)
     {
@@ -81,9 +80,9 @@ public class UiPageController extends BaseController{
 
 
     /**
-     * 新增页面表(uiPage)
+     * 新增页面表
      */
-    @ApiOperation(value = "新增页面表(uiPage)")
+    @ApiOperation(value = "新增页面表")
     @PostMapping
     public R<Long> add(@RequestBody UiPage uiPage)
     {
@@ -94,9 +93,9 @@ public class UiPageController extends BaseController{
     }
 
     /**
-     * 修改页面表(uiPage)
+     * 修改页面表
      */
-    @ApiOperation(value = "修改页面表(uiPage)")
+    @ApiOperation(value = "修改页面表")
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody UiPage uiPage)
     {
@@ -107,9 +106,9 @@ public class UiPageController extends BaseController{
     }
 
     /**
-     * 删除页面表(uiPage)
+     * 删除页面表
      */
-    @ApiOperation(value = "删除页面表(uiPage)")
+    @ApiOperation(value = "删除页面表")
 	@PostMapping("/delete/{ids}")
     public R<Integer> remove(@PathVariable Long[] ids)
     {
@@ -120,9 +119,9 @@ public class UiPageController extends BaseController{
 	
 	
 	 /**
-     * 页面表(uiPage)的动态字典
+     * 页面表的动态字典
      */
-    @ApiOperation(value = "页面表(uiPage)的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
+    @ApiOperation(value = "页面表的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
     @PostMapping("/dict")
     public List<UiPage> dict(@RequestBody List<Long> ids) {
 		List<UiPage> data = uiPageService.listByIds(ids);
