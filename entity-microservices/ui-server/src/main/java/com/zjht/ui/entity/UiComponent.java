@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.wukong.core.mp.base.BaseUserEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import java.util.Date;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import javax.persistence.*;
 
 import com.zjht.unified.common.core.entity.BaseCopyEntity;
@@ -27,19 +30,27 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiComponent对象", description = "")
 public class UiComponent extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -6120888256622867312L;
+	private static final long serialVersionUID = -8738053806867096047L;
 
 
 
 	/**
-	 * 
+	 *            
 	 */
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "           ")
 	@Column(name = "id")
 	@Id
 	@TableId(value = "id", type = IdType.AUTO)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	 /**
+	 * 
+	 */
+	@ApiModelProperty(value = "")
+	@Column(name = "guid")
+	@TableField(value = "guid")  
+	private String guid;
 
 	 /**
 	 * 组件名称
@@ -50,20 +61,36 @@ public class UiComponent extends BaseCopyEntity {
 	private String name;
 
 	 /**
-	 * 组件文件地址
-	 */
-	@ApiModelProperty(value = "组件文件地址")
-	@Column(name = "path")
-	@TableField(value = "path")  
-	private String path;
-
-	 /**
 	 * 组件接入规格（json）
 	 */
 	@ApiModelProperty(value = "组件接入规格（json）")
 	@Column(name = "plugin_spec")
 	@TableField(value = "plugin_spec")  
 	private String pluginSpec;
+
+	 /**
+	 * 组件初始化脚本
+	 */
+	@ApiModelProperty(value = "组件初始化脚本")
+	@Column(name = "plugin_script")
+	@TableField(value = "plugin_script")  
+	private String pluginScript;
+
+	 /**
+	 * 组件接入数据集
+	 */
+	@ApiModelProperty(value = "组件接入数据集")
+	@Column(name = "plugin_data")
+	@TableField(value = "plugin_data")  
+	private String pluginData;
+
+	 /**
+	 * 与页面布局的整合数据
+	 */
+	@ApiModelProperty(value = "与页面布局的整合数据")
+	@Column(name = "layout_data")
+	@TableField(value = "layout_data")  
+	private String layoutData;
 
 	 /**
 	 * 组件类型，native组件/ normal普通组件
@@ -74,12 +101,28 @@ public class UiComponent extends BaseCopyEntity {
 	private String componentType;
 
 	 /**
-	 * 是否可见
+	 * 组件的css
 	 */
-	@ApiModelProperty(value = "是否可见")
-	@Column(name = "visible")
-	@TableField(value = "visible")  
-	private Integer visible;
+	@ApiModelProperty(value = "组件的css")
+	@Column(name = "css_data")
+	@TableField(value = "css_data")  
+	private String cssData;
+
+	 /**
+	 * 源组件ID
+	 */
+	@ApiModelProperty(value = "源组件ID")
+	@Column(name = "component_ref")
+	@TableField(value = "component_ref")  
+	private Long componentRef;
+
+	 /**
+	 * 排序
+	 */
+	@ApiModelProperty(value = "排序")
+	@Column(name = "sort")
+	@TableField(value = "sort")  
+	private Integer sort;
 
 	 /**
 	 * 页面ID
@@ -90,9 +133,9 @@ public class UiComponent extends BaseCopyEntity {
 	private Long pageId;
 
 	 /**
-	 * 源ID
+	 * 上级ID
 	 */
-	@ApiModelProperty(value = "源ID")
+	@ApiModelProperty(value = "上级ID")
 	@Column(name = "parent_id")
 	@TableField(value = "parent_id")  
 	private Long parentId;
@@ -130,6 +173,14 @@ public class UiComponent extends BaseCopyEntity {
 	private String depSpec;
 
 	 /**
+	 * 原始ID
+	 */
+	@ApiModelProperty(value = "原始ID")
+	@Column(name = "original_id")
+	@TableField(value = "original_id")  
+	private Long originalId;
+
+	 /**
 	 * 项目ID
 	 */
 	@ApiModelProperty(value = "项目ID")
@@ -138,42 +189,34 @@ public class UiComponent extends BaseCopyEntity {
 	private Long rprjId;
 
 	 /**
-	 * 组件接入数据集
+	 * 是否模板组件 1是 0否
 	 */
-	@ApiModelProperty(value = "组件接入数据集")
-	@Column(name = "plugin_data")
-	@TableField(value = "plugin_data")  
-	private String pluginData;
-
-	 /**
-	 * 与页面布局的整合数据
-	 */
-	@ApiModelProperty(value = "与页面布局的整合数据")
-	@Column(name = "layout_data")
-	@TableField(value = "layout_data")  
-	private String layoutData;
-
-	 /**
-	 * 是否模板组件
-	 */
-	@ApiModelProperty(value = "是否模板组件")
+	@ApiModelProperty(value = "是否模板组件 1是 0否")
 	@Column(name = "template")
 	@TableField(value = "template")  
 	private Integer template;
 
 	 /**
-	 * 组件初始化脚本
+	 * 是否动态容器
 	 */
-	@ApiModelProperty(value = "组件初始化脚本")
-	@Column(name = "plugin_script")
-	@TableField(value = "plugin_script")  
-	private String pluginScript;
+	@ApiModelProperty(value = "是否动态容器")
+	@Column(name = "dynamic_container")
+	@TableField(value = "dynamic_container")  
+	private Integer dynamicContainer;
 
 	 /**
-	 * 原始ID
+	 * 动态元素的关联容器ID
 	 */
-	@ApiModelProperty(value = "原始ID")
-	@Column(name = "original_id")
-	@TableField(value = "original_id")  
-	private Long originalId;
+	@ApiModelProperty(value = "动态元素的关联容器ID")
+	@Column(name = "dynamic_attached")
+	@TableField(value = "dynamic_attached")  
+	private Long dynamicAttached;
+
+	 /**
+	 * 所有的Render数据统一序列化为json字符串保存在这个字段
+	 */
+	@ApiModelProperty(value = "所有的Render数据统一序列化为json字符串保存在这个字段")
+	@Column(name = "render_data")
+	@TableField(value = "render_data")  
+	private String renderData;
 }

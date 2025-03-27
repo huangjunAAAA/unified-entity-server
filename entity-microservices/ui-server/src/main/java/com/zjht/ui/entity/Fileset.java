@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.wukong.core.mp.base.BaseUserEntity;
-import com.zjht.unified.common.core.entity.BaseCopyEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import javax.persistence.*;
 
+import com.zjht.unified.common.core.entity.BaseCopyEntity;
 
 
 /**
@@ -30,7 +30,7 @@ import javax.persistence.*;
 @ApiModel(value = "Fileset对象", description = "")
 public class Fileset extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -3019241714368501598L;
+	private static final long serialVersionUID = 9077441398896244418L;
 
 
 
@@ -107,4 +107,12 @@ public class Fileset extends BaseCopyEntity {
 	@Column(name = "content")
 	@TableField(value = "content")  
 	private String content;
+
+	 /**
+	 * 原始ID
+	 */
+	@ApiModelProperty(value = "原始ID")
+	@Column(name = "original_id")
+	@TableField(value = "original_id")  
+	private Long originalId;
 }

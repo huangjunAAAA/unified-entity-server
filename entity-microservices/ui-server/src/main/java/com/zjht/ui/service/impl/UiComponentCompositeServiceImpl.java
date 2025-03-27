@@ -2,6 +2,9 @@ package com.zjht.ui.service.impl;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zjht.ui.service.IUiComponentService;
 
 import com.zjht.ui.service.*;
@@ -20,7 +23,9 @@ import com.zjht.ui.wrapper.*;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Wrapper;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +44,10 @@ public class UiComponentCompositeServiceImpl implements IUiComponentCompositeSer
     private IFilesetCompositeService filesetCompositeService;
   	@Autowired
     private IFilesetService filesetService;
+    @Autowired
+    private IUiEventHandleCompositeService uiEventHandleCompositeService;
+  	@Autowired
+    private IUiEventHandleService uiEventHandleService;
   
     public Long submit(UiComponentCompositeDTO entity) {
         if(entity==null)
@@ -74,6 +83,26 @@ public class UiComponentCompositeServiceImpl implements IUiComponentCompositeSer
                 filesetCompositeService.batchSubmit(updateList);
             }
         }
+        {
+            ListExtractionUtils<UiEventHandleCompositeDTO, Long> uiEventHandleUtils = new ListExtractionUtils<>();
+            List<UiEventHandleCompositeDTO> newList = uiEventHandleUtils.extractNew(entity.getComponentIdUiEventHandleList(), oldEntity ==
+            null ? null : oldEntity.getComponentIdUiEventHandleList(), UiEventHandleCompositeDTO::getId);
+            List<UiEventHandleCompositeDTO> updateList = uiEventHandleUtils.extractUpdate(entity.getComponentIdUiEventHandleList(), oldEntity ==
+            null ? null : oldEntity.getComponentIdUiEventHandleList(), UiEventHandleCompositeDTO::getId);
+            List<Long> delList = uiEventHandleUtils.extractDel(entity.getComponentIdUiEventHandleList(), oldEntity ==
+            null ? null : oldEntity.getComponentIdUiEventHandleList(), UiEventHandleCompositeDTO::getId);
+            if (CollectionUtils.isNotEmpty(delList)) {
+                uiEventHandleCompositeService.batchRemove(delList);
+            }
+            if (CollectionUtils.isNotEmpty(newList)) {
+                newList.stream().forEach(t->{t.setComponentId(entity.getId());});
+                uiEventHandleCompositeService.batchSubmit(newList);
+            }
+            if (CollectionUtils.isNotEmpty(updateList)) {
+                updateList.stream().forEach(t->{t.setComponentId(entity.getId());});
+                uiEventHandleCompositeService.batchSubmit(updateList);
+            }
+        }
         boolean updateRequired=false;
         if(UiComponentCompositeValidate.validateOnFlush(entity)||updateRequired)
           uiComponentService.updateById(entity);
@@ -86,6 +115,10 @@ public class UiComponentCompositeServiceImpl implements IUiComponentCompositeSer
             if(CollectionUtils.isNotEmpty(oldEntity.getBelongtoIdFilesetList())){
                 List<Long> filesetIdList = oldEntity.getBelongtoIdFilesetList().stream().map(t -> t.getId()).collect(Collectors.toList());
                 filesetCompositeService.batchRemove(filesetIdList);
+            }
+            if(CollectionUtils.isNotEmpty(oldEntity.getComponentIdUiEventHandleList())){
+                List<Long> uiEventHandleIdList = oldEntity.getComponentIdUiEventHandleList().stream().map(t -> t.getId()).collect(Collectors.toList());
+                uiEventHandleCompositeService.batchRemove(uiEventHandleIdList);
             }
         }
       uiComponentService.removeById(id);
@@ -115,6 +148,9 @@ public class UiComponentCompositeServiceImpl implements IUiComponentCompositeSer
         filesetParam.setBelongtoId(id);
         filesetParam.setBelongtoType(UiComponentCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);
         uiComponentDTO.setBelongtoIdFilesetList(filesetCompositeService.selectList(filesetParam));
+        UiEventHandleCompositeDTO uiEventHandleParam = new UiEventHandleCompositeDTO();
+        uiEventHandleParam.setComponentId(id);
+        uiComponentDTO.setComponentIdUiEventHandleList(uiEventHandleCompositeService.selectList(uiEventHandleParam));
         return uiComponentDTO;
     }
 
@@ -154,6 +190,14 @@ public class UiComponentCompositeServiceImpl implements IUiComponentCompositeSer
               t.setBelongtoType(UiComponentCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);
             });
             entity.setBelongtoIdFilesetList(filesetList);
+        }
+        {
+            List<UiEventHandleCompositeDTO> uiEventHandleList=entity.getComponentIdUiEventHandleList().stream().map(t->uiEventHandleCompositeService.deepCopyById(t.getId())).collect(Collectors.toList());
+            uiEventHandleList.stream().forEach(t->{
+              t.setComponentId(entity.getId());
+              uiEventHandleService.updateById(t);
+            });
+            entity.setComponentIdUiEventHandleList(uiEventHandleList);
         }
         if(UiComponentCompositeValidate.validateOnCopy(entity))
           uiComponentService.updateById(entity);
