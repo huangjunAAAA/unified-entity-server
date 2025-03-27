@@ -5,6 +5,7 @@ import com.zjht.unified.domain.exchange.CID;
 import com.zjht.unified.domain.exchange.Cell;
 import com.zjht.unified.domain.exchange.PageSpec;
 import com.zjht.unified.utils.PageModelUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,17 @@ import java.util.List;
 @Service
 public class PageModelService {
 
+    @Autowired
+    private IUiPageService uiPageService;
+
+    @Autowired
+    private IUiPageCompositeService uiPageCompositeService;
+
     public void delCell(CID guid) {
+
+    }
+
+    public void delCell(Long id, String guid){
 
     }
 
