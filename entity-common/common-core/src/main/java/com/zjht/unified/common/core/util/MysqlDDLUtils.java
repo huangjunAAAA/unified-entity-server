@@ -58,7 +58,9 @@ public class MysqlDDLUtils {
         javaToJdbcType.put("Double", "double(32,8)");
         javaToJdbcType.put("double", "double(32,8)");
         javaToJdbcType.put("String", "varchar(255)");
+        javaToJdbcType.put("string", "varchar(255)");
         javaToJdbcType.put("Date","datetime");
+        javaToJdbcType.put("date","datetime");
     }
 
     public static void main(String[] args) {

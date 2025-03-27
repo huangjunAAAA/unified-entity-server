@@ -4,18 +4,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
-
-import com.wukong.core.mp.base.BaseEntity;
-import com.zjht.ui.vo.GitStoreVo;
-import com.zjht.ui.wrapper.GitStoreWrapper;
-import com.zjht.ui.entity.GitStore;
-import com.zjht.ui.service.IGitStoreService;
 import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.DeleteConstants;
 import com.zjht.unified.common.core.controller.BaseController;
 import com.zjht.unified.common.core.domain.PageDomain;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
+import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.ui.vo.GitStoreVo;
+import com.zjht.ui.wrapper.GitStoreWrapper;
+import com.zjht.ui.entity.GitStore;
+import com.zjht.ui.service.IGitStoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -31,19 +31,19 @@ import java.util.Arrays;
  *
  * @author wangy
  */
-@Api(value = "git表维护",tags = {"git表维护"})
+@Api(value = "git表(gitStore)维护",tags = {"git表(gitStore)维护"})
 @RestController
 @RequestMapping("/gitStore")
-public class GitStoreController extends BaseController {
+public class GitStoreController extends BaseController{
 
 	private static final Logger logger = LoggerFactory.getLogger(GitStoreController.class);
 	@Autowired
     private IGitStoreService gitStoreService;
 	
 	/**
-     * 查询git表列表, 对象形式
+     * 查询git表(gitStore)列表, 对象形式
      */
-    @ApiOperation(value = "查询git表列表")
+    @ApiOperation(value = "查询git表(gitStore)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<GitStoreVo> listExt(@RequestBody BaseQueryDTO<GitStore> gitStore)
     {
@@ -51,9 +51,9 @@ public class GitStoreController extends BaseController {
     }
 	
 	/**
-     * 查询git表列表
+     * 查询git表(gitStore)列表
      */
-    @ApiOperation(value = "查询git表列表")
+    @ApiOperation(value = "查询git表(gitStore)列表")
     @GetMapping("/list")
     public TableDataInfo<GitStoreVo> list(GitStore gitStore, PageDomain  pageDomain)
     {
@@ -69,9 +69,9 @@ public class GitStoreController extends BaseController {
     }
 
     /**
-     * 获取git表详细信息
+     * 获取git表(gitStore)详细信息
      */
-    @ApiOperation(value = "获取git表详细信息")
+    @ApiOperation(value = "获取git表(gitStore)详细信息")
     @GetMapping(value = "/{id}")
     public R<GitStoreVo> getInfo(@PathVariable("id") Long id)
     {
@@ -81,9 +81,9 @@ public class GitStoreController extends BaseController {
 
 
     /**
-     * 新增git表
+     * 新增git表(gitStore)
      */
-    @ApiOperation(value = "新增git表")
+    @ApiOperation(value = "新增git表(gitStore)")
     @PostMapping
     public R<Long> add(@RequestBody GitStore gitStore)
     {
@@ -94,9 +94,9 @@ public class GitStoreController extends BaseController {
     }
 
     /**
-     * 修改git表
+     * 修改git表(gitStore)
      */
-    @ApiOperation(value = "修改git表")
+    @ApiOperation(value = "修改git表(gitStore)")
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody GitStore gitStore)
     {
@@ -107,9 +107,9 @@ public class GitStoreController extends BaseController {
     }
 
     /**
-     * 删除git表
+     * 删除git表(gitStore)
      */
-    @ApiOperation(value = "删除git表")
+    @ApiOperation(value = "删除git表(gitStore)")
 	@PostMapping("/delete/{ids}")
     public R<Integer> remove(@PathVariable Long[] ids)
     {
@@ -120,9 +120,9 @@ public class GitStoreController extends BaseController {
 	
 	
 	 /**
-     * git表的动态字典
+     * git表(gitStore)的动态字典
      */
-    @ApiOperation(value = "git表的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
+    @ApiOperation(value = "git表(gitStore)的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
     @PostMapping("/dict")
     public List<GitStore> dict(@RequestBody List<Long> ids) {
 		List<GitStore> data = gitStoreService.listByIds(ids);

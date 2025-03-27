@@ -31,7 +31,7 @@ import java.util.Arrays;
  *
  * @author wangy
  */
-@Api(value = "UI文件列表维护",tags = {"UI文件列表维护"})
+@Api(value = "UI文件列表(fileset)维护",tags = {"UI文件列表(fileset)维护"})
 @RestController
 @RequestMapping("/fileset")
 public class FilesetController extends BaseController{
@@ -41,9 +41,9 @@ public class FilesetController extends BaseController{
     private IFilesetService filesetService;
 	
 	/**
-     * 查询UI文件列表列表, 对象形式
+     * 查询UI文件列表(fileset)列表, 对象形式
      */
-    @ApiOperation(value = "查询UI文件列表列表")
+    @ApiOperation(value = "查询UI文件列表(fileset)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<FilesetVo> listExt(@RequestBody BaseQueryDTO<Fileset> fileset)
     {
@@ -51,9 +51,9 @@ public class FilesetController extends BaseController{
     }
 	
 	/**
-     * 查询UI文件列表列表
+     * 查询UI文件列表(fileset)列表
      */
-    @ApiOperation(value = "查询UI文件列表列表")
+    @ApiOperation(value = "查询UI文件列表(fileset)列表")
     @GetMapping("/list")
     public TableDataInfo<FilesetVo> list(Fileset fileset, PageDomain  pageDomain)
     {
@@ -69,9 +69,9 @@ public class FilesetController extends BaseController{
     }
 
     /**
-     * 获取UI文件列表详细信息
+     * 获取UI文件列表(fileset)详细信息
      */
-    @ApiOperation(value = "获取UI文件列表详细信息")
+    @ApiOperation(value = "获取UI文件列表(fileset)详细信息")
     @GetMapping(value = "/{id}")
     public R<FilesetVo> getInfo(@PathVariable("id") Long id)
     {
@@ -81,9 +81,9 @@ public class FilesetController extends BaseController{
 
 
     /**
-     * 新增UI文件列表
+     * 新增UI文件列表(fileset)
      */
-    @ApiOperation(value = "新增UI文件列表")
+    @ApiOperation(value = "新增UI文件列表(fileset)")
     @PostMapping
     public R<Long> add(@RequestBody Fileset fileset)
     {
@@ -94,9 +94,9 @@ public class FilesetController extends BaseController{
     }
 
     /**
-     * 修改UI文件列表
+     * 修改UI文件列表(fileset)
      */
-    @ApiOperation(value = "修改UI文件列表")
+    @ApiOperation(value = "修改UI文件列表(fileset)")
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody Fileset fileset)
     {
@@ -107,9 +107,9 @@ public class FilesetController extends BaseController{
     }
 
     /**
-     * 删除UI文件列表
+     * 删除UI文件列表(fileset)
      */
-    @ApiOperation(value = "删除UI文件列表")
+    @ApiOperation(value = "删除UI文件列表(fileset)")
 	@PostMapping("/delete/{ids}")
     public R<Integer> remove(@PathVariable Long[] ids)
     {
@@ -120,9 +120,9 @@ public class FilesetController extends BaseController{
 	
 	
 	 /**
-     * UI文件列表的动态字典
+     * UI文件列表(fileset)的动态字典
      */
-    @ApiOperation(value = "UI文件列表的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
+    @ApiOperation(value = "UI文件列表(fileset)的字典接口", notes = "传入id获取唯一对应值，或传空获取所有值",hidden = true)
     @PostMapping("/dict")
     public List<Fileset> dict(@RequestBody List<Long> ids) {
 		List<Fileset> data = filesetService.listByIds(ids);
