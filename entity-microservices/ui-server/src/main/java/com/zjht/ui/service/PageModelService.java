@@ -1,6 +1,7 @@
 package com.zjht.ui.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.zjht.ui.dto.UiComponentCompositeDTO;
 import com.zjht.ui.dto.UiEventHandleCompositeDTO;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -154,6 +156,20 @@ public class PageModelService {
     public PageSpec savePage(PageSpec page) {
         UiPageCompositeDTO uiPage = convertToUiPage(page);
         uiPageCompositeService.submit(uiPage);
+        Map<String, UiComponentCompositeDTO> cMap = uiPage.getPageIdUiComponentList().stream().collect(Collectors.toMap(UiComponent::getGuid, v -> v));
+        if(page.getCell()!=null) {
+            UiComponentCompositeDTO rootCC = cMap.get(page.getCell().getId().getGuid());
+            uiPage.setRootComId(rootCC.getId());
+            // 根据page的cell本身的层级结构设置UiComponent的parentId
+            page.getCell().traverse((cell, parentCell) -> {
+                if (parentCell != null) {
+                    UiComponentCompositeDTO cc = cMap.get(cell.getId().getGuid());
+                    UiComponentCompositeDTO ccParent = cMap.get(parentCell.getId().getGuid());
+                    cc.setParentId(ccParent.getId());
+                }
+                return false;
+            });
+        }
         return convertToPageSpec(uiPage);
     }
 
@@ -189,7 +205,7 @@ public class PageModelService {
             Cell rootCell = null;
             for (UiComponentCompositeDTO uiComponent : uiPage.getPageIdUiComponentList()) {
                 Cell cell = componentMap.get(new CID(uiComponent.getId(),uiComponent.getGuid()));
-                if (uiComponent.getParentId() == null) {
+                if (Objects.equals(uiComponent.getId(), uiPage.getRootComId())) {
                     // This is the root component
                     rootCell = cell;
                 } else {
@@ -208,6 +224,8 @@ public class PageModelService {
         return pageSpec;
     }
 
+
+
     public UiPageCompositeDTO convertToUiPage(PageSpec pageSpec) {
         if (pageSpec == null) {
             return null;
@@ -218,6 +236,7 @@ public class PageModelService {
         uiPage.setGuid(pageSpec.getPageId().getGuid());
         uiPage.setRoute(pageSpec.getRoute());
         uiPage.setRprjId(pageSpec.getRprjId());
+        uiPage.setRootComId(pageSpec.getCell() != null ? pageSpec.getCell().getId().getId() : null);
 
         // Convert Cell to UiComponent list
         if (pageSpec.getCell() != null) {
@@ -343,6 +362,27 @@ public class PageModelService {
         }
 
         return uiComponent;
+    }
+
+
+    public List<Cell> getTemplateCell(){
+        List<UiComponent> ccList = uiComponentService.list(new LambdaQueryWrapper<UiComponent>().eq(UiComponent::getTemplate, Constants.TRUE));
+        List<Cell> cellList = ccList.stream().map(cc -> uiComponentCompositeService.selectById(cc.getId())).map(this::convertUiComponentToCell).collect(Collectors.toList());
+        return buildCellTree(cellList);
+    }
+
+    public List<Cell> buildCellTree(List<Cell> cellList){
+        Map<CID,Cell> cellMap = cellList.stream().collect(Collectors.toMap(Cell::getId, Function.identity()));
+        cellList.forEach(cell -> {
+            if(cell.getParentId()!=null){
+                Cell parentCell = cellMap.get(cell.getParentId());
+                if(parentCell!=null){
+                    cell.getParentId().setGuid(parentCell.getId().getGuid());
+                    parentCell.getChildren().add(cell);
+                }
+            }
+        });
+        return cellList.stream().filter(cell -> cell.getParentId()==null).collect(Collectors.toList());
     }
 }
 
