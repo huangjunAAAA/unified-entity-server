@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiPage对象", description = "")
 public class UiPage extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 8930370328186847582L;
+	private static final long serialVersionUID = 185300135460038354L;
 
 
 
@@ -107,4 +107,12 @@ public class UiPage extends BaseCopyEntity {
 	@Column(name = "original_id")
 	@TableField(value = "original_id")  
 	private Long originalId;
+
+	 /**
+	 * 根元素ID
+	 */
+	@ApiModelProperty(value = "根元素ID")
+	@Column(name = "root_com_id")
+	@TableField(value = "root_com_id")  
+	private Long rootComId;
 }
