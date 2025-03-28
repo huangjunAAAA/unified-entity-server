@@ -90,6 +90,8 @@ public class Constants {
      */
     public static final String YES = "1";
     public static final String NO = "2";
+    public static final int TRUE=1;
+    public static final int FALSE=0;
 
     /**
      * 日志状态

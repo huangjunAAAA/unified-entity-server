@@ -1,7 +1,6 @@
 package com.zjht.ui.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.zjht.ui.dto.UiComponentCompositeDTO;
 import com.zjht.ui.dto.UiEventHandleCompositeDTO;
@@ -366,9 +365,15 @@ public class PageModelService {
 
 
     public List<Cell> getTemplateCell(){
-        List<UiComponent> ccList = uiComponentService.list(new LambdaQueryWrapper<UiComponent>().eq(UiComponent::getTemplate, Constants.TRUE));
+        List<UiComponent> ccList = uiComponentService.list(new LambdaQueryWrapper<UiComponent>().ge(UiComponent::getTemplate, Constants.TRUE));
+        Map<Long, UiComponent> ccMap=ccList.stream().collect(Collectors.toMap(UiComponent::getId, Function.identity()));
         List<Cell> cellList = ccList.stream().map(cc -> uiComponentCompositeService.selectById(cc.getId())).map(this::convertUiComponentToCell).collect(Collectors.toList());
-        return buildCellTree(cellList);
+        List<Cell> tempCells = buildCellTree(cellList);
+        tempCells.forEach(cell -> {
+            UiComponent cc = ccMap.get(cell.getId().getId());
+            cell.setTemplate(new TemplateInfo(cc.getTemplate()+"",cc.getTemplate()+"Group",0));
+        });
+        return tempCells;
     }
 
     public List<Cell> buildCellTree(List<Cell> cellList){

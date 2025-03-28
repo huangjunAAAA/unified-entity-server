@@ -38,6 +38,8 @@ public class Cell {
     private ComponentSpec dataset;
     @JsonProperty("parent_id")
     private CID parentId;
+    @JsonProperty("template")
+    private TemplateInfo template;
 
     public Cell() {
     }
