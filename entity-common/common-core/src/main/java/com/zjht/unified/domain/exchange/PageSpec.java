@@ -14,8 +14,8 @@ public class PageSpec {
     private String route;
     @JsonProperty("source_id")
     private CID sourceId;
-    @JsonProperty("rprj_id")
-    private Long rprjId;
+    @JsonProperty("ui_prj_id")
+    private Long uiPrjId;
 
 
     public PageSpec() {

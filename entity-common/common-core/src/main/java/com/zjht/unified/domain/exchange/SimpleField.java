@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class SimpleField extends ParamField {
     @JsonProperty("order")
-    private int order;
+    private Integer order;
     @JsonProperty("ref")
     private String ref;
     @JsonProperty("indexSteps")
@@ -18,7 +18,7 @@ public class SimpleField extends ParamField {
     public SimpleField() {
     }
 
-    public SimpleField(String name, String desc, String type, int order, String ref, List<FieldLocator> indexSteps) {
+    public SimpleField(String name, String desc, String type, Integer order, String ref, List<FieldLocator> indexSteps) {
         super(name, desc, type);
         this.order = order;
         this.ref = ref;
