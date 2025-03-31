@@ -63,7 +63,7 @@ public class PageModelController {
     @ApiOperation(value = "查询整个项目所有的页面")
     @PostMapping("/getPageList")
     public R<List<PageSpec>> getPageList(@RequestBody ModelPrjDTO id){
-        Long rprjId=id.getRPrjId();
+        Long rprjId=id.getUiPrjId();
         if(rprjId==null){
             UiPrj rprj = uiPrjService.getOne(new LambdaQueryWrapper<UiPrj>().eq(UiPrj::getExternalId, id.getUePrjId()+""));
             if(rprj!=null){
