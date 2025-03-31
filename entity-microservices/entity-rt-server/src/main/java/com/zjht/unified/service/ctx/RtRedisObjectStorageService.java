@@ -1,6 +1,7 @@
 package com.zjht.unified.service.ctx;
 
 
+import alluxio.shaded.client.org.checkerframework.checker.units.qual.C;
 import com.google.common.collect.Maps;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.wukong.core.weblog.utils.JsonUtil;
@@ -8,6 +9,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.config.RedisKeyName;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.InstanceFieldDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
@@ -22,6 +24,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Service
@@ -99,9 +102,11 @@ public class RtRedisObjectStorageService {
     }
 
     public void initSpecDefinition(TaskContext ctx, PrjSpecDO spec){
-        spec.getStaticDefList().forEach(sd->{
-            setObjectAttrValue(ctx,RedisKeyName.getStaticKey(ctx.getVer()),sd.getFieldName(),sd.getFieldValue(),false);
-        });
+        if (Objects.nonNull(spec.getStaticDefList())) {
+            spec.getStaticDefList().forEach(sd->{
+                setObjectAttrValue(ctx,RedisKeyName.getStaticKey(ctx.getVer()),sd.getFieldName(),sd.getFieldValue(),false);
+            });
+        }
 
         spec.getClazzList().forEach(cd->{
             if(!ctx.getClazzMap().containsKey(cd.getName()))
@@ -129,14 +134,24 @@ public class RtRedisObjectStorageService {
     }
 
     public void initializeInstances(TaskContext ctx, PrjSpecDO spec){
-        spec.getInstanceList().forEach(inst->{
-            setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true));
-            if(StringUtils.isNotBlank(inst.getAttrValue())){
-                List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
-                fdlst.forEach(fd->{
-                    setObjectAttrValue(ctx,inst.getGuid(),fd.getField(),fd.getCurrentValue(),false);
-                });
-            }
-        });
+        if (Objects.nonNull(spec.getInstanceList())) {
+            spec.getInstanceList().forEach(inst->{
+                setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true));
+                if(StringUtils.isNotBlank(inst.getAttrValue())){
+                    List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
+                    fdlst.forEach(fd->{
+                        setObjectAttrValue(ctx,inst.getGuid(),fd.getField(),fd.getCurrentValue(),false);
+                    });
+                }
+
+                Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, inst.getGuid());
+                objectAttrValueMap.put("clazz_guid",inst.getClassGuid());
+                ClazzDefCompositeDO classDef = ctx.getClazzGUIDMap().get(inst.getClassGuid());
+                EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, ctx,objectAttrValueMap,true);
+                log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
+                gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
+            });
+        }
+
     }
 }

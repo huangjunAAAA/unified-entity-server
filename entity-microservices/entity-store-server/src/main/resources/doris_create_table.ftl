@@ -1,10 +1,6 @@
 create table ${table.name}
 (
-    sys_id BIGINT,
-    dev_id BIGINT,
-    point_id BIGINT,
-    plan_id BIGINT,
-    driver_id BIGINT,
+    guid STRING,
     <#list table.cols as x>
     ${sutil.toUnderlineCase(x.nameEn)}  ${x.jdbcType} <#if x.nameZh??>comment "${x.nameZh}"</#if> <#if x_has_next>,</#if>
     </#list>

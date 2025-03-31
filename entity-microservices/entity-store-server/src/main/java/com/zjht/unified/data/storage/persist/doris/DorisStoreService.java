@@ -48,14 +48,19 @@ public class DorisStoreService extends AbstractStoreService {
     private Admin admin;
 
 
-    @Override
-    public Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices, Long colpId) {
-        return 0L;
-    }
+//    @Override
+//    public Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices, Long colpId) {
+//        return 0L;
+//    }
 
     @Override
     public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
-        return 0;
+        MysqlDDLUtils.setJdbcType(colDef,vals);
+        MysqlDDLUtils.addUpdateConditionColumns(colDef);
+        String updateSql = dorisDDLService.update(tbl, vals, colDef);
+        log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
+        int update = jdbcTemplate.update(updateSql);
+        return update;
     }
 
     private final Map<String,Boolean> streamRoutineExistence=new HashMap<>();
@@ -132,7 +137,7 @@ public class DorisStoreService extends AbstractStoreService {
     }
 
 
-    public Long saveObject(Map<String, Object> data, String tbl, List<TblCol> preDefLst, List<TblIndex> indices,Long colpId, Long driverId) {
+    public Long saveObject(Map<String, Object> data, String tbl, List<TblCol> preDefLst, List<TblIndex> indices,Long colpId) {
         DorisDDLUtils.setJdbcType(preDefLst,data);
         createObjectTable(data,tbl,preDefLst,indices);
         createKafkaTopic(KafkaNames.DORIS_TOPIC_PRIFIX+tbl);
@@ -174,7 +179,7 @@ public class DorisStoreService extends AbstractStoreService {
 //        sData.put(FieldConstants.DEVICE_ID,ref.getDeviceId());
 //        sData.put(FieldConstants.POINT_ID,ref.getPointId());
         sData.put(FieldConstants.PROJECT_ID,colpId);
-        sData.put(FieldConstants.DRIVER_ID,driverId);
+//        sData.put(FieldConstants.DRIVER_ID,driverId);
         String vss = JsonUtilUnderline.toJson(sData);
         kafkaTemplate.send(KafkaNames.DORIS_TOPIC_PRIFIX+tbl,"rt", vss);
         return id;

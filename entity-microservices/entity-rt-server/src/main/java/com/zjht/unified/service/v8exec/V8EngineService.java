@@ -45,20 +45,27 @@ public class V8EngineService implements IScriptEngine {
 
     }
 
+    public void testM(TaskContext taskContext) {
+        exec(
+//                "var a =ClassUtils.new(\"ClassA\");\n" +
+//                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
+//                        "a.f1 = b ;\n" +
+//                        "b.f2 = 3;\n" +
+//                        "console.log(\"111111111111111111111111\");\n"+
+//                        "console.log(\"\"+a.f1.f2);"
+
+//                "var a = ClassUtils.newPersist(\"ClassA\");"+
+//                "a.name = \"张三new\";"+
+                "var a = ClassUtils.new(\"Device\",1,2);"+
+                        "console.log(a.power_on());"
+                , taskContext);
+    }
+
 
     public void test() {
-        /**
-         * public class TaskContext {
-         *     private String ver;
-         *     private PrjSpecDO prjSpec;
-         *     private Map<String, MethodDefDO> methods=new HashMap<>();
-         *     private Map<String,ClazzDefCompositeDO> clazzMap=new HashMap<>();
-         *     private Map<String,ClazzDefCompositeDO> clazzGUIDMap=new HashMap<>();
-         *     private ConcurrentHashMap<String, ClazzDefCompositeDO> rtti=new ConcurrentHashMap<>();
-         * }
-         */
 
         TaskContext taskContext = new TaskContext();
+
         HashMap<String, MethodDefDO> objectObjectHashMap = new HashMap<>();
         HashMap<String, ClazzDefCompositeDO> clazzMap = new HashMap<>();
         HashMap<String, ClazzDefCompositeDO> clazzgGUIDMap = new HashMap<>();
@@ -118,6 +125,7 @@ public class V8EngineService implements IScriptEngine {
         PrjSpecDO prjSpecDO = new PrjSpecDO();
         prjSpecDO.setUiPrj(uiPrjDO);
 
+        taskContext.setPrjId("1");
         taskContext.getPrjContextProvider().setPrjectContext(prjSpecDO);
 
         exec(
@@ -127,11 +135,17 @@ public class V8EngineService implements IScriptEngine {
 //                        "b.f2 = 3;\n" +
 //                        "console.log(\"111111111111111111111111\");\n"+
 //                        "console.log(\"\"+a.f1.f2);"
-                "var a = ClassUtils.newPersist(\"ClassA\");"+
-                "a.name = \"张三new\";"
+
+//                "var a = ClassUtils.newPersist(\"ClassA\");"+
+//                "a.name = \"张三new\";"+
+                        "var a = ClassUtils.newPersist(\"ClassA\");"+
+//                                "function method1() { console.log(this.name);}"+
+                                "a.method1();"
                 , taskContext);
 
     }
+
+
 
     @Override
     public Object exec(String script, TaskContext ctx) {

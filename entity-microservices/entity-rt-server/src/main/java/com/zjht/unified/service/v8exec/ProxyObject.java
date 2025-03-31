@@ -15,17 +15,16 @@ import com.caoccao.javet.interop.proxy.IJavetDirectProxyHandler;
 import com.caoccao.javet.interop.proxy.IJavetProxyHandler;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.primitive.*;
-import com.caoccao.javet.values.reference.IV8ValueObject;
-import com.caoccao.javet.values.reference.V8ValueObject;
-import com.caoccao.javet.values.reference.V8ValueProxy;
-import com.caoccao.javet.values.reference.V8ValueSymbol;
+import com.caoccao.javet.values.reference.*;
 import com.caoccao.javet.values.reference.builtin.V8ValueBuiltInSymbol;
 import com.wukong.core.util.ThreadLocalUtil;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
+import com.zjht.unified.domain.composite.MethodDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.domain.simple.MethodDefDO;
 import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -37,10 +36,11 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Data
-public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
+public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyObject.class);
 
@@ -49,6 +49,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
         this.taskContext = taskContext;
         this.guid = guid;
         this.clazzGUID = clazzGUID;
+        methodSet = taskContext.getMethods().values().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
     }
 
     private Map<String,Object> snapshot;
@@ -59,10 +60,29 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
 
     private String clazzGUID;
 
+    private Map<String,AttrWrapper> fieldObjectMap = new HashMap<>();
+
+    private Set<String> methodSet = new HashSet<>();
+
+
+    @Override
+    public V8Value symbolToPrimitive(V8Value... v8Values) throws JavetException, Exception {
+        System.out.println("==========symbolToPrimitive called=============================");
+        return IJavetDirectProxyHandler.super.symbolToPrimitive(v8Values);
+    }
+
     @Override
     public V8Value proxyGet(V8Value target, V8Value property, V8Value receiver) throws JavetException {
         log.info("proxyGet:" + property.toString());
         String key = null;
+
+        if (methodSet.contains(property.toString())) {
+            try {
+                return IJavetDirectProxyHandler.super.proxyGet(target, property, receiver);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         if (property instanceof V8ValueSymbol)
             try {
@@ -140,6 +160,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
                 return convertToV8Value(t);
         }
 
+
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         Object objectAttrValue = rtRedisObjectStorageService.getObjectAttrValue(taskContext, guid, key);
         if (Objects.nonNull(objectAttrValue)) {
@@ -147,8 +168,11 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
                 UnifiedObject uo = rtRedisObjectStorageService.getObject(taskContext, ((UnifiedObject) objectAttrValue).getGuid());
                 ProxyObject t = SpringUtils.getBean(V8RttiService.class).createFromUnifiedObject(taskContext, uo);
                 return new JavetProxyConverter().toV8Value(getV8Runtime(), t);
-            } else
-                return convertToV8Value(objectAttrValue);
+            } else {
+                AttrWrapper attrWrapper = new AttrWrapper(objectAttrValue, "someEV", 1, "someEval", taskContext);
+                fieldObjectMap.put(key, attrWrapper);
+                return new JavetProxyConverter().toV8Value(getV8Runtime(), attrWrapper);
+            }
         }
 
         return getV8Runtime().createV8ValueUndefined();
@@ -164,6 +188,23 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception> {
         }
         if (key == null)
             return getV8Runtime().createV8ValueBoolean(false);
+
+        if (methodSet.contains(property.toString())) {
+            try {
+                return IJavetDirectProxyHandler.super.proxySet(target, property, value, receiver);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        AttrWrapper attrWrapper = fieldObjectMap.get(key);
+        if (Objects.nonNull(attrWrapper)) {
+            int archiveStatus = attrWrapper.getArchiveStatus();
+            System.out.println("archiveStatus = " + archiveStatus);
+            if (archiveStatus==1) {
+                return getV8Runtime().createV8ValueBoolean(true);
+            }
+        }
 
         Object o = convertFromV8Value(value);
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);

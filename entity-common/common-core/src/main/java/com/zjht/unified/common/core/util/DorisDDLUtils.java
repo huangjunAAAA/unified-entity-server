@@ -8,6 +8,7 @@ import com.zjht.unified.common.core.constants.KafkaNames;
 
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
+import sun.plugin2.message.ShowDocumentMessage;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -61,6 +62,7 @@ public class DorisDDLUtils {
 
         List<TblCol> validColList = new ArrayList<>(preDefLst);
         setJdbcType(validColList,actualData);
+        addSdpReferenceColumns(validColList);
         table.setCols(validColList);
 
         Optional<TblCol> tmpTs = validColList.stream().filter(c -> c.getNameEn().equalsIgnoreCase("data_time")).findFirst();
@@ -86,6 +88,9 @@ public class DorisDDLUtils {
                 validColList.add(idPk);
             }
         }
+
+        
+
 
 
         table.setHashCol(FieldConstants.DATATIME);
@@ -116,6 +121,32 @@ public class DorisDDLUtils {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    public static void addSdpReferenceColumns(List<TblCol> validColList){
+        Set<String> cSet = validColList.stream().map(c -> c.getNameEn()).collect(Collectors.toSet());
+
+        if(!cSet.contains(FieldConstants.PROJECT_ID)) {
+            TblCol planCol = new TblCol();
+            planCol.setNameEn(FieldConstants.PROJECT_ID);
+            planCol.setType("Long");
+            planCol.setJdbcType("bigint");
+            planCol.setNameZh("项目ID");
+            planCol.setIsTempstamp(0);
+            validColList.add(planCol);
+        }
+
+
+        if(!cSet.contains(FieldConstants.CLAZZ_GUID)) {
+            TblCol planCol = new TblCol();
+            planCol.setNameEn(FieldConstants.CLAZZ_GUID);
+            planCol.setType("String");
+            planCol.setJdbcType("varchar(255)");
+            planCol.setNameZh("类guid");
+            planCol.setIsTempstamp(0);
+            validColList.add(planCol);
+        }
+
     }
 
     public static String createStreamLoadPipe(String tbl, List<String> kafkaServers, Template template) {

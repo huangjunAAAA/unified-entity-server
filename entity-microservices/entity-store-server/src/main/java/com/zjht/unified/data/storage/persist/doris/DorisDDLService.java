@@ -6,6 +6,7 @@ import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.util.DorisDDLUtils;
+import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.data.storage.persist.PersistConfig;
 import com.zjht.unified.data.storage.persist.TableDDLService;
 import freemarker.template.Template;
@@ -43,5 +44,9 @@ public class DorisDDLService implements TableDDLService {
     public String createStreamRoutine(String tbl) {
         String pddl = DorisDDLUtils.createStreamLoadPipe(tbl, properties.getBootstrapServers(), createPipeTemp);
         return pddl;
+    }
+
+    public String update(String tbl, Map<String, Object> data, List<TblCol> def) {
+        return MysqlDDLUtils.update(tbl,data,def);
     }
 }
