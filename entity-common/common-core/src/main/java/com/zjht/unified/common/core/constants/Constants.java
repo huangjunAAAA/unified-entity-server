@@ -90,6 +90,8 @@ public class Constants {
      */
     public static final String YES = "1";
     public static final String NO = "2";
+    public static final int TRUE=1;
+    public static final int FALSE=0;
 
     /**
      * 日志状态
@@ -409,4 +411,7 @@ public class Constants {
 
     public static final String HOLDING_REGISTER="1";
     public static final String DATA_INFER_REGISTER="2";
+
+    public static final String EVENT_TYPE_CONTEXT="context";
+    public static final String EVENT_TYPE_REGULAR="event";
 }

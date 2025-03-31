@@ -6,16 +6,16 @@ import lombok.Data;
 @Data
 public class Point3D {
     @JsonProperty("x")
-    private int x;
+    private Integer x;
     @JsonProperty("y")
-    private int y;
+    private Integer y;
     @JsonProperty("z")
-    private int z;
+    private Integer z;
 
     public Point3D() {
     }
 
-    public Point3D(int x, int y, int z) {
+    public Point3D(Integer x, Integer y, Integer z) {
         this.x = x;
         this.y = y;
         this.z = z;

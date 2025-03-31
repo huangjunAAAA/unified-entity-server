@@ -19,17 +19,17 @@ public class Cell {
     @JsonProperty("css")
     private String css;
     @JsonProperty("zIndex")
-    private int zIndex;
+    private Integer zIndex;
     @JsonProperty("children")
     private List<Cell> children;
     @JsonProperty("dynamic_container")
-    private int dynamicContainer;
+    private Integer dynamicContainer;
     @JsonProperty("component_ref")
-    private int componentRef;
+    private Long componentRef;
     @JsonProperty("render")
     private Render render;
     @JsonProperty("sort")
-    private int sort;
+    private Integer sort;
     @JsonProperty("event")
     private Map<String, List<Script>> event;
     @JsonProperty("contextmenu")
@@ -38,11 +38,13 @@ public class Cell {
     private ComponentSpec dataset;
     @JsonProperty("parent_id")
     private CID parentId;
+    @JsonProperty("template")
+    private TemplateInfo template;
 
     public Cell() {
     }
 
-    public Cell(CID id, String layout, String css, int zIndex, List<Cell> children, int dynamicContainer, int componentRef, Render render, int sort, Map<String, List<Script>> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
+    public Cell(CID id, String layout, String css, Integer zIndex, List<Cell> children, Integer dynamicContainer, Long componentRef, Render render, Integer sort, Map<String, List<Script>> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
         this.id = id;
         this.layout = layout;
         this.css = css;
