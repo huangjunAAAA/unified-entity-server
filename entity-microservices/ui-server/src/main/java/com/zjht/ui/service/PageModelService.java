@@ -180,7 +180,7 @@ public class PageModelService {
         PageSpec pageSpec = new PageSpec();
         pageSpec.setPageId(new CID(uiPage.getId(), uiPage.getGuid()));
         pageSpec.setRoute(uiPage.getRoute());
-        pageSpec.setRprjId(uiPage.getRprjId());
+        pageSpec.setUiPrjId(uiPage.getRprjId());
 
         // Convert UiComponent list to a tree structure and set the root node to PageSpec's cell
         if (uiPage.getPageIdUiComponentList() != null) {
@@ -234,7 +234,7 @@ public class PageModelService {
         uiPage.setId(pageSpec.getPageId().getId());
         uiPage.setGuid(pageSpec.getPageId().getGuid());
         uiPage.setRoute(pageSpec.getRoute());
-        uiPage.setRprjId(pageSpec.getRprjId());
+        uiPage.setRprjId(pageSpec.getUiPrjId());
         uiPage.setRootComId(pageSpec.getCell() != null ? pageSpec.getCell().getId().getId() : null);
 
         // Convert Cell to UiComponent list
