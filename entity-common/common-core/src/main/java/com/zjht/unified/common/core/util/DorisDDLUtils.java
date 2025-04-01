@@ -8,7 +8,6 @@ import com.zjht.unified.common.core.constants.KafkaNames;
 
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
-import sun.plugin2.message.ShowDocumentMessage;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -89,7 +88,7 @@ public class DorisDDLUtils {
             }
         }
 
-        
+
 
 
 
