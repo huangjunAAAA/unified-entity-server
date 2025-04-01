@@ -47,8 +47,8 @@ public class PageModelController {
     private IUiPageService uiPageService;
 
     @ApiOperation(value = "查询类方法定义列表")
-    @PostMapping("/update")
-    public R<PageSpec> update(@RequestBody PageSpec pageSpec){
+    @PostMapping("/updateModel")
+    public R<PageSpec> updateModel(@RequestBody PageSpec pageSpec){
         PageSpec ret=pageModelService.savePage(pageSpec);
         return R.ok(ret);
     }
