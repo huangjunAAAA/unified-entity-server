@@ -31,7 +31,7 @@ public class Cell {
     @JsonProperty("sort")
     private Integer sort;
     @JsonProperty("event")
-    private List<Map<String, List<Script>>> event;
+    private List<Event> event;
     @JsonProperty("contextmenu")
     private List<Contextmenu> contextmenu;
     @JsonProperty("dataset")
@@ -50,7 +50,7 @@ public class Cell {
     public Cell() {
     }
 
-    public Cell(CID id, String layout, String css, Integer zIndex, List<Cell> children, Integer dynamicContainer, Long componentRef, Render render, Integer sort, List<Map<String, List<Script>>> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
+    public Cell(CID id, String layout, String css, Integer zIndex, List<Cell> children, Integer dynamicContainer, Long componentRef, Render render, Integer sort, List<Event> event, List<Contextmenu> contextmenu, ComponentSpec dataset, CID parentId) {
         this.id = id;
         this.layout = layout;
         this.css = css;
