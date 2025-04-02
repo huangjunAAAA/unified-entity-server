@@ -40,6 +40,12 @@ public class Cell {
     private CID parentId;
     @JsonProperty("template")
     private TemplateInfo template;
+    @JsonProperty("pluginData")
+    private String pluginData;
+    @JsonProperty("pluginScript")
+    private String pluginScript;
+
+
 
     public Cell() {
     }

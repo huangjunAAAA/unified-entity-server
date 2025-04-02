@@ -333,6 +333,8 @@ public class PageModelService {
         uiComponent.setDynamicContainer(cell.getDynamicContainer());
         uiComponent.setComponentRef(cell.getComponentRef());
         uiComponent.setRenderData(JsonUtilUnderline.toJson(cell.getRender()));
+        uiComponent.setPluginData(cell.getPluginData());
+        uiComponent.setPluginScript(cell.getPluginScript());
 
         // Convert Cell.event and Cell.contextmenu to UiEventHandle
         if (cell.getEvent() != null) {
