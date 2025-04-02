@@ -278,6 +278,7 @@ public class PageModelService {
         if(uiComponent.getParentId()!=null){
             cell.setParentId(new CID(uiComponent.getParentId(), null));
         }
+        ArrayList<Map<String, List<Script>>> events = new ArrayList<>();
 
         // Convert UiEventHandle to Cell.event and Cell.contextmenu
         if (uiComponent.getComponentIdUiEventHandleList() != null) {
@@ -286,7 +287,10 @@ public class PageModelService {
                     Script script = new Script(uiEventHandle.getType(), uiEventHandle.getContent());
                     List<Script> value = new ArrayList<>();
                     value.add(script);
-                    cell.getEvent().put(uiEventHandle.getEventCode(), value);
+                    HashMap<String, List<Script>> enventMap = new HashMap<>();
+                    enventMap.put(uiEventHandle.getEventCode(),value);
+                    events.add(enventMap);
+//                    cell.getEvent().put(uiEventHandle.getEventCode(), value);
                 } else if (Constants.EVENT_TYPE_CONTEXT.equals(uiEventHandle.getEventType())) {
                     List<Script> scripts = new ArrayList<>();
                     scripts.add(new Script(uiEventHandle.getType(), uiEventHandle.getContent()));
@@ -296,6 +300,7 @@ public class PageModelService {
                     cell.getContextmenu().add(contextmenu);
                 }
             }
+            cell.setEvent(events);
         }
 
         return cell;
@@ -338,14 +343,27 @@ public class PageModelService {
 
         // Convert Cell.event and Cell.contextmenu to UiEventHandle
         if (cell.getEvent() != null) {
-            for (Map.Entry<String, List<Script>> entry : cell.getEvent().entrySet()) {
-                for (Script script : entry.getValue()) {
-                    UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
-                    uiEventHandle.setEventCode(entry.getKey());
-                    uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
-                    uiEventHandle.setType(script.getType());
-                    uiEventHandle.setContent(script.getContent());
-                    uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
+//            for (Map.Entry<String, List<Script>> entry : cell.getEvent().entrySet()) {
+//                for (Script script : entry.getValue()) {
+//                    UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
+//                    uiEventHandle.setEventCode(entry.getKey());
+//                    uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
+//                    uiEventHandle.setType(script.getType());
+//                    uiEventHandle.setContent(script.getContent());
+//                    uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
+//                }
+//            }
+            for (Map<String, List<Script>> stringListMap : cell.getEvent()) {
+                Set<Map.Entry<String, List<Script>>> entries = stringListMap.entrySet();
+                for (Map.Entry<String, List<Script>> entry : entries) {
+                    for (Script script : entry.getValue()) {
+                        UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
+                        uiEventHandle.setEventCode(entry.getKey());
+                        uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
+                        uiEventHandle.setType(script.getType());
+                        uiEventHandle.setContent(script.getContent());
+                        uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
+                    }
                 }
             }
         }
