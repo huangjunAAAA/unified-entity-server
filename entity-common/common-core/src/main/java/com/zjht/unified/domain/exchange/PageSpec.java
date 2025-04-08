@@ -17,6 +17,12 @@ public class PageSpec {
     @JsonProperty("ui_prj_id")
     private Long uiPrjId;
 
+    @JsonProperty("templateTag")
+    private String templateTag;
+    @JsonProperty("styleTag")
+    private String styleTag;
+    @JsonProperty("canvasRawData")
+    private String canvasRawData;
 
     public PageSpec() {
     }

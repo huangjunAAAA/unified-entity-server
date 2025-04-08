@@ -177,19 +177,9 @@ public class DeployService {
 
 
     private void renderPage(UiPageCompositeDTO page){
-        UiPrj prj = iUiPrjService.getById(page.getRprjId());
-        if(CollectionUtils.isEmpty(page.getBelongtoIdFilesetList())){
-            // 从布局重新生成
-            FilesetCompositeDTO sf=new FilesetCompositeDTO();
-            sf.setBelongtoId(page.getRprjId());
-            sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
-            sf.setPath(page.getPath());
-            sf.setStorageType(prj.getStorageType());
-            sf.setContent(page.getLayoutIdUiLayoutComposite().getTemplateData());
-            filesetService.save(sf);
-            page.getBelongtoIdFilesetList().add(sf);
-        }
 
+        if(CollectionUtils.isEmpty(page.getBelongtoIdFilesetList()))
+            return;
         StringBuilder pf=new StringBuilder();
         FilesetCompositeDTO fFile = page.getBelongtoIdFilesetList().get(0);
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());

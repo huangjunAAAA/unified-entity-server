@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.wukong.core.mp.base.BaseUserEntity;
+import com.zjht.unified.common.core.entity.BaseCopyEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import javax.persistence.*;
 
-import com.zjht.unified.common.core.entity.BaseCopyEntity;
+
 
 
 /**
@@ -30,7 +31,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiPage对象", description = "")
 public class UiPage extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 185300135460038354L;
+	private static final long serialVersionUID = -1664972154463987313L;
 
 
 
@@ -115,4 +116,12 @@ public class UiPage extends BaseCopyEntity {
 	@Column(name = "root_com_id")
 	@TableField(value = "root_com_id")  
 	private Long rootComId;
+
+	 /**
+	 * 画布的额外数据
+	 */
+	@ApiModelProperty(value = "画布的额外数据")
+	@Column(name = "canvas_data")
+	@TableField(value = "canvas_data")  
+	private String canvasData;
 }

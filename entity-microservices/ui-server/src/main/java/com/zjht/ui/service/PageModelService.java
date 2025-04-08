@@ -1,18 +1,22 @@
 package com.zjht.ui.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.zjht.ui.dto.FilesetCompositeDTO;
 import com.zjht.ui.dto.UiComponentCompositeDTO;
 import com.zjht.ui.dto.UiEventHandleCompositeDTO;
 import com.zjht.ui.dto.UiPageCompositeDTO;
-import com.zjht.ui.entity.UiComponent;
-import com.zjht.ui.entity.UiPage;
+import com.zjht.ui.entity.*;
 import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.util.ScriptUtils;
 import com.zjht.unified.domain.exchange.*;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import com.zjht.unified.utils.PageModelUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +44,15 @@ public class PageModelService {
 
     @Autowired
     private IUiEventHandleCompositeService uiEventHandleCompositeService;
+
+    @Autowired
+    private IFilesetService filesetService;
+
+    @Autowired
+    private IUiPrjService uiPrjService;
+
+    @Autowired
+    private IUiLayoutService uiLayoutService;
 
     public void delCell(CID cid,boolean withChildren) {
         if(cid!=null)
@@ -219,6 +232,25 @@ public class PageModelService {
         pageSpec.setPageId(new CID(uiPage.getId(), uiPage.getGuid()));
         pageSpec.setRoute(uiPage.getRoute());
         pageSpec.setUiPrjId(uiPage.getRprjId());
+        pageSpec.setCanvasRawData(uiPage.getCanvasData());
+
+        if(CollectionUtils.isNotEmpty(uiPage.getBelongtoIdFilesetList())){
+            FilesetCompositeDTO sf = uiPage.getBelongtoIdFilesetList().get(0);
+
+            Map<String, String> vueParts = ScriptUtils.parseVueFile(sf.getContent());
+
+            // 加入template部分
+            StringBuilder pf=new StringBuilder();
+            pf.append(vueParts.get("templateTag")).append("\n");
+            pf.append(vueParts.get("template")).append("\n").append("</template>").append("\n");
+            pageSpec.setTemplateTag(pf.toString());
+
+            // 加入style部分
+            StringBuilder pf2=new StringBuilder();
+            pf2.append(vueParts.get("styleTag")).append("\n");
+            pf2.append(vueParts.get("style")).append("\n").append("</style>");
+            pageSpec.setStyleTag(pf2.toString());
+        }
 
         // Convert UiComponent list to a tree structure and set the root node to PageSpec's cell
         if (uiPage.getPageIdUiComponentList() != null) {
@@ -276,12 +308,45 @@ public class PageModelService {
         uiPage.setRoute(pageSpec.getRoute());
         uiPage.setRprjId(pageSpec.getUiPrjId());
         uiPage.setRootComId(pageSpec.getCell() != null ? pageSpec.getCell().getId().getId() : null);
+        uiPage.setCanvasData(pageSpec.getCanvasRawData());
 
         // Convert Cell to UiComponent list
         if (pageSpec.getCell() != null) {
             List<UiComponentCompositeDTO> uiComponents = convertCellTreeToUiComponentList(pageSpec.getCell());
             uiComponents.forEach(uiComponent -> {uiComponent.setRprjId(pageSpec.getUiPrjId());});
             uiPage.setPageIdUiComponentList(uiComponents);
+        }
+
+        if(uiPage.getId()!=null){
+            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getRprjId())
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                    .eq(Fileset::getPath, uiPage.getPath()));
+            FilesetCompositeDTO sf=new FilesetCompositeDTO();
+            if(targetFile!=null){
+                BeanUtils.copyProperties(targetFile,sf);
+            }else{
+                UiPrj prj = uiPrjService.getById(uiPage.getRprjId());
+                sf.setBelongtoId(uiPage.getRprjId());
+                sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
+                sf.setPath(uiPage.getPath());
+                sf.setStorageType(prj.getStorageType());
+            }
+
+            StringBuilder content=new StringBuilder();
+            if(pageSpec.getTemplateTag()!=null){
+                content.append(pageSpec.getTemplateTag());
+            }else{
+                content.append("<template></template>").append("\\n");
+            }
+            content.append("<script setup lang=\"ts\"></script>").append("\\n");
+
+            if(pageSpec.getStyleTag()!=null){
+                content.append(pageSpec.getStyleTag());
+            }else{
+                content.append("<style></style>");
+            }
+            sf.setContent(content.toString());
+            filesetService.saveOrUpdate(sf);
         }
 
         return uiPage;
