@@ -414,4 +414,7 @@ public class Constants {
 
     public static final String EVENT_TYPE_CONTEXT="context";
     public static final String EVENT_TYPE_REGULAR="event";
+
+    public static final String CC_BELONG_TO_PAGE="page";
+    public static final String CC_BELONG_TO_CELL="cell";
 }

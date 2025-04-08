@@ -160,6 +160,7 @@ public class PageModelService {
         Map<String, UiComponentCompositeDTO> cMap = uiPage.getPageIdUiComponentList().stream().collect(Collectors.toMap(UiComponent::getGuid, v -> v));
         if(page.getCell()!=null) {
             UiComponentCompositeDTO rootCC = cMap.get(page.getCell().getId().getGuid());
+            rootCC.setParentType(Constants.CC_BELONG_TO_PAGE);
             uiPage.setRootComId(rootCC.getId());
             // 根据page的cell本身的层级结构设置UiComponent的parentId
             page.getCell().traverse((cell, parentCell) -> {
@@ -172,6 +173,9 @@ public class PageModelService {
             });
             uiPageService.updateById(uiPage);
             uiPage.getPageIdUiComponentList().forEach(cc -> {
+                if(cc.getParentId()!=null && !Objects.equals(cc.getId(),rootCC.getId())){
+                    cc.setParentType(Constants.CC_BELONG_TO_CELL);
+                }
                 uiComponentCompositeService.submit(cc);
             });
         }
@@ -385,16 +389,6 @@ public class PageModelService {
 
         // Convert Cell.event and Cell.contextmenu to UiEventHandle
         if (cell.getEvent() != null) {
-//            for (Map.Entry<String, List<Script>> entry : cell.getEvent().entrySet()) {
-//                for (Script script : entry.getValue()) {
-//                    UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
-//                    uiEventHandle.setEventCode(entry.getKey());
-//                    uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
-//                    uiEventHandle.setType(script.getType());
-//                    uiEventHandle.setContent(script.getContent());
-//                    uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
-//                }
-//            }
             for (Event event : cell.getEvent()) {
                 for (Script script : event.getScripts()) {
                     UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
@@ -416,6 +410,14 @@ public class PageModelService {
                 uiEventHandle.setType(contextmenu.getScript().get(0).getType());
                 uiEventHandle.setContent(contextmenu.getScript().get(0).getContent());
                 uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
+            }
+        }
+
+        if(cell.getComponentRef()!=null){
+            UiComponent tCC = uiComponentService.getById(cell.getComponentRef());
+            if(tCC!=null){
+                uiComponent.setComponentType(tCC.getComponentType());
+                uiComponent.setDeriveType(tCC.getDeriveType());
             }
         }
 
