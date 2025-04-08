@@ -170,6 +170,10 @@ public class PageModelService {
                 }
                 return false;
             });
+            uiPageService.updateById(uiPage);
+            uiPage.getPageIdUiComponentList().forEach(cc -> {
+                uiComponentCompositeService.submit(cc);
+            });
         }
         return convertToPageSpec(uiPage);
     }
