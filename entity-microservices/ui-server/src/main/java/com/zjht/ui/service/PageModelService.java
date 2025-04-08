@@ -11,6 +11,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.domain.exchange.*;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import com.zjht.unified.utils.PageModelUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -274,7 +275,8 @@ public class PageModelService {
         cell.setSort(uiComponent.getSort());
         cell.setDynamicContainer(uiComponent.getDynamicContainer());
         cell.setComponentRef(uiComponent.getComponentRef());
-        cell.setRender(JsonUtilUnderline.parse(uiComponent.getRenderData(),Render.class));
+        if(StringUtils.isNotBlank(uiComponent.getRenderData()))
+            cell.setRender(JsonUtilUnderline.parse(uiComponent.getRenderData(),Render.class));
         if(uiComponent.getParentId()!=null){
             cell.setParentId(new CID(uiComponent.getParentId(), null));
         }
