@@ -32,7 +32,7 @@ public class TestProxyObject implements IJavetDirectProxyHandler<Exception> {
         return IJavetDirectProxyHandler.super.proxyApply(target, thisObject, arguments);
     }
 
-    public V8Value exec(String method,V8Value... arguments) throws JavetException, Exception {
+    public V8Value exec(TestProxyObject that,String method,V8Value... arguments) throws JavetException, Exception {
         System.out.println("exec method:"+method);
         System.out.println("exec params:"+arguments[0]);
         return arguments[0].getV8Runtime().createV8ValueString("7788");
@@ -45,7 +45,7 @@ public class TestProxyObject implements IJavetDirectProxyHandler<Exception> {
         if(property.toString().equals("m1")){
             return property.getV8Runtime().createV8ValueFunction(new JavetCallbackContext(
                     "m1", this, JavetCallbackType.DirectCallNoThisAndResult,
-                    (IJavetDirectCallable.NoThisAndResult<Exception>) (v8Values) -> exec(property.toString(),v8Values)));
+                    (IJavetDirectCallable.NoThisAndResult<Exception>) (v8Values) -> exec(TestProxyObject.this,property.toString(),v8Values)));
         }
         return IJavetDirectProxyHandler.super.proxyGet(target, property, receiver);
     }

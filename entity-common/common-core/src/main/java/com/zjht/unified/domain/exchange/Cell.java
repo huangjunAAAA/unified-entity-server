@@ -21,7 +21,7 @@ public class Cell {
     @JsonProperty("zIndex")
     private Integer zIndex;
     @JsonProperty("children")
-    private List<Cell> children;
+    private List<Cell> children=new ArrayList<>();
     @JsonProperty("dynamic_container")
     private Integer dynamicContainer;
     @JsonProperty("component_ref")
@@ -33,7 +33,7 @@ public class Cell {
     @JsonProperty("event")
     private List<Event> event;
     @JsonProperty("contextmenu")
-    private List<Contextmenu> contextmenu;
+    private List<Contextmenu> contextmenu=new ArrayList<>();
     @JsonProperty("dataset")
     private ComponentSpec dataset;
     @JsonProperty("parent_id")

@@ -46,14 +46,14 @@ public class PageModelController {
     @Autowired
     private IUiPageService uiPageService;
 
-    @ApiOperation(value = "查询类方法定义列表")
+    @ApiOperation(value = "整体更新页面数据")
     @PostMapping("/updateModel")
     public R<PageSpec> updateModel(@RequestBody PageSpec pageSpec){
         PageSpec ret=pageModelService.savePage(pageSpec);
         return R.ok(ret);
     }
 
-    @ApiOperation(value = "查询类方法定义列表")
+    @ApiOperation(value = "获取页面的整体数据")
     @PostMapping("/getSinglePage")
     public R<PageSpec> getSinglePage(@RequestBody CID id){
         PageSpec ret = pageModelService.getPage(id);

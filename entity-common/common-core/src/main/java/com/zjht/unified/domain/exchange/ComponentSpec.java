@@ -4,16 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class ComponentSpec {
     @JsonProperty("interfaces")
-    private List<CustomizeOptions> interfaces;
+    private List<CustomizeOptions> interfaces=new ArrayList<>();
     @JsonProperty("sample")
     private String sample;
     @JsonProperty("entries")
-    private List<ExposeEntry> entries;
+    private List<ExposeEntry> entries=new ArrayList<>();
 
     public ComponentSpec() {
     }

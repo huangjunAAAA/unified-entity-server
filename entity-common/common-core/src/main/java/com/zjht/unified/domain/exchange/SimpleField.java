@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zjht.unified.common.core.domain.misc.FieldLocator;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,7 +14,7 @@ public class SimpleField extends ParamField {
     @JsonProperty("ref")
     private String ref;
     @JsonProperty("indexSteps")
-    private List<FieldLocator> indexSteps;
+    private List<FieldLocator> indexSteps=new ArrayList<>();
 
     public SimpleField() {
     }

@@ -11,6 +11,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.domain.exchange.*;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import com.zjht.unified.utils.PageModelUtils;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -173,6 +174,34 @@ public class PageModelService {
         return convertToPageSpec(uiPage);
     }
 
+    private static class CIDMap<T>{
+        private HashMap<Long, T> idMap = new HashMap<>();
+        private HashMap<String, T> guidMap = new HashMap<>();
+        public T get(CID id){
+            if(id.getId()!=null)
+                return idMap.get(id.getId());
+            if(id.getGuid()!=null)
+                return guidMap.get(id.getGuid());
+            return null;
+        }
+
+        public T put(CID id, T t){
+            if(id.getId()!=null)
+                return idMap.put(id.getId(), t);
+            if(id.getGuid()!=null)
+                return guidMap.put(id.getGuid(), t);
+            return null;
+        }
+
+        public T remove(CID id){
+            if(id.getId()!=null)
+                return idMap.remove(id.getId());
+            if(id.getGuid()!=null)
+                return guidMap.remove(id.getGuid());
+            return null;
+        }
+    }
+
     public PageSpec convertToPageSpec(UiPageCompositeDTO uiPage) {
         if (uiPage == null) {
             return null;
@@ -186,13 +215,15 @@ public class PageModelService {
         // Convert UiComponent list to a tree structure and set the root node to PageSpec's cell
         if (uiPage.getPageIdUiComponentList() != null) {
             // First, build a map of components by their ID for quick lookup
-            Map<CID, Cell> componentMap = new HashMap<>();
+            CIDMap<Cell> componentMap = new CIDMap<>();
+            List<Cell> allCells=new ArrayList<>();
             for (UiComponentCompositeDTO uiComponent : uiPage.getPageIdUiComponentList()) {
                 Cell cell = convertUiComponentToCell(uiComponent);
                 componentMap.put(new CID(uiComponent.getId(),uiComponent.getGuid()), cell);
+                allCells.add(cell);
             }
 
-            componentMap.values().stream().forEach(cell -> {
+            allCells.forEach(cell -> {
                 if (cell.getParentId() != null) {
                     Cell parentCell = componentMap.get(cell.getParentId());
                     if (parentCell != null) {
