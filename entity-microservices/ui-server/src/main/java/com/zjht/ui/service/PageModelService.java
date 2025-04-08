@@ -272,6 +272,7 @@ public class PageModelService {
         // Convert Cell to UiComponent list
         if (pageSpec.getCell() != null) {
             List<UiComponentCompositeDTO> uiComponents = convertCellTreeToUiComponentList(pageSpec.getCell());
+            uiComponents.forEach(uiComponent -> {uiComponent.setRprjId(pageSpec.getUiPrjId());});
             uiPage.setPageIdUiComponentList(uiComponents);
         }
 
