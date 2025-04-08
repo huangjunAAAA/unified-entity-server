@@ -306,6 +306,8 @@ public class PageModelService {
         cell.setSort(uiComponent.getSort());
         cell.setDynamicContainer(uiComponent.getDynamicContainer());
         cell.setComponentRef(uiComponent.getComponentRef());
+        cell.setPluginData(uiComponent.getPluginData());
+        cell.setPluginScript(uiComponent.getPluginScript());
         if(StringUtils.isNotBlank(uiComponent.getRenderData()))
             cell.setRender(JsonUtilUnderline.parse(uiComponent.getRenderData(),Render.class));
         if(uiComponent.getParentId()!=null){
