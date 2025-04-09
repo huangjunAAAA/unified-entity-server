@@ -232,6 +232,7 @@ public class PageModelService {
         pageSpec.setPageId(new CID(uiPage.getId(), uiPage.getGuid()));
         pageSpec.setRoute(uiPage.getRoute());
         pageSpec.setUiPrjId(uiPage.getRprjId());
+        pageSpec.setName(uiPage.getName());
         pageSpec.setCanvasRawData(uiPage.getCanvasData());
 
         if(CollectionUtils.isNotEmpty(uiPage.getBelongtoIdFilesetList())){
@@ -309,6 +310,7 @@ public class PageModelService {
         uiPage.setRprjId(pageSpec.getUiPrjId());
         uiPage.setRootComId(pageSpec.getCell() != null ? pageSpec.getCell().getId().getId() : null);
         uiPage.setCanvasData(pageSpec.getCanvasRawData());
+        uiPage.setName(pageSpec.getName());
 
         // Convert Cell to UiComponent list
         if (pageSpec.getCell() != null) {

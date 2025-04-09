@@ -16,6 +16,8 @@ public class PageSpec {
     private CID sourceId;
     @JsonProperty("ui_prj_id")
     private Long uiPrjId;
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("templateTag")
     private String templateTag;
