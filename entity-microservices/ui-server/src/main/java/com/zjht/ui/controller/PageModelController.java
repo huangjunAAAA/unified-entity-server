@@ -9,6 +9,7 @@ import com.wukong.core.mp.base.BaseEntity;
 import com.zjht.ui.dto.ModelPrjDTO;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.entity.UiPrj;
+import com.zjht.ui.service.IUiPageCompositeService;
 import com.zjht.ui.service.IUiPageService;
 import com.zjht.ui.service.IUiPrjService;
 import com.zjht.ui.service.PageModelService;
@@ -39,6 +40,8 @@ public class PageModelController {
     @Autowired
     private PageModelService pageModelService;
 
+    @Autowired
+    private IUiPageCompositeService uiPageCompositeService;
 
     @Autowired
     private IUiPrjService uiPrjService;
@@ -58,6 +61,21 @@ public class PageModelController {
     public R<PageSpec> getSinglePage(@RequestBody CID id){
         PageSpec ret = pageModelService.getPage(id);
         return R.ok(ret);
+    }
+
+    @ApiOperation(value = "删除一个页面")
+    @PostMapping("/delPage")
+    public R<PageSpec> delPage(@RequestBody CID cid){
+        Long id=cid.getId();
+        if(id==null){
+            UiPage page = uiPageService.getOne(new LambdaQueryWrapper<UiPage>().eq(UiPage::getGuid, cid.getGuid()));
+            if(page!=null)
+                id=page.getId();
+        }
+        if(id!=null){
+            uiPageCompositeService.removeById(id);
+        }
+        return R.ok();
     }
 
     @ApiOperation(value = "查询整个项目所有的页面")
