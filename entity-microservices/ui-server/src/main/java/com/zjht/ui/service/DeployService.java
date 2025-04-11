@@ -2,6 +2,8 @@ package com.zjht.ui.service;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.util.*;
@@ -9,11 +11,14 @@ import com.zjht.ui.dto.FilesetCompositeDTO;
 import com.zjht.ui.dto.UiPageCompositeDTO;
 import com.zjht.ui.entity.Fileset;
 import com.zjht.ui.entity.UiPrj;
+import com.zjht.unified.domain.exchange.RoutingInfo;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -156,11 +161,21 @@ public class DeployService {
         });
 
         traversePrjectFiles(prjId,f->{
-            writeFile(fdir.getAbsolutePath(),f);
+            if(f.getBelongtoType().equals(Constants.FILE_TYPE_PROJECT_ROUTE)){
+                renderRoute(f);
+            }else {
+                writeFile(fdir.getAbsolutePath(), f);
+            }
             return null;
         });
 
         return R.ok();
+    }
+
+    private void renderRoute(Fileset f) {
+        StringBuilder rf=new StringBuilder();
+        rf.append("import { createRouter, createWebHistory } from 'vue-router'\n");
+        rf.append("export default router");
     }
 
     private void writeFile(String workdir, Fileset f){
@@ -241,8 +256,11 @@ public class DeployService {
             if(sf==null){
                 sf=new Fileset();
                 sf.setBelongtoId(prjId);
-                sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
                 sf.setPath(rPath);
+                if(rPath.toLowerCase().indexOf("route")==-1)
+                    sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
+                else
+                    sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_ROUTE);
                 sf.setStorageType(prj.getStorageType());
                 sf.setContent(FileUtil.readString(f,Charset.forName("utf8")));
                 sf.setStatus(Constants.STATUS_CONFIGURE);
@@ -262,7 +280,7 @@ public class DeployService {
 
     private <T> List<T> traversePrjectFiles(Long prjId, Function<Fileset,T> func){
         List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .ne(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_NODE_MODULE)
                 .eq(Fileset::getBelongtoId, prjId));
 
         UiPageCompositeDTO param=new UiPageCompositeDTO();
@@ -305,4 +323,25 @@ public class DeployService {
     private String sanitizeWorkDir(String dir){
         return FileSetUtils.translatePath(dir);
     }
+
+
+
+    private class StaticRoutor{
+        @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
+        private String history="createWebHistory(import.meta.env.BASE_URL)";
+        @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
+        private List<RoutingInfoInternal> routes;
+    }
+
+    private static class RoutingInfoInternal {
+        @JsonSerialize(using = NoQuotesJsonUtils.SingleQuotesSerializer.class)
+        private String path;
+        @JsonSerialize(using = NoQuotesJsonUtils.SingleQuotesSerializer.class)
+        private String name;
+        @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
+        private String component;
+        private RoutingInfo.Meta meta;
+
+    }
+
 }

@@ -230,7 +230,8 @@ public class PageModelService {
 
         PageSpec pageSpec = new PageSpec();
         pageSpec.setPageId(new CID(uiPage.getId(), uiPage.getGuid()));
-        pageSpec.setRoute(uiPage.getRoute());
+        if(StringUtils.isNotBlank(uiPage.getRoute()))
+            pageSpec.setRoute(JsonUtilUnderline.parse(uiPage.getRoute(), RoutingInfo.class));
         pageSpec.setUiPrjId(uiPage.getRprjId());
         pageSpec.setName(uiPage.getName());
         pageSpec.setCanvasRawData(uiPage.getCanvasData());
@@ -306,7 +307,10 @@ public class PageModelService {
         UiPageCompositeDTO uiPage = new UiPageCompositeDTO();
         uiPage.setId(pageSpec.getPageId().getId());
         uiPage.setGuid(pageSpec.getPageId().getGuid());
-        uiPage.setRoute(pageSpec.getRoute());
+        if(pageSpec.getRoute()!=null){
+            uiPage.setRoute(JsonUtilUnderline.toJson(pageSpec.getRoute()));
+            uiPage.setPath(pageSpec.getRoute().getComponent());
+        }
         uiPage.setRprjId(pageSpec.getUiPrjId());
         uiPage.setRootComId(pageSpec.getCell() != null ? pageSpec.getCell().getId().getId() : null);
         uiPage.setCanvasData(pageSpec.getCanvasRawData());
@@ -320,9 +324,10 @@ public class PageModelService {
         }
 
         if(uiPage.getId()!=null){
+            UiPage page = uiPageService.getById(uiPage.getId());
             Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getRprjId())
                     .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
-                    .eq(Fileset::getPath, uiPage.getPath()));
+                    .eq(Fileset::getPath, page.getPath()));
             FilesetCompositeDTO sf=new FilesetCompositeDTO();
             if(targetFile!=null){
                 BeanUtils.copyProperties(targetFile,sf);
@@ -330,9 +335,9 @@ public class PageModelService {
                 UiPrj prj = uiPrjService.getById(uiPage.getRprjId());
                 sf.setBelongtoId(uiPage.getRprjId());
                 sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
-                sf.setPath(uiPage.getPath());
                 sf.setStorageType(prj.getStorageType());
             }
+            sf.setPath(uiPage.getPath());
 
             StringBuilder content=new StringBuilder();
             if(pageSpec.getTemplateTag()!=null){

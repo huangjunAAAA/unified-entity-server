@@ -11,7 +11,7 @@ public class PageSpec {
     private Cell cell;
 
     @JsonProperty("route")
-    private String route;
+    private RoutingInfo route;
     @JsonProperty("source_id")
     private CID sourceId;
     @JsonProperty("ui_prj_id")
