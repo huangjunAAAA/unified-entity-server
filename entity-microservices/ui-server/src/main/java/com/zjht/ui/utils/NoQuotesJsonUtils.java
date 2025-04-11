@@ -27,7 +27,7 @@ public class NoQuotesJsonUtils {
         }
     }
 
-    public String toJson(Object o){
+    public static String toJson(Object o){
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false); // 全局禁用引号
 

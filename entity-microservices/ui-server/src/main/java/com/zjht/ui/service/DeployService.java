@@ -3,6 +3,7 @@ package com.zjht.ui.service;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
@@ -42,6 +43,9 @@ public class DeployService {
     @Resource
     private IUiPrjService iUiPrjService;
 
+    @Resource
+    private IUiPageService uiPageService;
+
     @Value("${workdir:f:/tmp}")
     private String workdir;
 
@@ -57,6 +61,7 @@ public class DeployService {
 
     public R<String> devRun(Long prjId){
         compilePages(prjId);
+        renderRoute(prjId);
         inflate(prjId);
         initNodeModule(prjId);
         UiPrj prj = iUiPrjService.getById(prjId);
@@ -161,21 +166,42 @@ public class DeployService {
         });
 
         traversePrjectFiles(prjId,f->{
-            if(f.getBelongtoType().equals(Constants.FILE_TYPE_PROJECT_ROUTE)){
-                renderRoute(f);
-            }else {
-                writeFile(fdir.getAbsolutePath(), f);
-            }
+            writeFile(fdir.getAbsolutePath(), f);
             return null;
         });
 
         return R.ok();
     }
 
-    private void renderRoute(Fileset f) {
+    private void renderRoute(Long prjId) {
+        Fileset sf = filesetService.getOne(new LambdaQueryWrapper<Fileset>()
+                .eq(Fileset::getBelongtoId, prjId).eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_ROUTE));
+        List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
+        StaticRoutor sr=new StaticRoutor();
+
+
+        pages.forEach(p->{
+            if(StringUtils.isNotBlank(p.getRoute())) {
+                RoutingInfoInternal ri = JsonUtilUnderline.readValue(p.getRoute(), RoutingInfoInternal.class);
+                ri.component="() => import('"+ri.component+"')";
+                sr.routes.add(ri);
+            }
+        });
         StringBuilder rf=new StringBuilder();
         rf.append("import { createRouter, createWebHistory } from 'vue-router'\n");
+        rf.append("const router=createRouter(\n").append(NoQuotesJsonUtils.toJson(sr)).append(")\n");
         rf.append("export default router");
+        if(sf==null){
+            UiPrj prj = iUiPrjService.getById(prjId);
+            sf=new Fileset();
+            sf.setBelongtoId(prjId);
+            sf.setPath("src/router/index.ts");
+            sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_ROUTE);
+            sf.setStorageType(prj.getStorageType());
+            sf.setStatus(Constants.STATUS_CONFIGURE);
+        }
+        sf.setContent(rf.toString());
+        filesetService.saveOrUpdate(sf);
     }
 
     private void writeFile(String workdir, Fileset f){
@@ -326,13 +352,15 @@ public class DeployService {
 
 
 
+    @Data
     private class StaticRoutor{
         @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
         private String history="createWebHistory(import.meta.env.BASE_URL)";
         @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
-        private List<RoutingInfoInternal> routes;
+        private List<RoutingInfoInternal> routes=new ArrayList<>();
     }
 
+    @Data
     private static class RoutingInfoInternal {
         @JsonSerialize(using = NoQuotesJsonUtils.SingleQuotesSerializer.class)
         private String path;
