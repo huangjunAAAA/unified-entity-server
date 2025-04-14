@@ -2,10 +2,7 @@ package com.zjht.unified.common.core.constants;
 
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
-import com.zjht.unified.domain.simple.ClsRelationDO;
-import com.zjht.unified.domain.simple.ConfigGraphDO;
-import com.zjht.unified.domain.simple.DbtableAliasDO;
-import com.zjht.unified.domain.simple.ViewDefDO;
+import com.zjht.unified.domain.simple.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.Map;
 public class CoreClazzDef {
 
     public static final String CLAZZ_TREE_NODE = "20877a07-962b-41c6-943c-6f085513b2fb";
+    public static final String CLAZZ_SENTINEL = "f0c0a2f4-b0f2-4d0d-a0d2-b9f0f0f0f0f0";
     public static final String CLAZZ_CLSREL = "e6b49b1f-342e-4cda-b030-bae68b561e24";
     public static final String CLAZZ_DATAVIEW = "aa5053a7-9b7e-44f1-8eac-4189fcb71c0f";
     public static final String CLAZZ_DB_TABLE = "9f2ff099-3191-44df-9a1e-f73c5253fdc8";
@@ -23,9 +21,10 @@ public class CoreClazzDef {
     public static final String NAME_CLSREL = "ClsRel";
     public static final String NAME_DATAVIEW = "DataView";
     public static final String NAME_DB_TABLE = "DTbl";
+    public static final String NAME_SENTINEL = "Sentinel";
 
-    public static final String[] CORE_CLASS_GUID = {CLAZZ_TREE_NODE, CLAZZ_CLSREL, CLAZZ_DATAVIEW, CLAZZ_DB_TABLE};
-    public static final String[] CORE_CLASS_NAME = {NAME_TREE_NODE, NAME_CLSREL, NAME_DATAVIEW, NAME_DB_TABLE};
+    public static final String[] CORE_CLASS_GUID = {CLAZZ_TREE_NODE, CLAZZ_CLSREL, CLAZZ_DATAVIEW, CLAZZ_DB_TABLE,CLAZZ_SENTINEL};
+    public static final String[] CORE_CLASS_NAME = {NAME_TREE_NODE, NAME_CLSREL, NAME_DATAVIEW, NAME_DB_TABLE,NAME_SENTINEL};
 
     public static String getCoreClassName(String guid) {
         for (int i = 0; i < CORE_CLASS_GUID.length; i++) {
@@ -60,6 +59,7 @@ public class CoreClazzDef {
                     coreClsMap.put(CLAZZ_CLSREL,convert(ClsRelationDO.class));
                     coreClsMap.put(CLAZZ_DATAVIEW,convert(ViewDefDO.class));
                     coreClsMap.put(CLAZZ_DB_TABLE,convert(DbtableAliasDO.class));
+                    coreClsMap.put(CLAZZ_SENTINEL,convert(SentinelDefDO.class));
                 }
             }
     }
