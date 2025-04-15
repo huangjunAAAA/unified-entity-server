@@ -1,5 +1,6 @@
 package com.zjht.unified.domain.exchange;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ public class RoutingInfo {
     @Data
     public static class Meta{
         private String title;
+        @JsonProperty("noNeedLogin")
         private Boolean noNeedLogin;
     }
 }

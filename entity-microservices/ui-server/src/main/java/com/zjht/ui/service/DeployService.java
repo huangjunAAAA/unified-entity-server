@@ -353,10 +353,10 @@ public class DeployService {
 
 
     @Data
-    private class StaticRoutor{
+    private static class StaticRoutor{
         @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
         private String history="createWebHistory(import.meta.env.BASE_URL)";
-        @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
+
         private List<RoutingInfoInternal> routes=new ArrayList<>();
     }
 
@@ -370,6 +370,21 @@ public class DeployService {
         private String component;
         private RoutingInfo.Meta meta;
 
+    }
+
+    public static void main(String[] args) {
+        StaticRoutor sr=new StaticRoutor();
+        RoutingInfoInternal ri = new RoutingInfoInternal();
+        ri.setPath("/");
+        ri.setName("home");
+        ri.setComponent("Home.vue");
+        ri.component="() => import('"+ri.component+"')";
+        ri.meta=new RoutingInfo.Meta();
+        ri.meta.setTitle("首页");
+        ri.meta.setNoNeedLogin(true);
+        sr.getRoutes().add(ri);
+        String json = NoQuotesJsonUtils.toJson(sr);
+        System.out.println(json);
     }
 
 }
