@@ -153,7 +153,7 @@ public class Constants {
      */
     public static final String FILE_TYPE_PROJECT_EXTRA = "project-extra";
     public static final String FILE_TYPE_PROJECT_ROUTE = "project-route";
-    public static final String FILE_TYPE_PROJECT_NODE_MODULE="node-module";
+    public static final String FILE_TYPE_PROJECT_NODE_MODULE="node_modules";
 
     /**
      * 方案类型
