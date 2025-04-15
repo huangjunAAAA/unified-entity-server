@@ -306,7 +306,7 @@ public class DeployService {
 
     private <T> List<T> traversePrjectFiles(Long prjId, Function<Fileset,T> func){
         List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                .ne(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_NODE_MODULE)
+                .ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE)
                 .eq(Fileset::getBelongtoId, prjId));
 
         UiPageCompositeDTO param=new UiPageCompositeDTO();
