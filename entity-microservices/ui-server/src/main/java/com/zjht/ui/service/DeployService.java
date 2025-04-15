@@ -179,11 +179,18 @@ public class DeployService {
         List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
         StaticRoutor sr=new StaticRoutor();
 
-
+        // 计算路径有几个父目录
+        String[] p1=sf.getPath().split("/");
+        String[] p2=sf.getPath().split("\\\\");
+        int actual=Math.max(p1.length,p2.length)-1;
+        StringBuilder pfx=new StringBuilder();
+        for (int i = 0; i < actual; i++) {
+            pfx.append("../");
+        }
         pages.forEach(p->{
             if(StringUtils.isNotBlank(p.getRoute())) {
                 RoutingInfoInternal ri = JsonUtilUnderline.readValue(p.getRoute(), RoutingInfoInternal.class);
-                ri.component="() => import('"+ri.component+"')";
+                ri.component="() => import('"+pfx+ri.component+"')";
                 sr.routes.add(ri);
             }
         });
@@ -385,6 +392,8 @@ public class DeployService {
         sr.getRoutes().add(ri);
         String json = NoQuotesJsonUtils.toJson(sr);
         System.out.println(json);
+
+        System.out.println("ff\\ff".split("\\\\").length);
     }
 
 }
