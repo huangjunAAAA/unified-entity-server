@@ -27,6 +27,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
 
 
+import javax.print.event.PrintJobAttributeEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,7 +58,20 @@ public class V8EngineService implements IScriptEngine {
 //                "var a = ClassUtils.newPersist(\"ClassA\");"+
 //                "a.name = \"张三new\";"+
                 "var a = ClassUtils.new(\"Device\",1,2);"+
-                        "console.log(a.power_on());"
+                        " //console.log(a.power_on()); \n"+
+                        " console.log(`a.pv = ${a.pv}`);" +
+                        " console.log(`a.name.archiveStatus = ${a.deviceName.archiveStatus}`);"+
+                        " console.log(`a.deviceName + 1 = ${a.deviceName + 1}`);"+
+                        " console.log(`a.deviceName.eval = ${a.deviceName.eval}`);"+
+                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
+                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
+                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"+
+
+                        " console.log(` exec a.deviceName + 1   ${a.deviceName = a.deviceName + 1 }`);"+
+
+                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
+                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
+                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"
                 , taskContext);
     }
 
@@ -140,11 +154,11 @@ public class V8EngineService implements IScriptEngine {
 //                "a.name = \"张三new\";"+
                         "var a = ClassUtils.newPersist(\"ClassA\");"+
 //                                "function method1() { console.log(this.name);}"+
-                                "a.method1();"
+                                "console.log(a.guid);  var guid = a.guid;"+
+                                "InstanceUtils.delByGuid(guid);  console.log(a.guid);"
                 , taskContext);
 
     }
-
 
 
     @Override

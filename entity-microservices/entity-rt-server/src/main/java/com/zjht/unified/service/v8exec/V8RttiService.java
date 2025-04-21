@@ -70,4 +70,26 @@ public class V8RttiService {
         }
         return null;
     }
+
+    public boolean deleteObject(TaskContext ctx, String guid) {
+        // 先获取对象，确保存在
+        UnifiedObject unifiedObject = redisObjectStorageService.getObject(ctx, guid);
+
+        if (unifiedObject == null) {
+            log.warn("Object with guid {} not found, nothing to delete!", guid);
+            return false;
+        }
+
+        // 删除对象记录
+        boolean objectDeleted = redisObjectStorageService.deleteObject(ctx, guid);
+        if (objectDeleted) {
+            log.info("Successfully deleted object with guid {}", guid);
+            return true;
+        } else {
+            log.error("Failed to delete object with guid {}", guid);
+            return false;
+        }
+    }
+
+
 }

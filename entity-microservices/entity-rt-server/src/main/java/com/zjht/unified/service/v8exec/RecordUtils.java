@@ -2,6 +2,7 @@ package com.zjht.unified.service.v8exec;
 
 import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.exceptions.JavetException;
+import com.caoccao.javet.interop.IV8Convertible;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.reference.V8ValueArray;

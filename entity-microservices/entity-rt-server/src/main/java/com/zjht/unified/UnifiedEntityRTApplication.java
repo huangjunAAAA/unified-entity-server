@@ -33,8 +33,8 @@ public class UnifiedEntityRTApplication {
 //            Thread.sleep(1000);
 //        }
 
-//        app.getBean(V8EngineService.class).test();
-        test();
+        app.getBean(V8EngineService.class).test();
+//        test();
 
 
     }
@@ -70,7 +70,9 @@ public class UnifiedEntityRTApplication {
                 "                        \"cachable\": -1,\n" +
                 "                        \"defaultLock\": \"lock\",\n" +
                 "                        \"classGuid\": \"b65f7c18-732e-4d3c-bf21-cabc14939867\",\n" +
-                "                        \"guid\": \"97e4b32c-96aa-4a80-9647-3a90ea0751db\"\n" +
+                "                        \"guid\": \"97e4b32c-96aa-4a80-9647-3a90ea0751db\",\n" +
+                "                        \"eval\": \" > 100\",\n" +
+                "                        \"archiveStatus\": 0\n" +
                 "                    },\n" +
                 "                    {\n" +
                 "                        \"id\": 21,\n" +
@@ -85,7 +87,9 @@ public class UnifiedEntityRTApplication {
                 "                        \"cachable\": 0,\n" +
                 "                        \"defaultLock\": \"lock\",\n" +
                 "                        \"classGuid\": \"b65f7c18-732e-4d3c-bf21-cabc14939867\",\n" +
-                "                        \"guid\": \"f0bc2053-d1c9-4cbd-8121-4514d4b7f968\"\n" +
+                "                        \"guid\": \"f0bc2053-d1c9-4cbd-8121-4514d4b7f968\",\n" +
+                "                        \"eval\": \" > 100 \",\n" +
+                "                        \"archiveStatus\": 0\n" +
                 "                    }\n" +
                 "                ],\n" +
                 "                \"clazzIdMethodDefList\": [\n" +
@@ -195,7 +199,7 @@ public class UnifiedEntityRTApplication {
                 "            \"version\": \"deviceversion\",\n" +
                 "            \"guid\": \"49e40d23-f3f4-11ef-bac4-8csdasbcbca77\"\n" +
                 "        }\n" +
-                "    }  ";
+                "    } ";
 
         PrjSpecDO prjSpecDO = JSON.parseObject(json, PrjSpecDO.class);
 //        TaskController bean = SpringUtils.getBean(TaskController.class);

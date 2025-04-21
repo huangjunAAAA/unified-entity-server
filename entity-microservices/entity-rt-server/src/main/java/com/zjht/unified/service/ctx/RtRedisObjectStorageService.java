@@ -154,4 +154,32 @@ public class RtRedisObjectStorageService {
         }
 
     }
+
+    public boolean deleteObject(TaskContext ctx, String guid) {
+        // 获取对象
+        UnifiedObject unifiedObject = getObject(ctx, guid);
+
+        if (unifiedObject == null) {
+            log.warn("Object with guid {} not found, nothing to delete!", guid);
+            return false;
+        }
+
+        // 删除对象属性
+        Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, guid);
+        if (objectAttrValueMap != null && !objectAttrValueMap.isEmpty()) {
+            objectAttrValueMap.keySet().forEach(attrName -> {
+                delObjectAttr(ctx, guid, attrName);  // 删除每个属性
+            });
+        }
+
+        // 删除对象记录
+        String objectKey = RedisKeyName.getObjectRtKey(ctx.getVer(), guid);
+        boolean deleted = redisTemplate.delete(objectKey);
+        if (deleted) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

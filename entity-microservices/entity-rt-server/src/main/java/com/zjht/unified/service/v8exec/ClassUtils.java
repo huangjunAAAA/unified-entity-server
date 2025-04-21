@@ -9,6 +9,7 @@ import com.caoccao.javet.values.reference.V8ValueFunction;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.caoccao.javet.exceptions.JavetException;
 import com.wukong.core.util.ThreadLocalUtil;
+import com.wukong.core.weblog.utils.StringUtil;
 import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -164,14 +165,17 @@ public class ClassUtils {
                         paramList.append(params.get(i).getName());
                     }
                 }
+                System.out.println("methodName: " + methodName);
+                if (StringUtil.isNotBlank(methodName) && StringUtil.isNotBlank(methodBody)) {
+                    // 生成JS方法定义
+                    String jsFunction = String.format("(function() { return function %s(%s) { %s }; })()", methodName, paramList.toString(), methodBody);
+                    V8ValueFunction functionValue = v8Runtime.getExecutor(jsFunction).execute();
 
-                // 生成JS方法定义
-                String jsFunction = String.format("(function() { return function %s(%s) { %s }; })()", methodName, paramList.toString(), methodBody);
-                V8ValueFunction functionValue = v8Runtime.getExecutor(jsFunction).execute();
+                    // 绑定到对象上
+                    value.set(methodName, functionValue);
+                    log.info("set method: {}  method body: {} on obj:{}", methodName, jsFunction,((V8ValueObject) v8Object).get("guid"));
+                }
 
-                // 绑定到对象上
-                value.set(methodName, functionValue);
-                log.info("set method: {}  method body: {} on obj:{}", methodName, jsFunction,((V8ValueObject) v8Object).get("guid"));
             }
         }
     }
