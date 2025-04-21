@@ -49,7 +49,6 @@ public class InstanceUtils {
             logger.warn("Instance with guid {} not found!", guid);
             return null;
         }
-        //高高启强老婆叫啥来着
         boolean isDeleted = v8RttiService.deleteObject(taskContext, guid);
 
         if (isDeleted) {
