@@ -159,8 +159,10 @@ public class TimerService {
             param = XxlJobHelper.getJobParam();
         DVal id = JsonUtil.parse(param, DVal.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        log.info("entinel-exec job get ctx:{}",ctx);
+        log.info("entinel-exec job get ctx:{}",JSON.toJSONString(ctx));
         SentinelDefDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL,id.getGuid());
+        log.info("entinel-exec job get SentinelDefDO:{}",JSON.toJSONString(ss));
+
         scriptEngine.exec(ss.getBody(),ctx);
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
