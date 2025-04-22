@@ -41,10 +41,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
     @Autowired
     private IUiPageService uiPageService;
     @Autowired
-    private IFilesetCompositeService filesetCompositeService;
-  	@Autowired
-    private IFilesetService filesetService;
-    @Autowired
     private IUiComponentCompositeService uiComponentCompositeService;
   	@Autowired
     private IUiComponentService uiComponentService;
@@ -63,28 +59,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
             BeanUtils.copyProperties(newestEntity,entity);
         }
         UiPageCompositeDTO oldEntity = selectById(entity.getId());
-        {
-            ListExtractionUtils<FilesetCompositeDTO, Long> filesetUtils = new ListExtractionUtils<>();
-            List<FilesetCompositeDTO> newList = filesetUtils.extractNew(entity.getBelongtoIdFilesetList(), oldEntity ==
-            null ? null : oldEntity.getBelongtoIdFilesetList(), FilesetCompositeDTO::getId);
-            List<FilesetCompositeDTO> updateList = filesetUtils.extractUpdate(entity.getBelongtoIdFilesetList(), oldEntity ==
-            null ? null : oldEntity.getBelongtoIdFilesetList(), FilesetCompositeDTO::getId);
-            List<Long> delList = filesetUtils.extractDel(entity.getBelongtoIdFilesetList(), oldEntity ==
-            null ? null : oldEntity.getBelongtoIdFilesetList(), FilesetCompositeDTO::getId);
-            if (CollectionUtils.isNotEmpty(delList)) {
-                filesetCompositeService.batchRemove(delList);
-            }
-            if (CollectionUtils.isNotEmpty(newList)) {
-                newList.stream().forEach(t->{t.setBelongtoId(entity.getId());});
-                newList.stream().forEach(t->{t.setBelongtoType(UiPageCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);});
-                filesetCompositeService.batchSubmit(newList);
-            }
-            if (CollectionUtils.isNotEmpty(updateList)) {
-                updateList.stream().forEach(t->{t.setBelongtoId(entity.getId());});
-                updateList.stream().forEach(t->{t.setBelongtoType(UiPageCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);});
-                filesetCompositeService.batchSubmit(updateList);
-            }
-        }
         {
             ListExtractionUtils<UiComponentCompositeDTO, Long> uiComponentUtils = new ListExtractionUtils<>();
             List<UiComponentCompositeDTO> newList = uiComponentUtils.extractNew(entity.getPageIdUiComponentList(), oldEntity ==
@@ -121,10 +95,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
     public void removeById(Long id) {
         UiPageCompositeDTO oldEntity = selectById(id);
         if(oldEntity!=null){
-            if(CollectionUtils.isNotEmpty(oldEntity.getBelongtoIdFilesetList())){
-                List<Long> filesetIdList = oldEntity.getBelongtoIdFilesetList().stream().map(t -> t.getId()).collect(Collectors.toList());
-                filesetCompositeService.batchRemove(filesetIdList);
-            }
             if(CollectionUtils.isNotEmpty(oldEntity.getPageIdUiComponentList())){
                 List<Long> uiComponentIdList = oldEntity.getPageIdUiComponentList().stream().map(t -> t.getId()).collect(Collectors.toList());
                 uiComponentCompositeService.batchRemove(uiComponentIdList);
@@ -155,10 +125,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
           return null;
         UiPageCompositeDTO uiPageDTO=new UiPageCompositeDTO();
         BeanUtils.copyProperties(uiPage,uiPageDTO);
-        FilesetCompositeDTO filesetParam = new FilesetCompositeDTO();
-        filesetParam.setBelongtoId(id);
-        filesetParam.setBelongtoType(UiPageCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);
-        uiPageDTO.setBelongtoIdFilesetList(filesetCompositeService.selectList(filesetParam));
         UiComponentCompositeDTO uiComponentParam = new UiComponentCompositeDTO();
         uiComponentParam.setPageId(id);
         uiPageDTO.setPageIdUiComponentList(uiComponentCompositeService.selectList(uiComponentParam));
@@ -194,15 +160,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
         entity.setOriginalId(entity.getId());
       	entity.setId(null);
         uiPageService.save(entity);
-        {
-            List<FilesetCompositeDTO> filesetList=entity.getBelongtoIdFilesetList().stream().map(t->filesetCompositeService.deepCopyById(t.getId())).collect(Collectors.toList());
-            filesetList.stream().forEach(t->{
-              t.setBelongtoId(entity.getId());
-              filesetService.updateById(t);
-              t.setBelongtoType(UiPageCompositeDTO.BELONGTOID_BELONGTOTYPE_FILESET_FK);
-            });
-            entity.setBelongtoIdFilesetList(filesetList);
-        }
         {
             List<UiComponentCompositeDTO> uiComponentList=entity.getPageIdUiComponentList().stream().map(t->uiComponentCompositeService.deepCopyById(t.getId())).collect(Collectors.toList());
             uiComponentList.stream().forEach(t->{

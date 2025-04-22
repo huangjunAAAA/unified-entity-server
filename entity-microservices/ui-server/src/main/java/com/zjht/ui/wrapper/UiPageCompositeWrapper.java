@@ -23,9 +23,6 @@ import java.util.function.Function;
 public class UiPageCompositeWrapper{
     public void visitComposite(UiPageCompositeDTO uiPage, Consumer<BaseEntity> visitor){
         visitor.accept(uiPage);
-      	if(CollectionUtils.isNotEmpty(uiPage.getBelongtoIdFilesetList())){
-            uiPage.getBelongtoIdFilesetList().stream().forEach(t -> FilesetCompositeWrapper.build().visitComposite(t,visitor));
-        }
       	if(CollectionUtils.isNotEmpty(uiPage.getPageIdUiComponentList())){
             uiPage.getPageIdUiComponentList().stream().forEach(t -> UiComponentCompositeWrapper.build().visitComposite(t,visitor));
         }
@@ -40,11 +37,6 @@ public class UiPageCompositeWrapper{
     public UiPageCompositeVO entityVO(UiPageCompositeDTO uiPage){
         UiPageWrapper wrapper=UiPageWrapper.build();
         UiPageCompositeVO vo= (UiPageCompositeVO)BeanCopyUtils.shallowCopy(wrapper.entityVO(uiPage),new UiPageCompositeVO(),null);
-      	if(CollectionUtils.isNotEmpty(uiPage.getBelongtoIdFilesetList())){
-      	    vo.setBelongtoIdFilesetList(uiPage.getBelongtoIdFilesetList().stream()
-                    .map(t -> FilesetCompositeWrapper.build().entityVO(t))
-                    .collect(Collectors.toList()));
-      	}
       	if(CollectionUtils.isNotEmpty(uiPage.getPageIdUiComponentList())){
       	    vo.setPageIdUiComponentList(uiPage.getPageIdUiComponentList().stream()
                     .map(t -> UiComponentCompositeWrapper.build().entityVO(t))

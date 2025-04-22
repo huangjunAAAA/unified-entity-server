@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @ApiModel(value = "VO", description = "",parent = UiPage.class)
 public class UiPageCompositeVO extends UiPageVo{
-  private List<FilesetCompositeVO> belongtoIdFilesetList;
   private List<UiComponentCompositeVO> pageIdUiComponentList;
   private UiLayoutCompositeVO layoutIdUiLayoutComposite;
 }

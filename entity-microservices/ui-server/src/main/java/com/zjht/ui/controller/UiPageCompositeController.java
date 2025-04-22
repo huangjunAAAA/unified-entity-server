@@ -107,13 +107,6 @@ public class UiPageCompositeController extends BaseController {
 
     private void decodePage(UiPageCompositeDTO uiPage){
         if(uiPage.getPageIdUiComponentList()!=null){
-            if(uiPage.getBelongtoIdFilesetList()!=null){
-                uiPage.getBelongtoIdFilesetList().forEach(f->{
-                    String d = Base64.decodeStr(f.getContent());
-                    if(StringUtils.isNotBlank(d))
-                        f.setContent(d);
-                });
-            }
             uiPage.getPageIdUiComponentList().forEach(ic->{
                 if(ic.getBelongtoIdFilesetList()!=null){
                     ic.getBelongtoIdFilesetList().forEach(f->{

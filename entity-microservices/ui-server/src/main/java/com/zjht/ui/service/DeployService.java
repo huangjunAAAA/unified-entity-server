@@ -124,7 +124,10 @@ public class DeployService {
         param.setRprjId(prjId);
         List<UiPageCompositeDTO> pages = uiPageCompositeService.selectList(param);
         pages.forEach(p->{
-            renderPage(p);
+            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                    .eq(Fileset::getPath, p.getPath()));
+            renderPage(p,targetFile);
         });
     }
 
@@ -152,18 +155,19 @@ public class DeployService {
         Set<String> pfSet=pfiles.stream().map(pf->pf.getPath()).collect(Collectors.toSet());
         File fdir = new File(dir);
         // clean dir
-        FileSetUtils.traverseDirDeepNoRoot(fdir.listFiles(),(f)->{
-            try {
-                String fpath = f.getAbsolutePath().replace(workdir + File.separator, "");
-                if(pfSet.contains(fpath)){
-                    log.info("delete project file:"+fpath);
-                    f.delete();
-                }
-            }catch (Exception e){
+        if(fdir.exists())
+            FileSetUtils.traverseDirDeepNoRoot(fdir.listFiles(),(f)->{
+                try {
+                    String fpath = f.getAbsolutePath().replace(workdir + File.separator, "");
+                    if(pfSet.contains(fpath)){
+                        log.info("delete project file:"+fpath);
+                        f.delete();
+                    }
+                }catch (Exception e){
 
-            }
-            return null;
-        });
+                }
+                return null;
+            });
 
         traversePrjectFiles(prjId,f->{
             writeFile(fdir.getAbsolutePath(), f);
@@ -218,27 +222,34 @@ public class DeployService {
             String oldContent = FileUtil.readString(af, Charset.forName("utf8"));
             if(oldContent.trim().equals(f.getContent().trim()))
                 return;
+        }else{
+            rf.getParentFile().mkdirs();
         }
         log.info("file updated:"+f.getPath());
         FileUtil.writeString(f.getContent(),rf, Charset.forName("utf8"));
     }
 
 
-    private void renderPage(UiPageCompositeDTO page){
+    private static String sanitizeScriptTag(String tag){
+        return tag;
+    }
 
-        if(CollectionUtils.isEmpty(page.getBelongtoIdFilesetList()))
+    private void renderPage(UiPageCompositeDTO page, Fileset fFile){
+
+        if(fFile==null)
             return;
         StringBuilder pf=new StringBuilder();
-        FilesetCompositeDTO fFile = page.getBelongtoIdFilesetList().get(0);
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());
 
         // 加入template部分
         pf.append(vueParts.get("templateTag")).append("\n");
         pf.append(vueParts.get("template")).append("\n").append("</template>").append("\n");
 
-        pf.append(vueParts.get("scriptTag")).append("\n");
         // 加入 component的script部分
         log.info("page component size:"+(page.getPageIdUiComponentList()==null?0:page.getPageIdUiComponentList().size()));
+
+        Map<String, StringBuilder> scripts=new HashMap<>();
+
         page.getPageIdUiComponentList().forEach(c->{
             String ss = c.getPluginScript();
             if(!StringUtils.isEmpty(ss)) {
@@ -247,13 +258,22 @@ public class DeployService {
                     StrSubstitutor sub = new StrSubstitutor(mapping);
                     ss = sub.replace(ss);
                 }
+                Map<String, String> ssParts = ScriptUtils.parseScript(ss);
+                String ssActural = ssParts.get("script");
+                if(StringUtils.isNotEmpty(ssActural)){
+                    String scriptTag = ssParts.get("scriptTag");
+                    scriptTag=sanitizeScriptTag(scriptTag);
+                    StringBuilder sb = scripts.getOrDefault(scriptTag,new StringBuilder());
+                    sb.append("\n").append(ssActural);
+                    scripts.put(scriptTag,sb);
+                }
             }
-            Map<String, String> ssParts = ScriptUtils.parseVueFile(ss);
-            String pluginData = ssParts.get("script");
-            pf.append(pluginData).append("\n");
         });
 
-        pf.append("\n</script>").append("\n");
+        scripts.forEach((tag,script)->{
+            pf.append(tag).append("\n").append(script).append("\n</script>").append("\n");
+        });
+
 
 //        // 加入最后的 init-end部分
 //        String ss = vueParts.get("script");
@@ -316,28 +336,10 @@ public class DeployService {
                 .ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE)
                 .eq(Fileset::getBelongtoId, prjId));
 
-        UiPageCompositeDTO param=new UiPageCompositeDTO();
-        param.setRprjId(prjId);
-        List<UiPageCompositeDTO> pages = uiPageCompositeService.selectList(param);
-
-
         List<T> ret=new ArrayList<>();
         pfiles.forEach(f->{
             T c=func.apply(f);
             ret.add(c);
-        });
-
-        pages.forEach(p->{
-            p.getBelongtoIdFilesetList().forEach(f->{
-                T c=func.apply(f);
-                ret.add(c);
-            });
-            p.getPageIdUiComponentList().forEach(com->{
-                com.getBelongtoIdFilesetList().forEach(f->{
-                    T c=func.apply(f);
-                    ret.add(c);
-                });
-            });
         });
         return ret;
     }

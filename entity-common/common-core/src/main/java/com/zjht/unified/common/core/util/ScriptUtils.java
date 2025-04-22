@@ -30,6 +30,29 @@ public class ScriptUtils {
         }
         return map;
     }
+
+
+    public static Map<String, String> parseScript(String content) {
+        Map<String, String> result = new HashMap<>();
+
+        result.put("script", "");
+        result.put("scriptTag", "<script setup lang=\"ts\">");
+
+        // 解析script部分
+        int scriptStart = findTagStart(content, "<script");
+        int scriptEnd = findTagEnd(content, "</script>", scriptStart);
+        if(scriptEnd==-1){
+            scriptEnd=findTagEnd(content,"<\\/script>",Math.max(0,scriptStart));
+        }
+        if (scriptStart != -1 && scriptEnd != -1) {
+            result.put("script", content.substring(findTagContentStart(content, scriptStart), scriptEnd).trim());
+            result.put("scriptTag", content.substring(scriptStart, findTagContentStart(content, scriptStart)).trim());
+        }else{
+            result.put("script",content);
+        }
+
+        return result;
+    }
     /**
      * 解析Vue文件内容
      * @param content Vue文件内容

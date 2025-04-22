@@ -236,10 +236,13 @@ public class PageModelService {
         pageSpec.setName(uiPage.getName());
         pageSpec.setCanvasRawData(uiPage.getCanvasData());
 
-        if(CollectionUtils.isNotEmpty(uiPage.getBelongtoIdFilesetList())){
-            FilesetCompositeDTO sf = uiPage.getBelongtoIdFilesetList().get(0);
 
-            Map<String, String> vueParts = ScriptUtils.parseVueFile(sf.getContent());
+        Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getRprjId())
+                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .eq(Fileset::getPath, uiPage.getPath()));
+
+        if(targetFile!=null){
+            Map<String, String> vueParts = ScriptUtils.parseVueFile(targetFile.getContent());
 
             // 加入template部分
             StringBuilder pf=new StringBuilder();
@@ -468,6 +471,9 @@ public class PageModelService {
                     uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
                     uiEventHandle.setType(script.getType());
                     uiEventHandle.setContent(script.getContent());
+                    if(uiComponent.getComponentIdUiEventHandleList()==null){
+                        uiComponent.setComponentIdUiEventHandleList(new ArrayList<>());
+                    }
                     uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
                 }
             }

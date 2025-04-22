@@ -10,8 +10,6 @@ import lombok.Data;
 @ApiModel(value = "DTO", description = "",parent = UiPage.class)
 public class UiPageCompositeDTO extends UiPage {
   private Long originalId;
-  private List<FilesetCompositeDTO> belongtoIdFilesetList;
-  public static final String BELONGTOID_BELONGTOTYPE_FILESET_FK="fk-fileset-UiPage-BELONGTOID-belongtoType";
   private List<UiComponentCompositeDTO> pageIdUiComponentList;
   private UiLayoutCompositeDTO layoutIdUiLayoutComposite;
 }
