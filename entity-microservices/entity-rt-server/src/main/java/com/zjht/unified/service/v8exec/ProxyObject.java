@@ -255,8 +255,10 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                 V8EngineService engineService = SpringUtils.getBean(V8EngineService.class);
                 if (StringUtil.isNotBlank(attrWrapper.getEval())) {
                     log.info("attrWrapper.getEval() = {} " ,attrWrapper.getEval());
-                    Boolean evalResult = (Boolean)engineService.exec(lastValue + " " + attrWrapper.getEval(), taskContext);
-                    if (evalResult) {
+                    String script = "'" + lastValue + "'" + attrWrapper.getEval();
+                    System.out.println("eval script = " + script);
+                    Boolean evalResult = (Boolean)engineService.exec(script  , taskContext);
+                    if (Objects.nonNull(evalResult) && evalResult) {
                         attrWrapper.setLastEV(lastValue);
                     }
                 }

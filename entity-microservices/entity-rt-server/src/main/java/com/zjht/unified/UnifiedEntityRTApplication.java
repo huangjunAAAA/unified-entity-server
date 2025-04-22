@@ -33,8 +33,8 @@ public class UnifiedEntityRTApplication {
 //            Thread.sleep(1000);
 //        }
 
-        app.getBean(V8EngineService.class).test();
-//        test();
+//        app.getBean(V8EngineService.class).test();
+        test();
 
 
     }
@@ -62,7 +62,7 @@ public class UnifiedEntityRTApplication {
                 "                        \"name\": \"deviceName\",\n" +
                 "                        \"type\": \"String\",\n" +
                 "                        \"nature\": 1,\n" +
-                "                        \"initValue\": \"设备名称\",\n" +
+                "                        \"initValue\": \"测试设备1\",\n" +
                 "                        \"clazzId\": 19,\n" +
                 "                        \"prjId\": 2,\n" +
                 "                        \"tblCol\": \"device_name\",\n" +
@@ -71,7 +71,6 @@ public class UnifiedEntityRTApplication {
                 "                        \"defaultLock\": \"lock\",\n" +
                 "                        \"classGuid\": \"b65f7c18-732e-4d3c-bf21-cabc14939867\",\n" +
                 "                        \"guid\": \"97e4b32c-96aa-4a80-9647-3a90ea0751db\",\n" +
-                "                        \"eval\": \" > 100\",\n" +
                 "                        \"archiveStatus\": 0\n" +
                 "                    },\n" +
                 "                    {\n" +
@@ -88,7 +87,6 @@ public class UnifiedEntityRTApplication {
                 "                        \"defaultLock\": \"lock\",\n" +
                 "                        \"classGuid\": \"b65f7c18-732e-4d3c-bf21-cabc14939867\",\n" +
                 "                        \"guid\": \"f0bc2053-d1c9-4cbd-8121-4514d4b7f968\",\n" +
-                "                        \"eval\": \" > 100 \",\n" +
                 "                        \"archiveStatus\": 0\n" +
                 "                    }\n" +
                 "                ],\n" +
@@ -183,13 +181,23 @@ public class UnifiedEntityRTApplication {
                 "        \"sentinelDefList\": [\n" +
                 "            {\n" +
                 "                \"id\": 4,\n" +
-                "                \"name\": \"设备开关门\",\n" +
-                "                \"body\": \"var myDevice = ClassUtils.newPersist('Device'); myDevice.power_on(); setTimeout(() => { myDevice.power_off();}, 10000);  \",\n" +
+                "                \"name\": \"设备开门\",\n" +
+                "                \"body\": \"var myDevice = ClassUtils.newPersist('Device'); \\r\\nmyDevice.power_on(); \\r\\nmyDevice.deviceName = '新name';\\r\\n// setTimeout(() => { myDevice.power_off();}, 10000);  \",\n" +
                 "                \"cron\": \"0 * * * * ?\",\n" +
                 "                \"concurrent\": 0,\n" +
                 "                \"abort\": \"运行3小时后关闭\",\n" +
                 "                \"prjId\": 2,\n" +
                 "                \"guid\": \"b65f7c18-732e-4d3c-bf21-cabc14939867\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": 5,\n" +
+                "                \"name\": \"设备关门\",\n" +
+                "                \"body\": \"var myDevice = ClassUtils.newPersist('Device'); \\r\\nmyDevice.power_off(); \",\n" +
+                "                \"cron\": \"0 * * * * ?\",\n" +
+                "                \"concurrent\": 0,\n" +
+                "                \"abort\": \"运行3小时后关闭\",\n" +
+                "                \"prjId\": 2,\n" +
+                "                \"guid\": \"b65f7c18-732e-4d3c-bf21-cabc14939868\"\n" +
                 "            }\n" +
                 "        ],\n" +
                 "        \"uePrj\": {\n" +
@@ -199,7 +207,7 @@ public class UnifiedEntityRTApplication {
                 "            \"version\": \"deviceversion\",\n" +
                 "            \"guid\": \"49e40d23-f3f4-11ef-bac4-8csdasbcbca77\"\n" +
                 "        }\n" +
-                "    } ";
+                "    }";
 
         PrjSpecDO prjSpecDO = JSON.parseObject(json, PrjSpecDO.class);
 //        TaskController bean = SpringUtils.getBean(TaskController.class);

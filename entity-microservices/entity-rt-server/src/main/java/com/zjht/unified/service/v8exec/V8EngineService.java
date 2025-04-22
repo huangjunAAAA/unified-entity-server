@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import javax.print.event.PrintJobAttributeEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 @Slf4j
@@ -47,7 +49,10 @@ public class V8EngineService implements IScriptEngine {
     }
 
     public void testM(TaskContext taskContext) {
-        exec(
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+//        exec(
 //                "var a =ClassUtils.new(\"ClassA\");\n" +
 //                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
 //                        "a.f1 = b ;\n" +
@@ -57,22 +62,52 @@ public class V8EngineService implements IScriptEngine {
 
 //                "var a = ClassUtils.newPersist(\"ClassA\");"+
 //                "a.name = \"张三new\";"+
-                "var a = ClassUtils.new(\"Device\",1,2);"+
-                        " //console.log(a.power_on()); \n"+
-                        " console.log(`a.pv = ${a.pv}`);" +
-                        " console.log(`a.name.archiveStatus = ${a.deviceName.archiveStatus}`);"+
-                        " console.log(`a.deviceName + 1 = ${a.deviceName + 1}`);"+
-                        " console.log(`a.deviceName.eval = ${a.deviceName.eval}`);"+
-                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
-                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
-                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"+
+//                "var a = ClassUtils.new(\"Device\",1,2);"+
+//                        " //console.log(a.power_on()); \n"+
+//                        " console.log(`a.pv = ${a.pv}`);" +
+//                        " console.log(`a.name.archiveStatus = ${a.deviceName.archiveStatus}`);"+
+//                        " console.log(`a.deviceName + 1 = ${a.deviceName + 1}`);"+
+//                        " console.log(`a.deviceName.eval = ${a.deviceName.eval}`);"+
+//                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
+//                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
+//                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"+
+//
+//                        " console.log(` exec a.deviceName + 1   ${a.deviceName = a.deviceName + 1 }`);"+
+//
+//                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
+//                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
+//                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"
+//                "var myDevice = ClassUtils.newPersist('Device'); \n" +
+//                        "myDevice.power_on(); \n" +
+//                        "myDevice.deviceName = '新name';\n"
+//                , taskContext);
 
-                        " console.log(` exec a.deviceName + 1   ${a.deviceName = a.deviceName + 1 }`);"+
+//        exec(
+//                "var myDevice = ClassUtils.newPersist('Device'); \n" +
+//                        "myDevice.power_off(); "
+//                , taskContext);
 
-                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
-                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
-                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"
-                , taskContext);
+        Runnable task1 = () -> {
+            exec(
+                    "var myDevice = ClassUtils.newPersist('Device'); \n" +
+                            "myDevice.power_on(); \n" +
+                            "myDevice.deviceName = '新name';\n",
+//                            "myDevice.deviceStatus = '新name';\n",
+                    taskContext
+            );
+        };
+
+        Runnable task2 = () -> {
+            exec(
+                    "var myDevice = ClassUtils.newPersist('Device'); \n" +
+                            "myDevice.power_off();",
+                    taskContext
+            );
+        };
+
+        executor.submit(task1);
+        executor.submit(task2);
+        executor.shutdown();
     }
 
 
