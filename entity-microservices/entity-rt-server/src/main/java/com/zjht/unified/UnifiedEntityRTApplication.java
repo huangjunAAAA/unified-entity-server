@@ -33,8 +33,8 @@ public class UnifiedEntityRTApplication {
 //            Thread.sleep(1000);
 //        }
 
-//        app.getBean(V8EngineService.class).test();
-        test();
+        app.getBean(V8EngineService.class).testExec();
+//        test();
 
 
     }

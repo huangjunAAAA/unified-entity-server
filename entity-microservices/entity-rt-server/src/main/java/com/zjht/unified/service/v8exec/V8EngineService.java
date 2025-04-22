@@ -110,6 +110,27 @@ public class V8EngineService implements IScriptEngine {
         executor.shutdown();
     }
 
+    public void testExec() {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        Runnable task1 = () -> {
+            exec(
+                    "1+1"
+
+            );
+        };
+
+        Runnable task2 = () -> {
+            exec(
+                    "1+2"
+            );
+        };
+
+        executor.submit(task1);
+        executor.submit(task2);
+        executor.shutdown();
+    }
+
 
     public void test() {
 
@@ -209,6 +230,18 @@ public class V8EngineService implements IScriptEngine {
         return null;
     }
 
+    public Object exec(String script) {
+        try {
+            V8Runtime v8Runtime = getRuntime();
+            Object o = v8Runtime.getExecutor(script).executeObject();
+            clearThreadRuntime();
+            return o;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return null;
+    }
+
     public static V8Runtime getRuntime(TaskContext taskContext){
         V8Runtime rt = ThreadLocalUtil.get("V8Runtime");
         if(rt==null) {
@@ -217,6 +250,26 @@ public class V8EngineService implements IScriptEngine {
                 JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
                 consoleInterceptor.register(v8Runtime.getGlobalObject());
                 registerUtils(v8Runtime,taskContext);
+                ThreadLocalUtil.put("V8Runtime", v8Runtime);
+                ThreadLocalUtil.put("console", consoleInterceptor);
+                return v8Runtime;
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            return null;
+        }else{
+            return rt;
+        }
+    }
+
+    public static V8Runtime getRuntime(){
+        V8Runtime rt = ThreadLocalUtil.get("V8Runtime");
+        if(rt==null) {
+            try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
+                V8Runtime v8Runtime = javetEngine.getV8Runtime();
+                JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
+                consoleInterceptor.register(v8Runtime.getGlobalObject());
+//                registerUtils(v8Runtime,taskContext);
                 ThreadLocalUtil.put("V8Runtime", v8Runtime);
                 ThreadLocalUtil.put("console", consoleInterceptor);
                 return v8Runtime;
