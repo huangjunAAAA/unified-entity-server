@@ -45,7 +45,6 @@ public class V8EngineService implements IScriptEngine {
     public void test2() {
         Object o = exec(" var a=1", new TaskContext());
         System.out.println("o = " + o);
-
     }
 
     public void testM(TaskContext taskContext) {

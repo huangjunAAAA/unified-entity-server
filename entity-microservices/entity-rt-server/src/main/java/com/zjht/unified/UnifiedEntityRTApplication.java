@@ -1,6 +1,10 @@
 package com.zjht.unified;
 
 import com.alibaba.fastjson.JSON;
+import com.caoccao.javet.interop.V8Runtime;
+import com.caoccao.javet.interop.engine.IJavetEngine;
+import com.caoccao.javet.interop.engine.IJavetEnginePool;
+import com.caoccao.javet.interop.engine.JavetEnginePool;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.service.RtContextService;
@@ -9,15 +13,13 @@ import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.service.v8exec.V8EngineService;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@ComponentScan(value = {"com.zjht","com.wukong"})
+@ComponentScan(value = {"com.zjht", "com.wukong"})
 @EntityScan(basePackages = {"com.zjht"})
 @SpringCloudApplication
 @EnableFeignClients(basePackages = "com.zjht.**")
@@ -25,18 +27,41 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @Slf4j
 public class UnifiedEntityRTApplication {
+
+    private static final IJavetEnginePool<V8Runtime> javetEnginePool = new JavetEnginePool<>();
+
     public static void main(String[] args) throws Exception {
-        ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityRTApplication.class, args);
-        log.info("数据存储模块启动成功");
+//        ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityRTApplication.class, args);
+//        log.info("数据存储模块启动成功");
 //        for (int i = 0; i < 1000; i++) {
 //            app.getBean(V8EngineService.class).test2();
 //            Thread.sleep(1000);
 //        }
 
 //        app.getBean(V8EngineService.class).test();
-        test();
 
+        new Thread(() -> {
+            try {
+                test2();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
 
+        new Thread(() -> {
+            try {
+                test2();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
+    }
+
+    private static void test2() throws Exception {
+        try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
+            V8Runtime v8Runtime = javetEngine.getV8Runtime();
+        }
     }
 
     private static void test() {
