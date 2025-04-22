@@ -1,6 +1,7 @@
 package com.zjht.unified;
 
 import com.alibaba.fastjson.JSON;
+import com.caoccao.javet.interop.V8Host;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.engine.IJavetEngine;
 import com.caoccao.javet.interop.engine.IJavetEnginePool;
@@ -39,6 +40,8 @@ public class UnifiedEntityRTApplication {
 //        }
 
 //        app.getBean(V8EngineService.class).test();
+        try (V8Runtime v8Runtime = V8Host.getV8Instance().createV8Runtime()) {
+        }
 
         new Thread(() -> {
             try {
