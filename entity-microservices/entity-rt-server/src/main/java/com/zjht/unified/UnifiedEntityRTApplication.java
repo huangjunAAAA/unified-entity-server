@@ -1,6 +1,11 @@
 package com.zjht.unified;
 
 import com.alibaba.fastjson.JSON;
+import com.caoccao.javet.interop.V8Host;
+import com.caoccao.javet.interop.V8Runtime;
+import com.caoccao.javet.interop.engine.IJavetEngine;
+import com.caoccao.javet.interop.engine.IJavetEnginePool;
+import com.caoccao.javet.interop.engine.JavetEnginePool;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.service.RtContextService;
@@ -17,7 +22,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@ComponentScan(value = {"com.zjht","com.wukong"})
+@ComponentScan(value = {"com.zjht", "com.wukong"})
 @EntityScan(basePackages = {"com.zjht"})
 @SpringCloudApplication
 @EnableFeignClients(basePackages = "com.zjht.**")
@@ -25,18 +30,27 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @Slf4j
 public class UnifiedEntityRTApplication {
+
+    private static final IJavetEnginePool<V8Runtime> javetEnginePool = new JavetEnginePool<>();
+
     public static void main(String[] args) throws Exception {
+        // 规避cpu型号导致的v8线程初始化问题
+        try (V8Runtime v8Runtime = V8Host.getV8Instance().createV8Runtime()) {
+        }
+
+        // 正常启动
         ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityRTApplication.class, args);
         log.info("数据存储模块启动成功");
 //        for (int i = 0; i < 1000; i++) {
 //            app.getBean(V8EngineService.class).test2();
 //            Thread.sleep(1000);
 //        }
+    }
 
-        app.getBean(V8EngineService.class).testExec();
-//        test();
-
-
+    private static void test2() throws Exception {
+        try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
+            V8Runtime v8Runtime = javetEngine.getV8Runtime();
+        }
     }
 
     private static void test() {
