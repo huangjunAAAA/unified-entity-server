@@ -1,0 +1,9 @@
+objects:
+    scan-pkg:
+        - com.zjht
+        - com.wukong
+data:
+
+cache:
+    dirty: 100
+    panic: 50

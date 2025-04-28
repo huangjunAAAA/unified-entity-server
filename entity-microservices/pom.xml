@@ -22,6 +22,7 @@
         <module>entity-data-server</module>
         <module>entity-rt-server</module>
         <module>ui-server</module>
+        <module>entity-ds-server</module>
     </modules>
 
     <properties>

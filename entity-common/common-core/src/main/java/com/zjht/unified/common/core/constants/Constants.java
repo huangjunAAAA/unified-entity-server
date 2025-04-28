@@ -133,6 +133,7 @@ public class Constants {
 
     public static final String SSH_EXEC_IGNORE = "ignore";
     public static final String SSH_EXEC_BREAK = "break";
+    public static final int SUCCESS_A = 0;
 
     //0 任意类型 1 基础类型 2 普通类 3 结构 4 脚本 5 树节点 6 类关系
     public static int FIELD_TYPE_ANY=0;
