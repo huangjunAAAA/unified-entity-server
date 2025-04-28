@@ -13,6 +13,7 @@ import com.zjht.ui.dto.UiPageCompositeDTO;
 import com.zjht.ui.entity.Fileset;
 import com.zjht.ui.entity.UiPrj;
 import com.zjht.unified.domain.exchange.RoutingInfo;
+import com.zjht.unified.domain.exchange.Script;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -274,6 +275,26 @@ public class DeployService {
             pf.append(tag).append("\n").append(script).append("\n</script>").append("\n");
         });
 
+
+        // 处理事件
+        page.getPageIdUiComponentList().forEach(c->{
+            if(c.getComponentIdUiEventHandleList()!=null) {
+                c.getComponentIdUiEventHandleList().forEach(eh->{
+                    List<Script> ss= JsonUtilUnderline.parseArray(eh.getContent(),Script.class);
+                    if(ss!=null) {
+                        ss.forEach(s -> {
+                            if(Constants.SCRIPT_FRONT.equals(s.getType())){
+                                int splitIdx = s.getMethod().indexOf("(");
+                                String methodName=splitIdx==-1?s.getMethod():s.getMethod().substring(0,splitIdx);
+                                String paramLst=splitIdx==-1?"()":s.getMethod().substring(splitIdx+1,s.getMethod().length()-1);
+                                pf.append("const ").append(methodName).append("= function").append(paramLst).append("{\n")
+                                        .append(s.getContent()).append("\n}").append("\n");
+                            };
+                        });
+                    }
+                });
+            }
+        });
 
 //        // 加入最后的 init-end部分
 //        String ss = vueParts.get("script");

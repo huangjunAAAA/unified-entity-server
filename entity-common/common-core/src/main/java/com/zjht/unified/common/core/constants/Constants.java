@@ -418,4 +418,8 @@ public class Constants {
 
     public static final String CC_BELONG_TO_PAGE="page";
     public static final String CC_BELONG_TO_CELL="cell";
+
+    public static final String SCRIPT_FRONT="front";
+    public static final String SCRIPT_BACKEND="backend";
+    public static final String SCRIPT_FRONT_SUBMIT="front-submit";
 }
