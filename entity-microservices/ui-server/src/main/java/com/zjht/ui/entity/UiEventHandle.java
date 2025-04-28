@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.wukong.core.mp.base.BaseUserEntity;
+import com.zjht.unified.common.core.entity.BaseCopyEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import javax.persistence.*;
 
-import com.zjht.unified.common.core.entity.BaseCopyEntity;
+
 
 
 /**
@@ -30,7 +31,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "UiEventHandle对象", description = "")
 public class UiEventHandle extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -3131175787346621701L;
+	private static final long serialVersionUID = -5342644284113649750L;
 
 
 
@@ -61,9 +62,9 @@ public class UiEventHandle extends BaseCopyEntity {
 	private String eventType;
 
 	 /**
-	 * front 或则 backend
+	 * front/front-submit/backend
 	 */
-	@ApiModelProperty(value = "front 或则 backend")
+	@ApiModelProperty(value = "front/front-submit/backend")
 	@Column(name = "type")
 	@TableField(value = "type")  
 	private String type;
@@ -107,4 +108,20 @@ public class UiEventHandle extends BaseCopyEntity {
 	@Column(name = "original_id")
 	@TableField(value = "original_id")  
 	private Long originalId;
+
+	 /**
+	 * 前端的方法名
+	 */
+	@ApiModelProperty(value = "前端的方法名")
+	@Column(name = "event_method")
+	@TableField(value = "event_method")  
+	private String eventMethod;
+
+	 /**
+	 * 事件处理引擎
+	 */
+	@ApiModelProperty(value = "事件处理引擎")
+	@Column(name = "event_engine")
+	@TableField(value = "event_engine")  
+	private String eventEngine;
 }

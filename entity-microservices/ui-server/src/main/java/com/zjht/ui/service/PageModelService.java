@@ -403,21 +403,15 @@ public class PageModelService {
         if (uiComponent.getComponentIdUiEventHandleList() != null) {
             for (UiEventHandleCompositeDTO uiEventHandle : uiComponent.getComponentIdUiEventHandleList()) {
                 if (Constants.EVENT_TYPE_REGULAR.equals(uiEventHandle.getEventType())) {
-                    Script script = new Script(uiEventHandle.getType(), uiEventHandle.getContent());
-                    List<Script> value = new ArrayList<>();
-                    value.add(script);
-//                    HashMap<String, List<Script>> enventMap = new HashMap<>();
+                    List<Script> scripts = JsonUtilUnderline.parseArray(uiEventHandle.getContent(), Script.class);
                     Event event = new Event();
                     event.setKey(uiEventHandle.getEventCode());
-                    event.setScripts(value);
+                    event.setScripts(scripts);
                     events.add(event);
-//                    cell.getEvent().put(uiEventHandle.getEventCode(), value);
                 } else if (Constants.EVENT_TYPE_CONTEXT.equals(uiEventHandle.getEventType())) {
-                    List<Script> scripts = new ArrayList<>();
-                    scripts.add(new Script(uiEventHandle.getType(), uiEventHandle.getContent()));
-                    Contextmenu contextmenu = new Contextmenu(uiEventHandle.getEventCode(),
-                        JsonUtilUnderline.parseArray(uiEventHandle.getTargetData(), Targeted.class),
-                            scripts);
+                    List<Script> script = JsonUtilUnderline.parseArray(uiEventHandle.getContent(),Script.class);
+                    List<Targeted> target = JsonUtilUnderline.parseArray(uiEventHandle.getTargetData(), Targeted.class);
+                    Contextmenu contextmenu = new Contextmenu(uiEventHandle.getEventCode(),target,script);
                     cell.getContextmenu().add(contextmenu);
                 }
             }
@@ -463,19 +457,17 @@ public class PageModelService {
         uiComponent.setPluginScript(cell.getPluginScript());
 
         // Convert Cell.event and Cell.contextmenu to UiEventHandle
+        if(uiComponent.getComponentIdUiEventHandleList()==null){
+            uiComponent.setComponentIdUiEventHandleList(new ArrayList<>());
+        }
         if (cell.getEvent() != null) {
             for (Event event : cell.getEvent()) {
-                for (Script script : event.getScripts()) {
-                    UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
-                    uiEventHandle.setEventCode(event.getKey());
-                    uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
-                    uiEventHandle.setType(script.getType());
-                    uiEventHandle.setContent(script.getContent());
-                    if(uiComponent.getComponentIdUiEventHandleList()==null){
-                        uiComponent.setComponentIdUiEventHandleList(new ArrayList<>());
-                    }
-                    uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
-                }
+                UiEventHandleCompositeDTO uiEventHandle = new UiEventHandleCompositeDTO();
+                uiEventHandle.setEventCode(event.getKey());
+                uiEventHandle.setEventType(Constants.EVENT_TYPE_REGULAR);
+                String script = JsonUtilUnderline.toJson(event.getScripts());
+                uiEventHandle.setContent(script);
+                uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
             }
         }
 
@@ -485,8 +477,8 @@ public class PageModelService {
                 uiEventHandle.setEventCode(contextmenu.getName());
                 uiEventHandle.setEventType(Constants.EVENT_TYPE_CONTEXT);
                 uiEventHandle.setTargetData(JsonUtilUnderline.toJson(contextmenu.getTarget()));
-                uiEventHandle.setType(contextmenu.getScript().get(0).getType());
-                uiEventHandle.setContent(contextmenu.getScript().get(0).getContent());
+                String script = JsonUtilUnderline.toJson(contextmenu.getScript());
+                uiEventHandle.setContent(script);
                 uiComponent.getComponentIdUiEventHandleList().add(uiEventHandle);
             }
         }
