@@ -8,7 +8,6 @@ import com.zjht.unified.datasource.service.DSManager;
 import com.zjht.unified.datasource.service.DataEventCenter;
 import com.zjht.unified.datasource.util.DataValUtils;
 import com.zjht.unified.datasource.util.UniqueTaskThreadPool;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,8 +28,6 @@ public class BizEntityRefreshJob {
     private DataEventCenter dataEventCenter;
 
     private UniqueTaskThreadPool uniqueTaskThreadPool=new UniqueTaskThreadPool();
-    @Autowired
-    private CompositeMeterRegistry compositeMeterRegistry;
 
     @XxlJob("refresh_ds")
     public synchronized void refreshBizData(){

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: unified-ds-server
+    name: entity-ds-server
   profiles:
     active: dev
   main:
@@ -17,9 +17,9 @@ spring:
         file-extension: yaml
         # 共享配置
         shared-configs:
-          - unified-ds.${spring.cloud.nacos.config.file-extension}
-          - unified-ds-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-          - unified-ds-${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - entity-ds-server.${spring.cloud.nacos.config.file-extension}
+          - entity-ds-server-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - entity-ds-server-${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
 
 
 
