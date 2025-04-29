@@ -58,6 +58,11 @@ public class DeployService {
         private String workdir;
         private ProcessPump devProcess;
         private String runningEnv;
+
+        public void clear(){
+            devProcess=null;
+            runningEnv=null;
+        }
     }
 
     public R<String> devRun(Long prjId){
@@ -71,11 +76,16 @@ public class DeployService {
         StringBuilder debugInfo=new StringBuilder();
         StringBuilder errInfo=new StringBuilder();
         WorkingEnv wr = workingDirs.get(prjId);
-        if(wr.devProcess==null||wr.runningEnv==null) {
+        if(wr.devProcess==null||!wr.devProcess.getProc().isAlive()||wr.runningEnv==null) {
             try {
+                wr.clear();
                 String dir = workdir + prj.getWorkDir();
-                String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
+                String cmd = nodejs + "npm run dev "+prjId+" -- --host 0.0.0.0";
                 Process p = OsType.runCmd(cmd, new File(dir));
+                if(p==null){
+                    workingDirs.remove(prjId);
+                    return R.fail("unable to run dev process");
+                }
                 wr.devProcess = new ProcessPump(p);
                 wr.devProcess.start(l -> {
                     debugInfo.append(l).append("\n");

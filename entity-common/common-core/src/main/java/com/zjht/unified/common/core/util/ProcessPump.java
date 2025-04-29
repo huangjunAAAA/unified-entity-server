@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class ProcessPump {
     private StreamPump out;
     private StreamPump err;
-    private Process proc;
+    private final Process proc;
     private Consumer<String> outListener;
     private Consumer<String> errListener;
 
@@ -59,7 +59,7 @@ public class ProcessPump {
 
         @Override
         public void run() {
-            while (!Thread.currentThread().interrupted()&&proc.isAlive()) {
+            while (!Thread.currentThread().isInterrupted()&&proc.isAlive()) {
                 try {
                     String line = null;
                     BufferedReader br = new BufferedReader(new InputStreamReader(in));
