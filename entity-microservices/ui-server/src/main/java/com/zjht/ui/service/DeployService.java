@@ -80,7 +80,7 @@ public class DeployService {
             try {
                 wr.clear();
                 String dir = workdir + prj.getWorkDir();
-                String cmd = nodejs + "npm run dev "+prjId+" -- --host 0.0.0.0";
+                String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
                 Process p = OsType.runCmd(cmd, new File(dir));
                 if(p==null){
                     workingDirs.remove(prjId);
