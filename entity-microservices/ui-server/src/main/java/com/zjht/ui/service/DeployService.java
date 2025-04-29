@@ -2,13 +2,14 @@ package com.zjht.ui.service;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.wukong.redis.service.RedisService;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.util.*;
-import com.zjht.ui.dto.FilesetCompositeDTO;
 import com.zjht.ui.dto.UiPageCompositeDTO;
 import com.zjht.ui.entity.Fileset;
 import com.zjht.ui.entity.UiPrj;
@@ -16,12 +17,11 @@ import com.zjht.unified.domain.exchange.RoutingInfo;
 import com.zjht.unified.domain.exchange.Script;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -47,6 +47,9 @@ public class DeployService {
     @Resource
     private IUiPageService uiPageService;
 
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
+
     @Value("${workdir:f:/tmp}")
     private String workdir;
 
@@ -54,15 +57,68 @@ public class DeployService {
 
 
     @AllArgsConstructor
-    private class WorkingEnv{
+    @NoArgsConstructor
+    @Data
+    public static class WorkingEnv{
         private String workdir;
+        @JsonIgnore
         private ProcessPump devProcess;
         private String runningEnv;
+        private Long pid;
+        private Long prjId;
 
         public void clear(){
             devProcess=null;
             runningEnv=null;
+            pid=null;
         }
+    }
+
+    private boolean isWorkingEnvValid(WorkingEnv workingEnv){
+        if(workingEnv==null)
+            return false;
+        if(workingEnv.pid==null)
+            return false;
+        if(workingEnv.runningEnv==null)
+            return false;
+        return isProcessValid(workingEnv);
+    }
+
+    private void persistWorkingEnv(WorkingEnv workingEnv){
+        workingDirs.put(workingEnv.prjId,workingEnv);
+        String weData = JsonUtilUnderline.toJson(workingEnv);
+        redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId,weData);
+    }
+
+    private boolean isProcessValid(WorkingEnv workingEnv){
+        if(workingEnv.devProcess!=null&&workingEnv.devProcess.getProc().isAlive())
+            return true;
+        if(workingEnv.pid==null)
+            return false;
+        return isPidExist(workingEnv.pid);
+    }
+
+    public static boolean isPidExist(long pid) {
+        String os = System.getProperty("os.name").toLowerCase();
+        String command = os.contains("win")
+                ? "tasklist /FI \"PID eq " + pid + "\""  // Windows命令
+                : "ps -p " + pid;                        // Linux命令
+
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+
+            // 解析输出判断结果
+            return reader.lines().anyMatch(line ->
+                    line.contains("" + pid) && !line.contains("grep"));
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void destroyWorkingEnv(WorkingEnv workingEnv){
+        workingDirs.remove(workingEnv.workdir);
     }
 
     public R<String> devRun(Long prjId){
@@ -71,19 +127,18 @@ public class DeployService {
         inflate(prjId);
         initNodeModule(prjId);
         UiPrj prj = iUiPrjService.getById(prjId);
-        String nodejs="nvm use "+prj.getNodejsVer()+"\n";
         SynchronousQueue<String> runningPort=new SynchronousQueue<>();
         StringBuilder debugInfo=new StringBuilder();
         StringBuilder errInfo=new StringBuilder();
-        WorkingEnv wr = workingDirs.get(prjId);
-        if(wr.devProcess==null||!wr.devProcess.getProc().isAlive()||wr.runningEnv==null) {
+        WorkingEnv wr = createWorkingDir(prjId);
+        if(!isWorkingEnvValid(wr)) {
             try {
                 wr.clear();
                 String dir = workdir + prj.getWorkDir();
-                String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
+                String cmd = "npm run dev -- --host 0.0.0.0";
                 Process p = OsType.runCmd(cmd, new File(dir));
                 if(p==null){
-                    workingDirs.remove(prjId);
+                    destroyWorkingEnv(wr);
                     return R.fail("unable to run dev process");
                 }
                 wr.devProcess = new ProcessPump(p);
@@ -110,9 +165,12 @@ public class DeployService {
             String ss = runningPort.poll(10, TimeUnit.SECONDS);
             if(ss!=null) {
                 wr.runningEnv=ss;
+                persistWorkingEnv(wr);
                 return R.ok(ss);
-            }else
+            }else{
+                destroyWorkingEnv(wr);
                 return R.ok(errInfo.toString());
+            }
         } catch (InterruptedException e) {
 
         }
@@ -143,13 +201,13 @@ public class DeployService {
     }
 
     public void initNodeModule(Long prjId){
-        String dir = getWorkingDir(prjId);
-        log.info("init node_module for project:"+prjId+", working dir:"+dir);
+        WorkingEnv workingEnv = createWorkingDir(prjId);
+        log.info("init node_module for project:"+prjId+", working dir:"+workingEnv.workdir);
         UiPrj prj = iUiPrjService.getById(prjId);
         try {
             String nodejs="nvm use "+prj.getNodejsVer()+"\n";
             String cmd=nodejs+" npm config set registry http://wukong.zjht100.com:10003/ \n npm i";
-            Process p = OsType.runCmd(cmd, new File(dir));
+            Process p = OsType.runCmd(cmd, new File(workingEnv.workdir));
             new ProcessPump(p).start(null,null);
             p.waitFor();
         }catch (Exception e){
@@ -158,13 +216,13 @@ public class DeployService {
     }
 
     public R<String> inflate(Long prjId){
-        String dir = getWorkingDir(prjId);
-        log.info("inflate project:"+prjId+", working dir:"+dir);
+        WorkingEnv workingEnv = createWorkingDir(prjId);
+        log.info("inflate project:"+prjId+", working dir:"+workingEnv.workdir);
 
         List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
                 .eq(Fileset::getBelongtoId, prjId));
         Set<String> pfSet=pfiles.stream().map(pf->pf.getPath()).collect(Collectors.toSet());
-        File fdir = new File(dir);
+        File fdir = new File(workingEnv.workdir);
         // clean dir
         if(fdir.exists())
             FileSetUtils.traverseDirDeepNoRoot(fdir.listFiles(),(f)->{
@@ -384,15 +442,25 @@ public class DeployService {
         return ret;
     }
 
-    private String getWorkingDir(Long prjId){
+    private WorkingEnv createWorkingDir(Long prjId){
         WorkingEnv wr = workingDirs.get(prjId);
         if(wr==null){
+            Object wrData = redisTemplate.opsForHash().get(Constants.VITE_IN_RUNNING, prjId);
+            if(wrData!=null){
+                wr=JsonUtilUnderline.parse(wrData.toString(),WorkingEnv.class);
+                workingDirs.put(prjId,wr);
+                return wr;
+            }
+        }
+        if(wr==null){
             UiPrj prj = iUiPrjService.getById(prjId);
-            wr = new WorkingEnv(sanitizeWorkDir(workdir+prj.getWorkDir()),null,null);
+            wr = new WorkingEnv();
+            wr.setWorkdir(sanitizeWorkDir(workdir+prj.getWorkDir()));
+            wr.setPrjId(prjId);
             new File(wr.workdir).mkdirs();
             workingDirs.put(prjId,wr);
         }
-        return wr.workdir;
+        return wr;
     }
 
     private String sanitizeWorkDir(String dir){

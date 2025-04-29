@@ -423,4 +423,6 @@ public class Constants {
     public static final String SCRIPT_FRONT="front";
     public static final String SCRIPT_BACKEND="backend";
     public static final String SCRIPT_FRONT_SUBMIT="front-submit";
+
+    public static final String VITE_IN_RUNNING="runningVite";
 }
