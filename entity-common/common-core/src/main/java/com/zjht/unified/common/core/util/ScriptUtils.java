@@ -105,10 +105,11 @@ public class ScriptUtils {
      */
     private static int findTagStart(String content, String tagStart) {
         int index = 0;
+        int candidate=-1;
         while (true) {
             index = content.indexOf(tagStart, index);
             if (index == -1) {
-                return -1;
+                return candidate;
             }
 
             // 检查标签是否在引号内
@@ -120,7 +121,7 @@ public class ScriptUtils {
             }
 
             if (!inQuotes) {
-                return index; // 标签不在引号内，返回位置
+                candidate = index;
             }
 
             index += tagStart.length(); // 继续查找下一个标签
