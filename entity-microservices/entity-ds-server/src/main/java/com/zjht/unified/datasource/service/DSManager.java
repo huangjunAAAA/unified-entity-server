@@ -30,14 +30,9 @@ public class DSManager {
     protected SystemBridgeService systemBridgeService;
     public Map<String,List<Map<String,Object>>> pullData(DtpDataSource dtpDataSource) {
         log.info("pull data from datasource id:" + dtpDataSource.getId());
-        SystemSpec dataspec = null;
-        try {
-            dataspec = apiService.convert(dtpDataSource);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(),e);
-            return null;
-        }
-
+        SystemSpec dataspec = apiService.convert(dtpDataSource);
+        if(dataspec==null)
+            log.error("SystemSpec is null, pull data failure.");
         ConcurrentHashMap<String,List<Map<String,Object>>> ret=new ConcurrentHashMap<>();
         // 遍历所有实体，根据实体的list api来获取完整的实体列表
         ArrayBlockingQueue<String> failedBizType=new ArrayBlockingQueue<>(dataspec.getBizObjects().size());

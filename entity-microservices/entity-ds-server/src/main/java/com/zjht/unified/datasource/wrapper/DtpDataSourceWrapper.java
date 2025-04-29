@@ -93,12 +93,12 @@ public class DtpDataSourceWrapper {
     }
   
   	public void validateDtpDataSource(DtpDataSource dtpDataSource){
+        if(dtpDataSource==null)
+            throw new RuntimeException("null datasource");
         SwaggerApiService apiService=SpringUtils.getBean(SwaggerApiService.class);
-        try {
-            SystemSpec spec = apiService.convert(dtpDataSource);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        SystemSpec spec = apiService.convert(dtpDataSource);
+        if(spec==null)
+            throw new RuntimeException("invalid datasource:"+dtpDataSource.getId());
 
     }
 

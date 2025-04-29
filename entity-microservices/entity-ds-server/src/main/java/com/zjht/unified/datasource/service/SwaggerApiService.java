@@ -156,11 +156,17 @@ public class SwaggerApiService {
     }
 
 
-    public SystemSpec convert(DtpDataSource dtpDataSource) throws JsonProcessingException{
+    public SystemSpec convert(DtpDataSource dtpDataSource) {
         String json = dtpDataSource.getApiSpec();
         ObjectMapper om = new ObjectMapper();
         om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        SystemSpec dataspec = om.readValue(json, SystemSpec.class);
+        SystemSpec dataspec = null;
+        try {
+            dataspec = om.readValue(json, SystemSpec.class);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(),e);
+            return null;
+        }
         elaborate(dataspec);
         ThirdAuthInfo authInfo = new ThirdAuthInfo();
         dataspec.setAuthInfo(authInfo);

@@ -55,13 +55,9 @@ public class ApiInvokeService {
         String targetKey=invokeParam.getDsId()+"|"+invokeParam.getPath();
         CMethodInfo opExt2 = baseUrlCache.get(targetKey);
         if(opExt2==null) {
-            SystemSpec sysSpec = null;
-            try {
-                sysSpec = apiService.convert(ds);
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage(),e);
+            SystemSpec sysSpec = apiService.convert(ds);
+            if(sysSpec==null)
                 return null;
-            }
             for (Iterator<OpenApiCollectionSpec> iterator = sysSpec.getApiSpecs().iterator(); iterator.hasNext(); ) {
                 OpenApiCollectionSpec spec = iterator.next();
                 List<OperationExt> opLst = apiService.parseSwagger(spec.getSwaggerUrl());

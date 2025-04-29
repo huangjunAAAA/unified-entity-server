@@ -57,12 +57,13 @@ public abstract class AbstractUnifiedSysStub implements SystemProxy, DataMessage
     public void init(DtpDataSource dtpDataSource) {
         if (dataspec != null)
             return;
-        log.info("init cdp data proxy for datasource id:" + dtpDataSource.getId());
-        try {
-            dataspec = apiService.convert(dtpDataSource);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
+        log.info("init data proxy for datasource id:" + dtpDataSource.getId());
+        SystemSpec spec = apiService.convert(dtpDataSource);
+        if(spec==null){
+            log.info("failed to init data proxy for datasource id:" + dtpDataSource.getId());
             return;
+        }else{
+            dataspec = spec;
         }
         this.dtpDataSource = dtpDataSource;
         specKeeper.schedule(new SpecChecker(this),600, TimeUnit.SECONDS);
@@ -85,20 +86,17 @@ public abstract class AbstractUnifiedSysStub implements SystemProxy, DataMessage
             if(inst==null)
                 return;
 
-            if (inst.dtpDataSource != null)
-                try {
-                    DtpDataSource ds = inst.dataSourceService.getById(inst.dtpDataSource.getId());
-                    if(ds==null){
-                        return;
-                    }
-                    BeanUtils.copyProperties(ds,inst.dtpDataSource);
-                    SwaggerApiService apiService= SpringUtil.getBean(SwaggerApiService.class);
-                    SystemSpec spec = apiService.convert(inst.dtpDataSource);
-                    if(spec!=null)
-                        inst.dataspec=spec;
-                } catch (JsonProcessingException e) {
-                    log.error(e.getMessage(), e);
+            if (inst.dtpDataSource != null) {
+                DtpDataSource ds = inst.dataSourceService.getById(inst.dtpDataSource.getId());
+                if (ds == null) {
+                    return;
                 }
+                BeanUtils.copyProperties(ds, inst.dtpDataSource);
+                SwaggerApiService apiService = SpringUtil.getBean(SwaggerApiService.class);
+                SystemSpec spec = apiService.convert(inst.dtpDataSource);
+                if (spec != null)
+                    inst.dataspec = spec;
+            }
             if(Thread.currentThread().isInterrupted())
                 return;
             specKeeper.schedule(this,600, TimeUnit.SECONDS);
