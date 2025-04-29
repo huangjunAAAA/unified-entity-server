@@ -181,8 +181,17 @@ public class DeployService {
     private void renderRoute(Long prjId) {
         Fileset sf = filesetService.getOne(new LambdaQueryWrapper<Fileset>()
                 .eq(Fileset::getBelongtoId, prjId).eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_ROUTE));
+
+        if(sf==null){
+            throw new RuntimeException("prj has no route file:"+prjId);
+        }
+
         List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
         StaticRoutor sr=new StaticRoutor();
+
+        if(StringUtils.isEmpty(sf.getPath())){
+            throw new RuntimeException("route file has no path:"+ sf.getId()+", prj id:"+prjId);
+        }
 
         // 计算路径有几个父目录
         String[] p1=sf.getPath().split("/");

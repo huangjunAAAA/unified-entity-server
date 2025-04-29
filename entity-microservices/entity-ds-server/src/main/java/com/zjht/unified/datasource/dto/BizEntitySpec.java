@@ -21,4 +21,6 @@ public class BizEntitySpec {
     private ApiSpec historyApi;
     @ApiModelProperty(value = "业务实体规格")
     private String schemaName;
+    @ApiModelProperty(value = "是否启用")
+    private Boolean enabled;
 }
