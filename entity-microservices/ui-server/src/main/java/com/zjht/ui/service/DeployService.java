@@ -87,7 +87,7 @@ public class DeployService {
     private void persistWorkingEnv(WorkingEnv workingEnv){
         workingDirs.put(workingEnv.prjId,workingEnv);
         String weData = JsonUtilUnderline.toJson(workingEnv);
-        redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId,weData);
+        redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId+"",weData);
     }
 
     private boolean isProcessValid(WorkingEnv workingEnv){
@@ -445,7 +445,7 @@ public class DeployService {
     private WorkingEnv createWorkingDir(Long prjId){
         WorkingEnv wr = workingDirs.get(prjId);
         if(wr==null){
-            Object wrData = redisTemplate.opsForHash().get(Constants.VITE_IN_RUNNING, prjId);
+            Object wrData = redisTemplate.opsForHash().get(Constants.VITE_IN_RUNNING, prjId+"");
             if(wrData!=null){
                 wr=JsonUtilUnderline.parse(wrData.toString(),WorkingEnv.class);
                 workingDirs.put(prjId,wr);
