@@ -127,6 +127,7 @@ public class DeployService {
         inflate(prjId);
         initNodeModule(prjId);
         UiPrj prj = iUiPrjService.getById(prjId);
+        String nodejs="nvm use "+prj.getNodejsVer()+"\n";
         SynchronousQueue<String> runningPort=new SynchronousQueue<>();
         StringBuilder debugInfo=new StringBuilder();
         StringBuilder errInfo=new StringBuilder();
@@ -135,7 +136,7 @@ public class DeployService {
             try {
                 wr.clear();
                 String dir = workdir + prj.getWorkDir();
-                String cmd = "npm run dev -- --host 0.0.0.0";
+                String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
                 Process p = OsType.runCmd(cmd, new File(dir));
                 if(p==null){
                     destroyWorkingEnv(wr);
