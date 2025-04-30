@@ -1,6 +1,7 @@
 package com.zjht.ui.service;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -350,7 +351,14 @@ public class DeployService {
         });
 
         scripts.forEach((tag,script)->{
-            pf.append(tag).append("\n").append(script).append("\n</script>").append("\n");
+            Pair<String, List<String>> sParts = ScriptUtils.parseImports(script.toString());
+            List<String> imports = ScriptUtils.mergeImports(sParts.getValue());
+            pf.append(tag).append("\n");
+            imports.forEach(i->{
+                pf.append(i).append("\n");
+            });
+            pf.append(sParts.getKey());
+            pf.append("\n</script>").append("\n");
         });
 
 
