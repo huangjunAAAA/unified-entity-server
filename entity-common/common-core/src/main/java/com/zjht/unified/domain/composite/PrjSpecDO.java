@@ -18,4 +18,5 @@ public class PrjSpecDO implements Serializable {
     private UiPrjDO uiPrj;
     private UePrjDO uePrj;
     private List<InitialInstanceDO> instanceList;
+    private String ctxVer;
 }

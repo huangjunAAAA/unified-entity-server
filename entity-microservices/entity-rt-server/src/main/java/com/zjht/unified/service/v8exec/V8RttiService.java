@@ -1,15 +1,13 @@
 package com.zjht.unified.service.v8exec;
 
-import com.google.common.collect.Lists;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.zjht.unified.common.core.constants.KafkaNames;
-import com.zjht.unified.common.core.domain.ddl.TblCol;
-import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
-import com.zjht.unified.common.core.util.JsonUtilExt;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.service.ctx.EntityDepService;
+import com.zjht.unified.service.ctx.PrjUniqueInfo;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.utils.StoreUtil;
@@ -27,6 +25,9 @@ public class V8RttiService {
     private RtRedisObjectStorageService redisObjectStorageService;
 
     @Autowired
+    private EntityDepService entityDepService;
+
+    @Autowired
     private GatherClient gather;
 
 
@@ -36,8 +37,10 @@ public class V8RttiService {
 
 
     public ProxyObject createNewObject(ClazzDefCompositeDO classDef, TaskContext taskContext, Boolean isPersist){
+
+        PrjUniqueInfo prjInfo = entityDepService.getPrjInfoByGuid(taskContext, classDef.getGuid());
         String guid = UUID.randomUUID().toString();
-        ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid());
+        ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid(),prjInfo.getPrjGuid(),prjInfo.getPrjVer());
 
         //加载默认值
         List<FieldDefCompositeDO> clazzIdFieldDefList = classDef.getClazzIdFieldDefList();
@@ -46,25 +49,25 @@ public class V8RttiService {
         }
 
         if (isPersist) {
-            Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid);
+            Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid,  prjInfo.getPrjGuid(),prjInfo.getPrjVer());
             objectAttrValueMap.put("clazz_guid",classDef.getGuid());
             EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap,true);
             log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
         }
 
-        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(),isPersist));
+        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(), isPersist,prjInfo.getPrjGuid(),prjInfo.getPrjVer(),taskContext.getVer()));
         return proxyObject;
     }
 
     public ProxyObject getObject(TaskContext ctx, String guid){
-        UnifiedObject uo = redisObjectStorageService.getObject(ctx, guid);
+        UnifiedObject uo = entityDepService.getObject(ctx, guid);
         return createFromUnifiedObject(ctx,uo);
     }
 
     public ProxyObject createFromUnifiedObject(TaskContext ctx,UnifiedObject uo){
         if(uo!=null){
-            ProxyObject proxyObject = new ProxyObject(ctx,uo.getGuid(),uo.getClazzGUID());
+            ProxyObject proxyObject = new ProxyObject(ctx,uo.getGuid(),uo.getClazzGUID(),uo.getPrjGuid(),uo.getPrjVer());
             return proxyObject;
 
         }
@@ -73,7 +76,7 @@ public class V8RttiService {
 
     public boolean deleteObject(TaskContext ctx, String guid) {
         // 先获取对象，确保存在
-        UnifiedObject unifiedObject = redisObjectStorageService.getObject(ctx, guid);
+        UnifiedObject unifiedObject = entityDepService.getObject(ctx, guid);
 
         if (unifiedObject == null) {
             log.warn("Object with guid {} not found, nothing to delete!", guid);
@@ -81,7 +84,7 @@ public class V8RttiService {
         }
 
         // 删除对象记录
-        boolean objectDeleted = redisObjectStorageService.deleteObject(ctx, guid);
+        boolean objectDeleted = redisObjectStorageService.deleteObject(ctx, guid,unifiedObject.getPrjGuid(),unifiedObject.getPrjVer());
         if (objectDeleted) {
             log.info("Successfully deleted object with guid {}", guid);
             return true;

@@ -5,7 +5,6 @@ import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.reference.V8ValueObject;
-import com.zjht.unified.common.core.util.MobileUtil;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -29,14 +28,19 @@ public class InstanceUtils {
     @Autowired
     private RtRedisObjectStorageService redisObjectStorageService;
 
-    public InstanceUtils(TaskContext taskContext) {
+    private String prjGuid;
+    private String prjVer;
+
+    public InstanceUtils(TaskContext taskContext, String prjGuid, String prjVer) {
         this.taskContext = taskContext;
+        this.prjGuid = prjGuid;
+        this.prjVer = prjVer;
     }
 
     @V8Function(name = "get")
     public V8Value getInstance(String guid) throws Exception {
         ProxyObject proxyObject = v8RttiService.getObject(taskContext,guid);
-        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext);
+        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         return new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
     }
 
@@ -98,19 +102,19 @@ public class InstanceUtils {
         String newGuid = java.util.UUID.randomUUID().toString();
 
         // 创建新对象，guid 需要重新生成
-        ProxyObject newProxyObject = new ProxyObject(taskContext, newGuid, originalProxyObject.getClazzGUID());
+        ProxyObject newProxyObject = new ProxyObject(taskContext, newGuid, originalProxyObject.getClazzGUID(),originalProxyObject.getPrjGuid(),originalProxyObject.getPrjVer());
 
         // 拷贝原对象的 Redis 属性值到新对象
-        Map<String, Object> originalAttrValues = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid);
+        Map<String, Object> originalAttrValues = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid,originalProxyObject.getPrjGuid(),originalProxyObject.getPrjVer());
         for (Map.Entry<String, Object> entry : originalAttrValues.entrySet()) {
             String attrName = entry.getKey();
             Object attrValue = entry.getValue();
             redisObjectStorageService.setObjectAttrValue(taskContext, newGuid, attrName, attrValue, false);
         }
-        redisObjectStorageService.setObject(taskContext,new UnifiedObject(newGuid, originalProxyObject.getClazzGUID(),false));
+        redisObjectStorageService.setObject(taskContext,new UnifiedObject(newGuid, originalProxyObject.getClazzGUID(),false,prjGuid,prjVer,taskContext.getVer()));
 
         // 返回新创建的 ProxyObject，转换成 V8Value 返回
-        return new JavetProxyConverter().toV8Value(V8EngineService.getRuntime(taskContext), newProxyObject);
+        return new JavetProxyConverter().toV8Value(V8EngineService.getRuntime(taskContext, prjGuid, prjVer), newProxyObject);
     }
 }
 

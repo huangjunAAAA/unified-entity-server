@@ -2,36 +2,19 @@ package com.zjht.unified.service.v8exec;
 
 import com.caoccao.javet.interception.logging.JavetStandardConsoleInterceptor;
 import com.caoccao.javet.interop.V8Runtime;
-import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.interop.engine.IJavetEngine;
 import com.caoccao.javet.interop.engine.IJavetEnginePool;
 import com.caoccao.javet.interop.engine.JavetEnginePool;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.wukong.core.util.ThreadLocalUtil;
 import com.zjht.unified.common.core.util.SpringUtils;
-import com.zjht.unified.common.core.util.UUID;
-import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
-import com.zjht.unified.domain.composite.FieldDefCompositeDO;
-import com.zjht.unified.domain.composite.MethodDefCompositeDO;
-import com.zjht.unified.domain.composite.PrjSpecDO;
-import com.zjht.unified.domain.simple.MethodDefDO;
-import com.zjht.unified.domain.simple.UiPrjDO;
 import com.zjht.unified.service.IScriptEngine;
-import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import groovy.util.logging.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
-
-
-import javax.print.event.PrintJobAttributeEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 @Slf4j
@@ -42,185 +25,10 @@ public class V8EngineService implements IScriptEngine {
 
     private static final IJavetEnginePool<V8Runtime> javetEnginePool = new JavetEnginePool<>();
 
-    public void test2() {
-        Object o = exec(" var a=1", new TaskContext());
-        System.out.println("o = " + o);
-
-    }
-
-    public void testM(TaskContext taskContext) {
-
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-//        exec(
-//                "var a =ClassUtils.new(\"ClassA\");\n" +
-//                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
-//                        "a.f1 = b ;\n" +
-//                        "b.f2 = 3;\n" +
-//                        "console.log(\"111111111111111111111111\");\n"+
-//                        "console.log(\"\"+a.f1.f2);"
-
-//                "var a = ClassUtils.newPersist(\"ClassA\");"+
-//                "a.name = \"张三new\";"+
-//                "var a = ClassUtils.new(\"Device\",1,2);"+
-//                        " //console.log(a.power_on()); \n"+
-//                        " console.log(`a.pv = ${a.pv}`);" +
-//                        " console.log(`a.name.archiveStatus = ${a.deviceName.archiveStatus}`);"+
-//                        " console.log(`a.deviceName + 1 = ${a.deviceName + 1}`);"+
-//                        " console.log(`a.deviceName.eval = ${a.deviceName.eval}`);"+
-//                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
-//                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
-//                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"+
-//
-//                        " console.log(` exec a.deviceName + 1   ${a.deviceName = a.deviceName + 1 }`);"+
-//
-//                        " console.log(`a.deviceName.currentvalue is ${a.deviceName }`);"+
-//                        " console.log(`a.deviceName.lastvalue is  ${a.deviceName.lastValue}`);"+
-//                        " console.log(`a.deviceName.lastEv is  ${a.deviceName.lastEv}`);"
-//                "var myDevice = ClassUtils.newPersist('Device'); \n" +
-//                        "myDevice.power_on(); \n" +
-//                        "myDevice.deviceName = '新name';\n"
-//                , taskContext);
-
-//        exec(
-//                "var myDevice = ClassUtils.newPersist('Device'); \n" +
-//                        "myDevice.power_off(); "
-//                , taskContext);
-
-        Runnable task1 = () -> {
-            exec(
-                    "var myDevice = ClassUtils.newPersist('Device'); \n" +
-                            "myDevice.power_on(); \n" +
-                            "myDevice.deviceName = '新name';\n",
-//                            "myDevice.deviceStatus = '新name';\n",
-                    taskContext
-            );
-        };
-
-        Runnable task2 = () -> {
-            exec(
-                    "var myDevice = ClassUtils.newPersist('Device'); \n" +
-                            "myDevice.power_off();",
-                    taskContext
-            );
-        };
-
-        executor.submit(task1);
-        executor.submit(task2);
-        executor.shutdown();
-    }
-
-    public void testExec() {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-        Runnable task1 = () -> {
-            exec(
-                    "1+1"
-
-            );
-        };
-
-        Runnable task2 = () -> {
-            exec(
-                    "1+2"
-            );
-        };
-
-        executor.submit(task1);
-        executor.submit(task2);
-        executor.shutdown();
-    }
-
-
-    public void test() {
-
-        TaskContext taskContext = new TaskContext();
-
-        HashMap<String, MethodDefDO> objectObjectHashMap = new HashMap<>();
-        HashMap<String, ClazzDefCompositeDO> clazzMap = new HashMap<>();
-        HashMap<String, ClazzDefCompositeDO> clazzgGUIDMap = new HashMap<>();
-
-        /**
-         * @Data
-         * @ApiModel(value = "DO", description = "",parent = ClazzDefDO.class)
-         * public class ClazzDefCompositeDO extends ClazzDefDO {
-         *   private Long originalId;
-         *   private List<FieldDefCompositeDO> clazzIdFieldDefList;
-         *   private List<MethodDefDO> clazzIdMethodDefList;
-         * }
-         */
-        ClazzDefCompositeDO clazzDefCompositeDO = new ClazzDefCompositeDO();
-        clazzDefCompositeDO.setName("ClassA");
-        clazzDefCompositeDO.setTbl("test_tbl");
-        String clsGuid = UUID.fastUUID().toString();
-        clazzDefCompositeDO.setGuid(clsGuid);
-
-
-
-        ArrayList<MethodDefCompositeDO> methods = new ArrayList<>();
-        methods.add(new MethodDefCompositeDO());
-
-        ArrayList<FieldDefCompositeDO> fileds = new ArrayList<>();
-        FieldDefCompositeDO fieldDefCompositeDO = new FieldDefCompositeDO();
-        fieldDefCompositeDO.setName("name");
-        fieldDefCompositeDO.setTblCol("name_col");
-        fieldDefCompositeDO.setDisplayName("姓名");
-        fieldDefCompositeDO.setType("String");
-        fieldDefCompositeDO.setInitValue("张三");
-        fileds.add(fieldDefCompositeDO);
-
-
-        FieldDefCompositeDO fieldDefCompositeDO2 = new FieldDefCompositeDO();
-        fieldDefCompositeDO2.setName("age");
-        fieldDefCompositeDO2.setTblCol("age_col");
-        fieldDefCompositeDO2.setDisplayName("年龄");
-        fieldDefCompositeDO2.setType("int");
-        fieldDefCompositeDO2.setInitValue("18");
-        fileds.add(fieldDefCompositeDO2);
-
-
-        clazzDefCompositeDO.setClazzIdFieldDefList(fileds);
-        clazzDefCompositeDO.setClazzIdMethodDefList(methods);
-        clazzMap.put("ClassA",clazzDefCompositeDO);
-        clazzgGUIDMap.put(clsGuid,clazzDefCompositeDO);
-
-        taskContext.setClazzMap(clazzMap);
-        taskContext.setClazzGUIDMap(clazzgGUIDMap);
-//        taskContext.set
-
-        UiPrjDO uiPrjDO = new UiPrjDO();
-
-        uiPrjDO.setId(66L);
-
-        PrjSpecDO prjSpecDO = new PrjSpecDO();
-        prjSpecDO.setUiPrj(uiPrjDO);
-
-        taskContext.setPrjId("1");
-        taskContext.getPrjContextProvider().setPrjectContext(prjSpecDO);
-
-        exec(
-//                "var a =ClassUtils.new(\"ClassA\");\n" +
-//                        "var b  = ClassUtils.new(\"ClassA\")\n;" +
-//                        "a.f1 = b ;\n" +
-//                        "b.f2 = 3;\n" +
-//                        "console.log(\"111111111111111111111111\");\n"+
-//                        "console.log(\"\"+a.f1.f2);"
-
-//                "var a = ClassUtils.newPersist(\"ClassA\");"+
-//                "a.name = \"张三new\";"+
-                        "var a = ClassUtils.newPersist(\"ClassA\");"+
-//                                "function method1() { console.log(this.name);}"+
-                                "console.log(a.guid);  var guid = a.guid;"+
-                                "InstanceUtils.delByGuid(guid);  console.log(a.guid);"
-                , taskContext);
-
-    }
-
-
     @Override
-    public Object exec(String script, TaskContext ctx) {
+    public Object exec(String script, TaskContext ctx, String prjGuid, String prjVer) {
         try {
-            V8Runtime v8Runtime = getRuntime(ctx);
+            V8Runtime v8Runtime = getRuntime(ctx, prjGuid, prjVer);
             Object o = v8Runtime.getExecutor(script).executeObject();
             clearThreadRuntime();
             return o;
@@ -242,14 +50,14 @@ public class V8EngineService implements IScriptEngine {
         return null;
     }
 
-    public static V8Runtime getRuntime(TaskContext taskContext){
+    public static V8Runtime getRuntime(TaskContext taskContext, String prjGuid, String prjVer){
         V8Runtime rt = ThreadLocalUtil.get("V8Runtime");
         if(rt==null) {
             try (IJavetEngine<V8Runtime> javetEngine = javetEnginePool.getEngine()) {
                 V8Runtime v8Runtime = javetEngine.getV8Runtime();
                 JavetStandardConsoleInterceptor consoleInterceptor = new JavetStandardConsoleInterceptor(v8Runtime);
                 consoleInterceptor.register(v8Runtime.getGlobalObject());
-                registerUtils(v8Runtime,taskContext);
+                registerUtils(v8Runtime,taskContext,prjGuid,prjVer);
                 ThreadLocalUtil.put("V8Runtime", v8Runtime);
                 ThreadLocalUtil.put("console", consoleInterceptor);
                 return v8Runtime;
@@ -297,8 +105,8 @@ public class V8EngineService implements IScriptEngine {
         }
     }
 
-    private static void registerUtils(V8Runtime v8Runtime,TaskContext taskContext) throws Exception{
-        ClassUtils classUtils = new ClassUtils(taskContext);
+    private static void registerUtils(V8Runtime v8Runtime,TaskContext taskContext,String prjGuid,String prjVer) throws Exception{
+        ClassUtils classUtils = new ClassUtils(taskContext,prjGuid,prjVer);
         AutowireCapableBeanFactory autowireCapableBeanFactory=SpringUtils.getApplicationContext().getAutowireCapableBeanFactory();
         autowireCapableBeanFactory.autowireBean(classUtils);
         try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
@@ -306,7 +114,7 @@ public class V8EngineService implements IScriptEngine {
             v8ValueObject.bind(classUtils);
         }
 
-        InstanceUtils instanceUtils=new InstanceUtils(taskContext);
+        InstanceUtils instanceUtils=new InstanceUtils(taskContext,prjGuid,prjVer);
         autowireCapableBeanFactory.autowireBean(instanceUtils);
         try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
             v8Runtime.getGlobalObject().set("InstanceUtils", v8ValueObject);

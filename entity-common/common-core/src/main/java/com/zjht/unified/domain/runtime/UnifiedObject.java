@@ -10,7 +10,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UnifiedObject implements Serializable {
+
     private String guid;
     private String clazzGUID;
     private Boolean persistTag;
+    private String prjGuid;
+    private String prjVer;
+    private String ver;
 }

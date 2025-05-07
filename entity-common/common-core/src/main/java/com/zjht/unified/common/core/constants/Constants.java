@@ -425,4 +425,10 @@ public class Constants {
     public static final String SCRIPT_FRONT_SUBMIT="front-submit";
 
     public static final String VITE_IN_RUNNING="runningVite";
+
+
+    public static final String STATICS = "static";
+    public static final String STATIC_TYPE_SENTINEL="static_sentinel";
+    public static final String STATIC_TYPE_FSM="static_fsm";
+    public static final String STATIC_NAME_GUID="name_guid";
 }

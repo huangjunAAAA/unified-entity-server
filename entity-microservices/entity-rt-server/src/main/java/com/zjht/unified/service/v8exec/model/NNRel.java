@@ -1,10 +1,13 @@
 package com.zjht.unified.service.v8exec.model;
 
+import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.simple.ClsRelationDO;
+import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.TaskContext;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -32,32 +35,24 @@ public class NNRel {
         String fieldIdFrom = rel.getFieldIdFrom();
         String fieldIdTo = rel.getFieldIdTo();
 
-        // 从TaskContext的clazzGUIDMap中获取ClazzDefCompositeDO
-        Map<String, ClazzDefCompositeDO> clazzGUIDMap = ctx.getClazzGUIDMap();
+       // 从TaskContext的clazzGUIDMap中获取ClazzDefCompositeDO
+        EntityDepService entityDepService= SpringUtils.getBean(EntityDepService.class);
 
-        // 遍历clazzGUIDMap，查找fieldIdFrom和fieldIdTo对应的ClazzDefCompositeDO
-        for (Map.Entry<String, ClazzDefCompositeDO> entry : clazzGUIDMap.entrySet()) {
-            ClazzDefCompositeDO clazzDefCompositeDO = entry.getValue();
+        // 查找fieldIdFrom对应的FieldDefCompositeDO
+        FieldDefCompositeDO fieldFrom = entityDepService.getFieldDefByGuid(ctx, fieldIdFrom);
 
-            // 查找fieldIdFrom对应的FieldDefCompositeDO
-            FieldDefCompositeDO fieldFrom = clazzDefCompositeDO.getClazzIdFieldDefList().stream()
-                .filter(field -> field.getGuid().equals(fieldIdFrom))
-                .findFirst()
-                .orElse(null);
+        // 查找fieldIdTo对应的FieldDefCompositeDO
+        FieldDefCompositeDO fieldTo = entityDepService.getFieldDefByGuid(ctx, fieldIdTo);
 
-            // 查找fieldIdTo对应的FieldDefCompositeDO
-            FieldDefCompositeDO fieldTo = clazzDefCompositeDO.getClazzIdFieldDefList().stream()
-                .filter(field -> field.getGuid().equals(fieldIdTo))
-                .findFirst()
-                .orElse(null);
+        // 如果找到对应的FieldDefCompositeDO，则设置from和to
+        if (fieldFrom != null) {
+            ClazzDefCompositeDO clazzDefCompositeDO = entityDepService.getClsDefByGuid(ctx, fieldFrom.getClassGuid());
+            nnRel.fromCls=(ClsDf.from(clazzDefCompositeDO,ctx));
+        }
 
-            // 如果找到对应的FieldDefCompositeDO，则设置from和to
-            if (fieldFrom != null) {
-                nnRel.fromCls=(ClsDf.from(clazzDefCompositeDO,ctx));
-            }
-            if (fieldTo != null) {
-                nnRel.toCls=(ClsDf.from(clazzDefCompositeDO,ctx));
-            }
+        if (fieldTo != null) {
+            ClazzDefCompositeDO clazzDefCompositeDO = entityDepService.getClsDefByGuid(ctx, fieldFrom.getClassGuid());
+            nnRel.toCls=(ClsDf.from(clazzDefCompositeDO,ctx));
         }
 
         // 设置其他属性

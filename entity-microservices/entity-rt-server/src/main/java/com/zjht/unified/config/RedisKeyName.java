@@ -1,6 +1,6 @@
 package com.zjht.unified.config;
 
-import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.common.core.constants.Constants;
 
 public class RedisKeyName {
     public static final String RUNNING_PROJECT ="running:entity:";
@@ -27,31 +27,43 @@ public class RedisKeyName {
         return ver+":"+ ATTR_AFFECTED +qualifiedName;
     }
 
+    public static String nameGUIDKey(String ver,String name,String prjGuid,String prjVer){
+        return ver+":"+ Constants.STATIC_NAME_GUID+ ":"+name+":"+prjGuid+":"+prjVer;
+    }
+
     public static String getDepOriginalKey(String key){
         String[] parts = key.split(ATTR_AFFECTED);
         return parts[parts.length-1];
     }
 
-    public static String getStaticKey(String ver){
-        return ver+"-static";
+    public static String getStaticKey(String prefix,String ver,String prjGuid,String prjVer){
+        return prefix+":"+ver+":"+prjGuid+":"+prjVer;
     }
 
     /**
      * 用来存储属性的计算公式（如果有）
-     * @param guid
+     * @param clsGuid
      * @param ver
      * @param attrName
      * @return
      */
-    public static String getObjectAttrKey(String guid,String ver,String attrName){
-        return ver+":"+guid+":"+attrName;
+    public static String getObjectAttrDefKey(String prjVer, String clsGuid, String ver, String attrName){
+        return ver+":"+prjVer+":"+clsGuid+":"+attrName;
     }
 
-    public static String getObjectKey(String guid,String ver){
-        return ver+":"+guid;
+    public static String getObjectAttrDefKey(String prjVer, String fieldGuid, String ver){
+        return ver+":"+prjVer+":"+fieldGuid;
     }
 
-    public static String getObjectRtKey(String guid,String ver){
-        return ver+":rt:"+guid;
+    public static String getObjectKey(String guid,String ver,String prjGuid,String prjVer){
+        return prjGuid+":"+prjVer+":"+ver+":"+guid;
+    }
+
+    public static String getClsDefKey(String ver,String prjVer,String clsGuid){
+        return ver+":"+prjVer+":"+clsGuid;
+    }
+
+    public static String getObjectRtKey(String guid,String ver,String prjGuid,String prjVer){
+        return prjGuid+":"+prjVer+":"+ver+":rt:"+guid;
     }
 }

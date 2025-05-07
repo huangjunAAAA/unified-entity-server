@@ -6,7 +6,6 @@ import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 
-import com.zjht.unified.service.ctx.unifiedentity.UnifiedPrjContext;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -15,10 +14,17 @@ import java.util.Map;
 @Data
 public class TaskContext {
     private String ver;
-    private String prjId;
-    private PrjContextProvider prjContextProvider=new UnifiedPrjContext();
-    private Map<String, MethodDefDO> methods=new HashMap<>();
-    private Map<String,ClazzDefCompositeDO> clazzMap=new HashMap<>();
-    private Map<String,ClazzDefCompositeDO> clazzGUIDMap=new HashMap<>();
-    public StaticMgmt staticMgmt=new UnifiedEntityStatics();
+    private PrjUniqueInfo prjInfo=new PrjUniqueInfo();
+    private Map<String, TaskContext> deps=new HashMap<>();
+    public void appendTaskContext(TaskContext ctx){
+        String key=ctx.getPrjInfo().getPrjGuid()+":"+ctx.getPrjInfo().getPrjVer();
+        this.deps.put(key,ctx);
+    }
+
+    public TaskContext getTaskContext(String prjGuid,String prjVer){
+        if(this.prjInfo.getPrjGuid().equals(prjGuid)&&this.prjInfo.getPrjVer().equals(prjVer))
+            return this;
+        String key=prjGuid+":"+prjVer;
+        return this.deps.get(key);
+    }
 }

@@ -1,8 +1,112 @@
 package com.zjht.unified.service.ctx;
 
+import com.zjht.unified.config.RedisKeyName;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
+import com.zjht.unified.domain.composite.FieldDefCompositeDO;
+import com.zjht.unified.domain.runtime.UnifiedObject;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
+
+import java.util.Iterator;
 
 @Service
 public class EntityDepService {
+
+    private RtRedisObjectStorageService rtRedisObjectStorageService;
+    public ClazzDefCompositeDO getClsDefByGuid(TaskContext ctx, String clsGuid){
+        ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
+        if(clsdef==null){
+            for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+                TaskContext dep = iterator.next();
+                clsdef=rtRedisObjectStorageService.getClsDef(dep, dep.getPrjInfo().getPrjVer(), clsGuid);
+                if(clsdef!=null)
+                    return clsdef;
+            }
+        }else
+            return clsdef;
+        return null;
+    }
+
+    public PrjUniqueInfo getPrjInfoByGuid(TaskContext ctx, String clsGuid){
+        ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
+        if(clsdef==null){
+            for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+                TaskContext dep = iterator.next();
+                clsdef=rtRedisObjectStorageService.getClsDef(dep, dep.getPrjInfo().getPrjVer(), clsGuid);
+                if(clsdef!=null)
+                    return dep.getPrjInfo();
+            }
+        }else{
+            return ctx.getPrjInfo();
+        }
+        return null;
+    }
+
+    public ClazzDefCompositeDO getClsDefByInstanceId(TaskContext ctx, String guid){
+        UnifiedObject uo = rtRedisObjectStorageService.getObject(ctx, guid, ctx.getPrjInfo().getPrjGuid(), ctx.getPrjInfo().getPrjVer());
+        if(uo==null){
+            for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+                TaskContext dep = iterator.next();
+                uo=rtRedisObjectStorageService.getObject(dep, guid, dep.getPrjInfo().getPrjGuid(), dep.getPrjInfo().getPrjVer());
+                if(uo!=null)
+                    return rtRedisObjectStorageService.getClsDef(dep, uo.getPrjVer(),  uo.getClazzGUID());
+            }
+        }else
+            return rtRedisObjectStorageService.getClsDef(ctx, uo.getPrjVer(),  uo.getClazzGUID());
+        return null;
+    }
+
+    public ClazzDefCompositeDO getClsByName(TaskContext ctx, String name){
+        ClazzDefCompositeDO clsdef=rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), name);
+        if(clsdef!=null)
+            return clsdef;
+        for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+            TaskContext dep = iterator.next();
+            clsdef=rtRedisObjectStorageService.getClsDef(dep, dep.getPrjInfo().getPrjVer(), name);
+            if(clsdef!=null)
+                return clsdef;
+        }
+        return null;
+    }
+
+    public FieldDefCompositeDO getFieldDefByGuid(TaskContext ctx, String fieldGuid){
+        Object fieldObj=rtRedisObjectStorageService.getAttrDefByGuid(ctx, ctx.getPrjInfo().getPrjVer(), fieldGuid);
+        if(fieldObj!=null){
+            if(fieldObj instanceof FieldDefCompositeDO)
+                return (FieldDefCompositeDO) fieldObj;
+            return null;
+        }
+        for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+            TaskContext dep = iterator.next();
+            fieldObj=rtRedisObjectStorageService.getAttrDefByGuid(dep, dep.getPrjInfo().getPrjVer(), fieldGuid);
+            if(fieldObj!=null){
+                if(fieldObj instanceof FieldDefCompositeDO)
+                    return (FieldDefCompositeDO) fieldObj;
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName){
+        UnifiedObject uo = getObject(ctx, guid);
+        if(uo==null)
+            return null;
+        return rtRedisObjectStorageService.getObjectAttrValue(ctx, guid, attrName, uo.getPrjGuid(), uo.getPrjVer());
+    }
+
+    public UnifiedObject getObject(TaskContext ctx, String guid){
+        UnifiedObject uo = rtRedisObjectStorageService.getObject(ctx, guid, ctx.getPrjInfo().getPrjGuid(), ctx.getPrjInfo().getPrjVer());
+        if(uo==null){
+            for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
+                TaskContext dep = iterator.next();
+                uo=rtRedisObjectStorageService.getObject(dep, guid, dep.getPrjInfo().getPrjGuid(), dep.getPrjInfo().getPrjVer());
+                if(uo!=null)
+                    return uo;
+            }
+        }else
+            return uo;
+        return null;
+    }
 
 }

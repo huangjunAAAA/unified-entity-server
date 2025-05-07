@@ -4,7 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.wukong.core.weblog.utils.JsonUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.CoreClazzDef;
+import com.zjht.unified.common.core.util.SpringUtils;
+import com.zjht.unified.config.RedisKeyName;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
+import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.FsmDefDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.feign.RemoteXXL;
@@ -13,12 +19,11 @@ import com.zjht.unified.feign.model.ReturnMap;
 import com.zjht.unified.feign.model.ReturnT;
 import com.zjht.unified.feign.model.XxlJobGroup;
 import com.zjht.unified.feign.model.XxlJobInfo;
+import com.zjht.unified.service.ctx.EntityDepService;
+import com.zjht.unified.service.ctx.PrjUniqueInfo;
+import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
-import com.zjht.unified.service.ctx.UnifiedEntityStatics;
 import com.zjht.unified.utils.JsonUtilUnderline;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +58,9 @@ public class TimerService {
     public void createSentinel(TaskContext ctx, SentinelDefDO sentinel){
         Integer jgid = getJgId(ctx);
         ReturnMap<XxlJobInfo> jobList = remoteXXL.listJobInfo(0, Integer.MAX_VALUE, jgid, SENTINEL_EXEC_METHOD, ctx.getVer());
-        ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL, sentinel.getGuid(), sentinel);
-        rtContextService.saveRunningContext(ctx);
-
         if(CollectionUtils.isEmpty(jobList.getData())) {
-            String param = JsonUtilUnderline.toJson(new DVal(ctx.getVer(), sentinel.getGuid()));
+            String param = JsonUtilUnderline.toJson(new UnifiedObject(sentinel.getGuid(),CoreClazzDef.CLAZZ_SENTINEL,true,
+                    ctx.getPrjInfo().getPrjGuid(),ctx.getPrjInfo().getPrjVer(),ctx.getVer()));
             XxlJobInfo jInfo = createJobInfo(jgid, sentinel.getCron(), SENTINEL_EXEC_METHOD, 3, ctx.getVer(), param);
             executeJob(jInfo);
         }
@@ -66,16 +69,19 @@ public class TimerService {
     public void removeAlljobs(TaskContext ctx){
         Integer jgid = getJgId(ctx);
         ReturnMap<XxlJobInfo> jobList = remoteXXL.listJobInfo(0, Integer.MAX_VALUE, jgid, null, ctx.getVer());
+        if(jobList.getData()!=null){
+            jobList.getData().forEach(jInfo->{
+                remoteXXL.removeJob(jInfo.getId());
+            });
+        }
     }
 
     public void createFSM(TaskContext ctx, FsmDefDO fsmDef){
         Integer jgid = getJgId(ctx);
         ReturnMap<XxlJobInfo> jobList = remoteXXL.listJobInfo(0, Integer.MAX_VALUE, jgid, FSM_EXEC_METHOD, ctx.getVer());
-        ctx.getStaticMgmt().setObject(UnifiedEntityStatics.STATIC_TYPE_FSM, fsmDef.getGuid(), fsmDef);
-        rtContextService.saveRunningContext(ctx);
-
         if(CollectionUtils.isEmpty(jobList.getData())) {
-            String param = JsonUtilUnderline.toJson(new DVal(ctx.getVer(), fsmDef.getGuid()));
+            String param = JsonUtilUnderline.toJson(new UnifiedObject(fsmDef.getGuid(),CoreClazzDef.CLAZZ_FSM,true,
+                    ctx.getPrjInfo().getPrjGuid(),ctx.getPrjInfo().getPrjVer(),ctx.getVer()));
             XxlJobInfo jInfo = createJobInfo(jgid, fsmDef.getCron(), FSM_EXEC_METHOD, 3, ctx.getVer(), param);
             executeJob(jInfo);
         }
@@ -145,25 +151,19 @@ public class TimerService {
         }
     }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class DVal{
-        private String ver;
-        private String guid;
-    }
 
     @XxlJob(SENTINEL_EXEC_METHOD)
     public com.xxl.job.core.biz.model.ReturnT execSentinelScript(String param){
         if (StringUtils.isEmpty(param))
             param = XxlJobHelper.getJobParam();
-        DVal id = JsonUtil.parse(param, DVal.class);
+        UnifiedObject id = JsonUtil.parse(param, UnifiedObject.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
         log.info("entinel-exec job get ctx:{}",JSON.toJSONString(ctx));
-        SentinelDefDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_SENTINEL,id.getGuid());
+        RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+        String objKey = RedisKeyName.getStaticKey(Constants.STATIC_TYPE_SENTINEL, id.getVer(), id.getPrjGuid(), id.getPrjVer());
+        SentinelDefDO ss = (SentinelDefDO) rtRedisObjectStorageService.getObjectAttrValue(ctx,objKey,id.getGuid(),id.getPrjGuid(),id.getPrjVer());
         log.info("entinel-exec job get SentinelDefDO:{}",JSON.toJSONString(ss));
-
-        scriptEngine.exec(ss.getBody(),ctx);
+        scriptEngine.exec(ss.getBody(),ctx,id.getPrjGuid(),id.getPrjVer());
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
 
@@ -171,10 +171,12 @@ public class TimerService {
     public com.xxl.job.core.biz.model.ReturnT evalFSM(String param){
         if (StringUtils.isEmpty(param))
             param = XxlJobHelper.getJobParam();
-        DVal id = JsonUtil.parse(param, DVal.class);
+        UnifiedObject id = JsonUtil.parse(param, UnifiedObject.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        FsmDefCompositeDO ss = ctx.getStaticMgmt().getObject(UnifiedEntityStatics.STATIC_TYPE_FSM,id.getGuid());
-        fsmService.evalFsm(ctx,ss);
+        RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+        String objKey = RedisKeyName.getStaticKey(Constants.STATIC_TYPE_FSM, id.getVer(), id.getPrjGuid(), id.getPrjVer());
+        FsmDefCompositeDO ss = (FsmDefCompositeDO) rtRedisObjectStorageService.getObjectAttrValue(ctx,objKey,id.getGuid(),id.getPrjGuid(),id.getPrjVer());
+        fsmService.evalFsm(ctx,ss,id.getPrjGuid(),id.getPrjVer());
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
 }

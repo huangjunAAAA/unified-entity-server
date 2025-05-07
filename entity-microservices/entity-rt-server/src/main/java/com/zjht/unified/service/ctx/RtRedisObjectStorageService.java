@@ -1,16 +1,15 @@
 package com.zjht.unified.service.ctx;
 
 
-import alluxio.shaded.client.org.checkerframework.checker.units.qual.C;
 import com.google.common.collect.Maps;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.wukong.core.weblog.utils.JsonUtil;
-import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
+import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
-import com.zjht.unified.domain.composite.PrjSpecDO;
+import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.InstanceFieldDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.utils.StoreUtil;
@@ -43,47 +42,48 @@ public class RtRedisObjectStorageService {
 
 
     public void setObject(TaskContext ctx, UnifiedObject uo){
-        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),uo.getGuid());
+        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),uo.getGuid(),uo.getPrjGuid(),uo.getPrjVer());
         redisTemplate.opsForValue().setIfAbsent(key,uo);
     }
 
-    public UnifiedObject getObject(TaskContext ctx, String guid){
-        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),guid);
+    public UnifiedObject getObject(TaskContext ctx, String guid,String prjGuid,String prjVer){
+        String key=RedisKeyName.getObjectRtKey(ctx.getVer(),guid,prjGuid,prjVer);
         return (UnifiedObject) redisTemplate.opsForValue().get(key);
     }
 
     public void setObjectAttrValue(TaskContext ctx, String guid, String attrName, Object val, boolean dispatch){
         log.info("set attr:"+guid+"."+attrName+"=>["+val+"]");
-        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer(),ctx.getPrjInfo().getPrjGuid(),ctx.getPrjInfo().getPrjVer());
         redisTemplate.opsForHash().put(key,attrName,val);
-        if(val instanceof  UnifiedObject){
-            setObject(ctx, (UnifiedObject) val);
-        }
+
         if (dispatch) {
             HashMap<String, Object> kvMap = Maps.newHashMap();
             kvMap.put(attrName,val);
             kvMap.put("guid", guid);
-            UnifiedObject object = getObject(ctx, guid);
-            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(ctx.getClazzGUIDMap().get(object.getClazzGUID()), ctx, kvMap, false);
+            EntityDepService entityDepService=SpringUtils.getBean(EntityDepService.class);
+            UnifiedObject object = entityDepService.getObject(ctx, guid);
+            RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
+            ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, object.getPrjVer(),  object.getClazzGUID());
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(classDef, ctx, kvMap, false);
             log.info("send update message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_FIELD_STORE,storeMessageDO);
 
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA,"update",storeMessageDO,System.currentTimeMillis());
         }
     }
 
-    public void delObjectAttr(TaskContext ctx,String guid,String attrName){
+    public void delObjectAttr(TaskContext ctx,String guid,String attrName,String prjGuid,String prjVer){
         log.info("delete attr:"+guid+"."+attrName);
-        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer(),prjGuid,prjVer);
         redisTemplate.opsForHash().delete(key,attrName);
     }
 
-    public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName){
-        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+    public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName,String prjGuid,String prjVer){
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer(),prjGuid,prjVer);
         return redisTemplate.opsForHash().get(key,attrName);
     }
 
-    public Map<String, Object> getObjectAttrValueMap(TaskContext ctx, String guid){
-        String key = RedisKeyName.getObjectKey(guid, ctx.getVer());
+    public Map<String, Object> getObjectAttrValueMap(TaskContext ctx, String guid,String prjGuid,String prjVer){
+        String key = RedisKeyName.getObjectKey(guid, ctx.getVer(),prjGuid,prjVer);
         Map<Object, Object> kvMap = redisTemplate.opsForHash().entries(key);
         Map<String, Object> resultMap = new HashMap<>();
         kvMap.forEach((k, v) -> resultMap.put(String.valueOf(k), v));
@@ -91,52 +91,59 @@ public class RtRedisObjectStorageService {
         return resultMap;
     }
 
-    public String getAttrDef(TaskContext ctx, String guid, String attrName){
-        String key = RedisKeyName.getObjectAttrKey(guid, ctx.getVer(), attrName);
+    public Object getAttrDef(TaskContext ctx, String prjVer,String clsGuid, String attrName){
+        String key = RedisKeyName.getObjectAttrDefKey(prjVer,clsGuid, ctx.getVer(), attrName);
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public Object getAttrDefByGuid(TaskContext ctx, String prjVer,String fieldGuid){
+        String key = RedisKeyName.getObjectAttrDefKey(prjVer,fieldGuid, ctx.getVer());
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public void setAttrDef(TaskContext ctx, String prjVer,String clsGuid, String fieldGuid, String attrName,Object def){
+        String key = RedisKeyName.getObjectAttrDefKey(prjVer,clsGuid, ctx.getVer(), attrName);
+        redisTemplate.opsForValue().set(key,def);
+        String key2 = RedisKeyName.getObjectAttrDefKey(prjVer,fieldGuid, ctx.getVer());
+        redisTemplate.opsForValue().set(key2,def);
+    }
+
+    public void setClsDef(TaskContext ctx, String prjVer,String clsGuid, ClazzDefCompositeDO clazzDef){
+        String key=RedisKeyName.getClsDefKey(ctx.getVer(),prjVer,clsGuid);
+        redisTemplate.opsForValue().set(key,clazzDef);
+        addNameToGUID(ctx.getVer(), clsGuid, clazzDef.getName(), clazzDef.getPrjGuid(), clazzDef.getPrjVer());
+    }
+
+    public ClazzDefCompositeDO getClsDef(TaskContext ctx, String prjVer,String clsGuid){
+        String key=RedisKeyName.getClsDefKey(ctx.getVer(),prjVer,clsGuid);
+        return (ClazzDefCompositeDO) redisTemplate.opsForValue().get(key);
+    }
+
+    public ClazzDefCompositeDO getClsDefByName(TaskContext ctx, String prjVer,String name){
+        String clsGuid=nameToGUID(ctx.getVer(), name, ctx.getPrjInfo().getPrjGuid(), ctx.getPrjInfo().getPrjVer());
+        if (clsGuid==null)
+            return null;
+        String key=RedisKeyName.getClsDefKey(ctx.getVer(),prjVer,clsGuid);
+        return (ClazzDefCompositeDO) redisTemplate.opsForValue().get(key);
+    }
+
+    public String nameToGUID(String ver, String name, String prjGuid,String prjVer){
+        String key=RedisKeyName.nameGUIDKey(ver,name,prjGuid,prjVer);
         return (String)redisTemplate.opsForValue().get(key);
     }
 
-    public void setAttrDef(TaskContext ctx, String guid, String attrName,String calcExpr){
-        String key = RedisKeyName.getObjectAttrKey(guid, ctx.getVer(), attrName);
-        redisTemplate.opsForValue().set(key,calcExpr);
+    public void addNameToGUID(String ver, String guid, String name, String prjGuid,String prjVer){
+        String key=RedisKeyName.nameGUIDKey(ver,name,prjGuid,prjVer);
+        redisTemplate.opsForValue().setIfAbsent(key,guid);
     }
 
-    public void initSpecDefinition(TaskContext ctx, PrjSpecDO spec){
-        if (Objects.nonNull(spec.getStaticDefList())) {
-            spec.getStaticDefList().forEach(sd->{
-                setObjectAttrValue(ctx,RedisKeyName.getStaticKey(ctx.getVer()),sd.getFieldName(),sd.getFieldValue(),false);
-            });
-        }
 
-        spec.getClazzList().forEach(cd->{
-            if(!ctx.getClazzMap().containsKey(cd.getName()))
-                ctx.getClazzMap().put(cd.getName(),cd);
-            ctx.getClazzMap().put(spec.getUePrj().getGuid()+":"+cd.getName(),cd);
-            ctx.getClazzGUIDMap().put(cd.getGuid(),cd);
-        });
-        spec.getClazzList().forEach(cd->{
-            cd.getClazzIdFieldDefList().forEach(fd->{
-                if(fd.getNature()== Constants.FIELD_TYPE_SCRIPT){
-                    setAttrDef(ctx,cd.getGuid(),fd.getName(),fd.getInitValue());
-                }
-            });
-            cd.getClazzIdMethodDefList().forEach(md->{
-                String key = RedisKeyName.getObjectAttrKey(cd.getGuid(), ctx.getVer(), md.getName());
-                ctx.getMethods().put(key,md);
-            });
-        });
 
-        if(spec.getDepPkgList()!=null){
-            spec.getDepPkgList().forEach(pkg->{
-                initSpecDefinition(ctx,pkg);
-            });
-        }
-    }
 
-    public void initializeInstances(TaskContext ctx, PrjSpecDO spec){
-        if (Objects.nonNull(spec.getInstanceList())) {
-            spec.getInstanceList().forEach(inst->{
-                setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true));
+    public void initializeInstances(TaskContext ctx, String prjGuid, String prjVer, List<InitialInstanceDO> instanceList){
+        if (Objects.nonNull(instanceList)) {
+            instanceList.forEach(inst->{
+                setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true, prjGuid,prjVer,ctx.getVer()));
                 if(StringUtils.isNotBlank(inst.getAttrValue())){
                     List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
                     fdlst.forEach(fd->{
@@ -144,9 +151,10 @@ public class RtRedisObjectStorageService {
                     });
                 }
 
-                Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, inst.getGuid());
+                Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, inst.getGuid(),prjGuid,prjVer);
                 objectAttrValueMap.put("clazz_guid",inst.getClassGuid());
-                ClazzDefCompositeDO classDef = ctx.getClazzGUIDMap().get(inst.getClassGuid());
+                RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
+                ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, prjVer,  inst.getClassGuid());
                 EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, ctx,objectAttrValueMap,true);
                 log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
                 gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
@@ -155,9 +163,9 @@ public class RtRedisObjectStorageService {
 
     }
 
-    public boolean deleteObject(TaskContext ctx, String guid) {
+    public boolean deleteObject(TaskContext ctx, String guid,String prjGuid,String prjVer) {
         // 获取对象
-        UnifiedObject unifiedObject = getObject(ctx, guid);
+        UnifiedObject unifiedObject = getObject(ctx, guid, prjGuid,prjVer);
 
         if (unifiedObject == null) {
             log.warn("Object with guid {} not found, nothing to delete!", guid);
@@ -165,15 +173,15 @@ public class RtRedisObjectStorageService {
         }
 
         // 删除对象属性
-        Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, guid);
+        Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, guid, prjGuid,prjVer);
         if (objectAttrValueMap != null && !objectAttrValueMap.isEmpty()) {
             objectAttrValueMap.keySet().forEach(attrName -> {
-                delObjectAttr(ctx, guid, attrName);  // 删除每个属性
+                delObjectAttr(ctx, guid, attrName,prjGuid,prjVer);  // 删除每个属性
             });
         }
 
         // 删除对象记录
-        String objectKey = RedisKeyName.getObjectRtKey(ctx.getVer(), guid);
+        String objectKey = RedisKeyName.getObjectRtKey(ctx.getVer(), guid, prjGuid,prjVer);
         boolean deleted = redisTemplate.delete(objectKey);
         if (deleted) {
             return true;

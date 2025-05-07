@@ -1,12 +1,10 @@
 package com.zjht.unified.service.v8exec;
 
-import com.caoccao.javet.annotations.V8Property;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.proxy.IJavetDirectProxyHandler;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.primitive.V8ValueBoolean;
-import com.caoccao.javet.values.reference.V8ValueObject;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -33,6 +31,8 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
     private String objGUID;
 
     private String propertyKey;
+    private String prjGuid;
+    private String prjVer;
 
 
     @Override
@@ -45,7 +45,7 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
 
     public Object getCurrentValue() {
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-        return rtRedisObjectStorageService.getObjectAttrValue(taskContext, objGUID, propertyKey);
+        return rtRedisObjectStorageService.getObjectAttrValue(taskContext, objGUID, propertyKey,prjGuid,prjVer);
     }
 
 
@@ -89,6 +89,6 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
 
     @Override
     public V8Runtime getV8Runtime() {
-        return V8EngineService.getRuntime(taskContext);
+        return V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
     }
 }

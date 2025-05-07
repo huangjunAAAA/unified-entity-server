@@ -136,11 +136,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.zjht.unified.data</groupId>
-            <artifactId>common-feign</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.wukong</groupId>
             <artifactId>lib-dal</artifactId>
         </dependency>

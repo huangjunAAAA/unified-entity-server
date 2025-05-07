@@ -61,7 +61,7 @@ public class StoreUtil {
         }
         messageDO.setCols(cols);
         messageDO.setIndices(indices);
-        messageDO.setPrjId(Long.parseLong(taskContext.getPrjId()));
+        messageDO.setPrjId(taskContext.getPrjInfo().getPrjId());
         messageDO.setData(JsonUtilExt.toJson(Lists.newArrayList(newKvMap)));
         return messageDO;
     }

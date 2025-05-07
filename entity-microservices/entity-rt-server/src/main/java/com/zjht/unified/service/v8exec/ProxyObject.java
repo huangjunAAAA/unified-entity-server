@@ -1,7 +1,5 @@
 package com.zjht.unified.service.v8exec;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.caoccao.javet.enums.V8ValueSymbolType;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interfaces.IJavetUniFunction;
@@ -9,35 +7,31 @@ import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.callback.IJavetDirectCallable;
 import com.caoccao.javet.interop.callback.JavetCallbackContext;
 import com.caoccao.javet.interop.callback.JavetCallbackType;
-import com.caoccao.javet.interop.converters.JavetObjectConverter;
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.interop.proxy.IJavetDirectProxyHandler;
 import com.caoccao.javet.interop.proxy.IJavetProxyHandler;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.primitive.*;
-import com.caoccao.javet.values.reference.*;
+import com.caoccao.javet.values.reference.V8ValueProxy;
+import com.caoccao.javet.values.reference.V8ValueSymbol;
 import com.caoccao.javet.values.reference.builtin.V8ValueBuiltInSymbol;
-import com.wukong.core.util.ThreadLocalUtil;
 import com.wukong.core.weblog.utils.StringUtil;
-import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
-import com.zjht.unified.domain.composite.MethodDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
-import com.zjht.unified.domain.simple.FieldDefDO;
 import com.zjht.unified.domain.simple.MethodDefDO;
 import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
+import com.zjht.unified.service.ctx.EntityDepService;
+import com.zjht.unified.service.ctx.PrjUniqueInfo;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.service.v8exec.model.ClsDf;
 import groovy.util.logging.Slf4j;
-import jdk.net.SocketFlow;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.Function;
@@ -49,13 +43,30 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyObject.class);
 
+    public ProxyObject(TaskContext taskContext, String guid, String clazzGUID, String prjVer, String prjGuid) {
+        this.taskContext = taskContext;
+        this.guid = guid;
+        this.clazzGUID = clazzGUID;
+        this.prjVer = prjVer;
+        this.prjGuid = prjGuid;
+        EntityDepService entityDepService = SpringUtils.getBean(EntityDepService.class);
+        ClazzDefCompositeDO clazzDef = entityDepService.getClsDefByGuid(taskContext,clazzGUID);
+        methodSet = clazzDef.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
+        fieldDefMap = clazzDef.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+    }
 
     public ProxyObject(TaskContext taskContext, String guid, String clazzGUID) {
         this.taskContext = taskContext;
         this.guid = guid;
         this.clazzGUID = clazzGUID;
-        methodSet = taskContext.getMethods().values().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
-        fieldDefMap = taskContext.getClazzGUIDMap().get(clazzGUID).getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+        EntityDepService entityDepService = SpringUtils.getBean(EntityDepService.class);
+        PrjUniqueInfo prjInfo  = entityDepService.getPrjInfoByGuid(taskContext, clazzGUID);
+        this.prjGuid=prjInfo.getPrjGuid();
+        this.prjVer=prjInfo.getPrjVer();
+        RtRedisObjectStorageService rtRedisObjectStorageService=SpringUtils.getBean(RtRedisObjectStorageService.class);
+        ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, this.prjVer,clazzGUID);
+        methodSet = clazzDef.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
+        fieldDefMap = clazzDef.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
     }
 
 
@@ -66,6 +77,10 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
     private String guid;
 
     private String clazzGUID;
+
+    private String prjVer;
+
+    private String prjGuid;
 
     private Map<String,AttrWrapper> fieldObjectMap = new HashMap<>();
 
@@ -117,11 +132,6 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-                log.error(e.getMessage());
-                log.error(e.getMessage());
-                log.error(e.getMessage());
-
-
             }
 
         if (target instanceof V8ValueString) {
@@ -171,13 +181,19 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             return getV8Runtime().createV8ValueUndefined();
         if ("guid".equalsIgnoreCase(key))
             return convertToV8Value(guid);
+        if ("prjGuid".equalsIgnoreCase(key))
+            return convertToV8Value(prjGuid);
+        if ("prjVer".equalsIgnoreCase(key))
+            return convertToV8Value(prjVer);
         if("cls".equalsIgnoreCase(key)){
-            ClazzDefCompositeDO cls = taskContext.getClazzGUIDMap().get(clazzGUID);
-            return V8BeanUtils.toV8Value(getV8Runtime(), ClsDf.from(cls,taskContext));
+            RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+            ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, prjVer, clazzGUID);
+            return V8BeanUtils.toV8Value(getV8Runtime(), ClsDf.from(clazzDef,taskContext));
         }
         if ("pv".equalsIgnoreCase(key)){
-            ClazzDefCompositeDO cls = taskContext.getClazzGUIDMap().get(clazzGUID);
-            key = cls.getPvAttr();
+            RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+            ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, prjVer, clazzGUID);
+            key = clazzDef.getPvAttr();
         }
 
         if(snapshot!=null){
@@ -188,18 +204,18 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
 
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-        Object objectAttrValue = rtRedisObjectStorageService.getObjectAttrValue(taskContext, guid, key);
+        Object objectAttrValue = rtRedisObjectStorageService.getObjectAttrValue(taskContext, guid, key,prjGuid,prjVer);
         if (Objects.nonNull(objectAttrValue)) {
             if (objectAttrValue instanceof UnifiedObject) {
-                UnifiedObject uo = rtRedisObjectStorageService.getObject(taskContext, ((UnifiedObject) objectAttrValue).getGuid());
-                ProxyObject t = SpringUtils.getBean(V8RttiService.class).createFromUnifiedObject(taskContext, uo);
+                ProxyObject t = SpringUtils.getBean(V8RttiService.class).createFromUnifiedObject(taskContext, (UnifiedObject) objectAttrValue);
                 return new JavetProxyConverter().toV8Value(getV8Runtime(), t);
             } else {
                 AttrWrapper attrWrapper = fieldObjectMap.get(key);
                 if (Objects.isNull(attrWrapper)) {
                     //todo init eval and archivestatus
                     FieldDefCompositeDO fieldDefCompositeDO = fieldDefMap.get(key);
-                    attrWrapper = new AttrWrapper(null, null, fieldDefCompositeDO.getArchiveStatus(), fieldDefCompositeDO.getEval(), taskContext,guid, key);
+                    attrWrapper = new AttrWrapper(null, null, fieldDefCompositeDO.getArchiveStatus(),
+                            fieldDefCompositeDO.getEval(), taskContext,guid, key,prjGuid,prjVer);
                     fieldObjectMap.put(key, attrWrapper);
                 }
                 return new JavetProxyConverter().toV8Value(getV8Runtime(), attrWrapper);
@@ -240,13 +256,11 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         Object o = convertFromV8Value(value);
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         if (o != null) {
-            UnifiedObject object = rtRedisObjectStorageService.getObject(taskContext, guid);
+            UnifiedObject object = rtRedisObjectStorageService.getObject(taskContext, guid,prjGuid,prjVer);
             boolean dispatch = false;
             if (object.getPersistTag()) {
-                ClazzDefCompositeDO clazzDefCompositeDO = this.getTaskContext().getClazzGUIDMap().get(clazzGUID);
-                List<FieldDefCompositeDO> clazzIdFieldDefList = clazzDefCompositeDO.getClazzIdFieldDefList();
                 String finalKey = key;
-                dispatch = clazzIdFieldDefList.stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(finalKey));
+                dispatch = fieldDefMap.values().stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(finalKey));
             }
 
             if (Objects.nonNull(attrWrapper)) {
@@ -257,7 +271,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                     log.info("attrWrapper.getEval() = {} " ,attrWrapper.getEval());
                     String script = "'" + lastValue + "'" + attrWrapper.getEval();
                     System.out.println("eval script = " + script);
-                    Boolean evalResult = (Boolean)engineService.exec(script  , taskContext);
+                    Boolean evalResult = (Boolean)engineService.exec(script,taskContext,prjGuid,prjVer);
                     if (Objects.nonNull(evalResult) && evalResult) {
                         attrWrapper.setLastEV(lastValue);
                     }
@@ -265,10 +279,8 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             }
 
             rtRedisObjectStorageService.setObjectAttrValue(taskContext, this.guid, key, o, dispatch);
-
-
         } else {
-            rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key);
+            rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key,prjGuid,prjVer);
         }
 
         if(snapshot!=null){
@@ -307,8 +319,10 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         } else if (value instanceof V8ValueProxy) {
             V8Value tid = ((V8ValueProxy) value).get("guid");
             if (tid != null) {
+                V8Value prjGuid = ((V8ValueProxy) value).get("prjGuid");
+                V8Value prjVer = ((V8ValueProxy) value).get("prjVer");
                 String guid = tid.toString();
-                return SpringUtils.getBean(RtRedisObjectStorageService.class).getObject(taskContext, guid);
+                return SpringUtils.getBean(RtRedisObjectStorageService.class).getObject(taskContext, guid,prjGuid.toString(),prjVer.toString());
             }
         }
         log.info("convertFromV8Value:" + value.toString());
@@ -317,7 +331,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
     @Override
     public V8Runtime getV8Runtime() {
-        return V8EngineService.getRuntime(taskContext);
+        return V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
     }
 
 }
