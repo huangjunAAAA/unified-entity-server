@@ -42,7 +42,7 @@ public class ClassUtils {
 
     @V8Function(name = "new")
     public V8Value newInstance(String className, V8Value... args) throws Exception {
-        System.out.println("args = " + Arrays.toString(args));
+        log.info("args = " + Arrays.toString(args));
 
         String cguid = CoreClazzDef.getCoreClassGuid(className);
         if (cguid != null) {
@@ -50,7 +50,7 @@ public class ClassUtils {
         } else {
             ClazzDefCompositeDO classDef = entityDepService.getClsByName(taskContext,className);
             if (classDef == null) {
-                log.error("ClassName not found in ClazzMap:  {}", className);
+                log.error("ClassName not found in newInstance:  {}", className);
                 return null;
             }
             ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
@@ -85,7 +85,7 @@ public class ClassUtils {
     public V8Value newPersistInstance(String className, V8Value... args) throws Exception {
         ClazzDefCompositeDO classDef = entityDepService.getClsByName(taskContext,className);
         if (classDef == null) {
-            log.error("ClassName not found in ClazzMap:  {}", className);
+            log.error("ClassName not found in newPersistInstance:  {}", className);
             return null;
         }
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, true);

@@ -7,11 +7,13 @@ import com.zjht.unified.domain.runtime.UnifiedObject;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Iterator;
 
 @Service
 public class EntityDepService {
 
+    @Resource
     private RtRedisObjectStorageService rtRedisObjectStorageService;
     public ClazzDefCompositeDO getClsDefByGuid(TaskContext ctx, String clsGuid){
         ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
@@ -57,12 +59,12 @@ public class EntityDepService {
     }
 
     public ClazzDefCompositeDO getClsByName(TaskContext ctx, String name){
-        ClazzDefCompositeDO clsdef=rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), name);
+        ClazzDefCompositeDO clsdef=rtRedisObjectStorageService.getClsDefByName(ctx, ctx.getPrjInfo().getPrjVer(), name);
         if(clsdef!=null)
             return clsdef;
         for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
             TaskContext dep = iterator.next();
-            clsdef=rtRedisObjectStorageService.getClsDef(dep, dep.getPrjInfo().getPrjVer(), name);
+            clsdef=rtRedisObjectStorageService.getClsDefByName(dep, dep.getPrjInfo().getPrjVer(), name);
             if(clsdef!=null)
                 return clsdef;
         }

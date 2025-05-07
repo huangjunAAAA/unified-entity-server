@@ -43,7 +43,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyObject.class);
 
-    public ProxyObject(TaskContext taskContext, String guid, String clazzGUID, String prjVer, String prjGuid) {
+    public ProxyObject(TaskContext taskContext, String guid, String clazzGUID, String prjGuid, String prjVer) {
         this.taskContext = taskContext;
         this.guid = guid;
         this.clazzGUID = clazzGUID;

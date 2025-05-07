@@ -20,7 +20,7 @@ import javax.annotation.Resource;
  *
  * @author wangy
  */
-@Api(value = "类方法定义维护",tags = {"类方法定义维护"})
+@Api(value = "运行统一实体项目",tags = {"运行统一实体项目"})
 @RestController
 @RequestMapping("/prj")
 public class PkgController {
@@ -28,14 +28,14 @@ public class PkgController {
     @Resource
     private RunService runService;
 
-    @ApiOperation(value = "查询类方法定义列表")
+    @ApiOperation(value = "运行特定统一实体项目")
     @PostMapping("/run")
     public R<String> run(@RequestParam Long prjId){
         return runService.runProject(prjId);
     }
 
 
-    @ApiOperation(value = "genPrjSpec")
+    @ApiOperation(value = "生产项目说明数据结构")
     @PostMapping("/genPrjSpec")
     public R<PrjSpecDO> genPrjSpec(@RequestParam Long prjId) {
         return R.ok(runService.genPrjSpec(prjId));

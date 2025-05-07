@@ -432,8 +432,6 @@ public class DeployService {
            return f;
         });
 
-        filesetService.removeByIds(files.values());
-
         return R.ok();
     }
 

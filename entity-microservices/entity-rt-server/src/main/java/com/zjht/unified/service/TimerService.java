@@ -156,13 +156,13 @@ public class TimerService {
     public com.xxl.job.core.biz.model.ReturnT execSentinelScript(String param){
         if (StringUtils.isEmpty(param))
             param = XxlJobHelper.getJobParam();
-        UnifiedObject id = JsonUtil.parse(param, UnifiedObject.class);
+        UnifiedObject id = JsonUtilUnderline.parse(param, UnifiedObject.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
-        log.info("entinel-exec job get ctx:{}",JSON.toJSONString(ctx));
+        log.info("sentinel-exec job get ctx:{}",JSON.toJSONString(ctx));
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         String objKey = RedisKeyName.getStaticKey(Constants.STATIC_TYPE_SENTINEL, id.getVer(), id.getPrjGuid(), id.getPrjVer());
         SentinelDefDO ss = (SentinelDefDO) rtRedisObjectStorageService.getObjectAttrValue(ctx,objKey,id.getGuid(),id.getPrjGuid(),id.getPrjVer());
-        log.info("entinel-exec job get SentinelDefDO:{}",JSON.toJSONString(ss));
+        log.info("sentinel-exec job get SentinelDefDO:{}",JSON.toJSONString(ss));
         scriptEngine.exec(ss.getBody(),ctx,id.getPrjGuid(),id.getPrjVer());
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
@@ -171,7 +171,7 @@ public class TimerService {
     public com.xxl.job.core.biz.model.ReturnT evalFSM(String param){
         if (StringUtils.isEmpty(param))
             param = XxlJobHelper.getJobParam();
-        UnifiedObject id = JsonUtil.parse(param, UnifiedObject.class);
+        UnifiedObject id = JsonUtilUnderline.parse(param, UnifiedObject.class);
         TaskContext ctx = rtContextService.getRunningContext(id.getVer());
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         String objKey = RedisKeyName.getStaticKey(Constants.STATIC_TYPE_FSM, id.getVer(), id.getPrjGuid(), id.getPrjVer());
