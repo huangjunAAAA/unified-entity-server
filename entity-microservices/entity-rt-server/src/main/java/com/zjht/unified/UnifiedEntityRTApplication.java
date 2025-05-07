@@ -1,13 +1,17 @@
 package com.zjht.unified;
 
+import alluxio.shaded.client.org.apache.yetus.audience.InterfaceAudience;
 import com.alibaba.fastjson.JSON;
 import com.caoccao.javet.interop.V8Host;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.engine.IJavetEngine;
 import com.caoccao.javet.interop.engine.IJavetEnginePool;
 import com.caoccao.javet.interop.engine.JavetEnginePool;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.PrjSpecDO;
+import com.zjht.unified.feign.RemoteAdmin;
 import com.zjht.unified.service.RtContextService;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -38,9 +42,10 @@ public class UnifiedEntityRTApplication {
         try (V8Runtime v8Runtime = V8Host.getV8Instance().createV8Runtime()) {
         }
 
-        // 正常启动
         ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityRTApplication.class, args);
         log.info("数据存储模块启动成功");
+        //初始化后端脚本默认执行的context
+        initScriptContext();
 //        for (int i = 0; i < 1000; i++) {
 //            app.getBean(V8EngineService.class).test2();
 //            Thread.sleep(1000);
@@ -235,6 +240,27 @@ public class UnifiedEntityRTApplication {
         V8EngineService engineService = SpringUtils.getBean(V8EngineService.class);
         engineService.testM(ctx);
     }
+
+
+    /**
+     * 初始化后端脚本默认执行的context
+     */
+    private static void initScriptContext() {
+        String version = "5f3a2b3f-d61c-4f9b-9a2c-f2ef0c891e34";
+        long prjId = 2L;
+        RemoteAdmin remoteAdmin = SpringUtils.getBean(RemoteAdmin.class);
+        RtContextService rtContextService = SpringUtils.getBean(RtContextService.class);
+        R<PrjSpecDO> prjSpecDOR = remoteAdmin.genPrjSpec(prjId);
+        if (prjSpecDOR.getCode()== Constants.SUCCESS) {
+            PrjSpecDO prjSpecDO = prjSpecDOR.getData();
+            RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+            TaskContext ctx = rtContextService.startNewSession(prjSpecDO, version);
+            rtRedisObjectStorageService.initSpecDefinition(ctx, prjSpecDO);
+            rtRedisObjectStorageService.initializeInstances(ctx, prjSpecDO);
+            rtContextService.saveRunningContext(ctx);
+        }
+    }
+
 
 
 }
