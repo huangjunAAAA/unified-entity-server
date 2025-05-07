@@ -47,26 +47,4 @@ public class UnifiedEntityRTApplication {
         log.info("数据存储模块启动成功");
     }
 
-
-    /**
-     * 初始化后端脚本默认执行的context
-     */
-    private static void initScriptContext() {
-        String version = "5f3a2b3f-d61c-4f9b-9a2c-f2ef0c891e34";
-        long prjId = 2L;
-        RemoteAdmin remoteAdmin = SpringUtils.getBean(RemoteAdmin.class);
-        RtContextService rtContextService = SpringUtils.getBean(RtContextService.class);
-        R<PrjSpecDO> prjSpecDOR = remoteAdmin.genPrjSpec(prjId);
-        if (prjSpecDOR.getCode()== Constants.SUCCESS) {
-            PrjSpecDO prjSpecDO = prjSpecDOR.getData();
-            RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-            TaskContext ctx = rtContextService.startNewSession(prjSpecDO, version);
-            rtRedisObjectStorageService.initSpecDefinition(ctx, prjSpecDO);
-            rtRedisObjectStorageService.initializeInstances(ctx, prjSpecDO);
-            rtContextService.saveRunningContext(ctx);
-        }
-    }
-
-
-
 }
