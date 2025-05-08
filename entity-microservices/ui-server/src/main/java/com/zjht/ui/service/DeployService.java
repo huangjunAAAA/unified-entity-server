@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -188,6 +190,7 @@ public class DeployService {
                 String ss = runningPort.poll(10, TimeUnit.SECONDS);
                 if (ss != null) {
                     wr.runningEnv = ss;
+                    wr.setPid(getProcessPid(wr.devProcess.getProc()));
                     persistWorkingEnv(wr);
                     return R.ok(ss);
                 } else {
@@ -200,6 +203,16 @@ public class DeployService {
 
             return R.fail(debugInfo + "|" + errInfo);
         }
+    }
+
+    public static Long getProcessPid(Process p) {
+        if (p.getClass().getName().equals("java.lang.UNIXProcess"))
+            try {
+                return (Long) FieldUtils.readDeclaredField(p, "pid", true);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        return null;
     }
 
     public R<String> dryRun(Long prjId){
