@@ -190,8 +190,11 @@ public class DeployService {
                 String ss = runningPort.poll(10, TimeUnit.SECONDS);
                 if (ss != null) {
                     wr.runningEnv = ss;
-                    wr.setPid(getProcessPid(wr.devProcess.getProc()));
-                    persistWorkingEnv(wr);
+                    Number pid = getProcessPid(wr.devProcess.getProc());
+                    if(pid!=null) {
+                        wr.setPid(pid.longValue());
+                        persistWorkingEnv(wr);
+                    }
                     return R.ok(ss);
                 } else {
                     destroyWorkingEnv(wr);
@@ -205,10 +208,10 @@ public class DeployService {
         }
     }
 
-    public static Long getProcessPid(Process p) {
+    public static Number getProcessPid(Process p) {
         if (p.getClass().getName().equals("java.lang.UNIXProcess"))
             try {
-                return (Long) FieldUtils.readDeclaredField(p, "pid", true);
+                return (Number) FieldUtils.readDeclaredField(p, "pid", true);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
