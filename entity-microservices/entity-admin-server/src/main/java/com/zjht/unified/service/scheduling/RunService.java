@@ -1,6 +1,7 @@
 package com.zjht.unified.service.scheduling;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wukong.core.weblog.utils.StringUtil;
 import com.zjht.unified.admin.utils.EntityDoUtils;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -68,8 +69,11 @@ public class RunService {
         return remoteRT.startProject(spec);
     }
 
-    public R runProject(Long prjId){
+    public R runProject(Long prjId,String version){
         PrjSpecDO spec = genPrjSpec(prjId);
+        if (StringUtil.isNotBlank(version)) {
+            spec.setCtxVer(version);
+        }
         return runSpec(spec);
     }
 

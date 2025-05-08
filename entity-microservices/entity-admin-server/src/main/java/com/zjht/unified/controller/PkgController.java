@@ -30,8 +30,8 @@ public class PkgController {
 
     @ApiOperation(value = "运行特定统一实体项目")
     @PostMapping("/run")
-    public R<String> run(@RequestParam Long prjId){
-        return runService.runProject(prjId);
+    public R<String> run(@RequestParam Long prjId,@RequestParam String version){
+        return runService.runProject(prjId,version);
     }
 
 
