@@ -103,6 +103,7 @@ public class DeployService {
     }
 
     private void persistWorkingEnv(WorkingEnv workingEnv){
+        log.info("persist workdir:"+workingEnv.getWorkdir()+", prj id:"+workingEnv.getPrjId());
         workingDirs.put(workingEnv.prjId,workingEnv);
         String weData = JsonUtilUnderline.toJson(workingEnv);
         redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId+"",weData);
