@@ -79,15 +79,25 @@ public class DeployService {
     private boolean isWorkingEnvValid(WorkingEnv workingEnv){
         if(workingEnv==null)
             return false;
-        if(workingEnv.pid==null){
-            log.info("pid is null:"+workingEnv.getWorkdir());
-            return false;
-        }
         if(workingEnv.runningEnv==null){
             log.info("runningEnv is null:"+workingEnv.getWorkdir());
             return false;
         }
-        return isProcessValid(workingEnv);
+        if(workingEnv.devProcess!=null){
+            if(workingEnv.devProcess.getProc().isAlive())
+                return true;
+            else{
+                log.info("devProcess is dead:"+workingEnv.getWorkdir());
+                return false;
+            }
+        }
+
+        if(workingEnv.pid==null){
+            log.info("pid is null:"+workingEnv.getWorkdir());
+            return false;
+        }
+
+        return isPidExist(workingEnv.pid);
     }
 
     private void persistWorkingEnv(WorkingEnv workingEnv){
@@ -96,17 +106,6 @@ public class DeployService {
         redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId+"",weData);
     }
 
-    private boolean isProcessValid(WorkingEnv workingEnv){
-        if(workingEnv.devProcess!=null&&workingEnv.devProcess.getProc().isAlive()){
-            log.info("devProcess is dead:"+workingEnv.getWorkdir());
-            return true;
-        }
-        if(workingEnv.pid==null){
-            log.info("pid is null:"+workingEnv.getWorkdir());
-            return false;
-        }
-        return isPidExist(workingEnv.pid);
-    }
 
     public static boolean isPidExist(long pid) {
         String os = System.getProperty("os.name").toLowerCase();
