@@ -79,10 +79,14 @@ public class DeployService {
     private boolean isWorkingEnvValid(WorkingEnv workingEnv){
         if(workingEnv==null)
             return false;
-        if(workingEnv.pid==null)
+        if(workingEnv.pid==null){
+            log.info("pid is null:"+workingEnv.getWorkdir());
             return false;
-        if(workingEnv.runningEnv==null)
+        }
+        if(workingEnv.runningEnv==null){
+            log.info("runningEnv is null:"+workingEnv.getWorkdir());
             return false;
+        }
         return isProcessValid(workingEnv);
     }
 
@@ -93,10 +97,14 @@ public class DeployService {
     }
 
     private boolean isProcessValid(WorkingEnv workingEnv){
-        if(workingEnv.devProcess!=null&&workingEnv.devProcess.getProc().isAlive())
+        if(workingEnv.devProcess!=null&&workingEnv.devProcess.getProc().isAlive()){
+            log.info("devProcess is dead:"+workingEnv.getWorkdir());
             return true;
-        if(workingEnv.pid==null)
+        }
+        if(workingEnv.pid==null){
+            log.info("pid is null:"+workingEnv.getWorkdir());
             return false;
+        }
         return isPidExist(workingEnv.pid);
     }
 
@@ -112,8 +120,18 @@ public class DeployService {
                     new InputStreamReader(process.getInputStream()));
 
             // 解析输出判断结果
-            return reader.lines().anyMatch(line ->
+            StringBuilder output = new StringBuilder();
+            boolean ret= reader.lines().map(l->{
+                output.append(l).append("\n");
+                return l;
+            }).anyMatch(line ->
                     line.contains("" + pid) && !line.contains("grep"));
+            reader.close();
+            log.info(pid+" isPidExist:"+ret);
+            if(!ret){
+                log.info(output.toString());
+            }
+            return ret;
         } catch (IOException e) {
             return false;
         }
@@ -135,7 +153,9 @@ public class DeployService {
             StringBuilder debugInfo = new StringBuilder();
             StringBuilder errInfo = new StringBuilder();
             WorkingEnv wr = createWorkingDir(prjId);
-            if (!isWorkingEnvValid(wr)) {
+            boolean isValid = isWorkingEnvValid(wr);
+            log.info(wr.getWorkdir()+" isValid:" + isValid);
+            if (!isValid) {
                 try {
                     wr.clear();
                     String dir = workdir + prj.getWorkDir();
