@@ -21,12 +21,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,26 +81,34 @@ public class DeployService {
     private boolean isWorkingEnvValid(WorkingEnv workingEnv){
         if(workingEnv==null)
             return false;
-        if(workingEnv.pid==null)
+        if(workingEnv.runningEnv==null){
+            log.info("runningEnv is null:"+workingEnv.getWorkdir());
             return false;
-        if(workingEnv.runningEnv==null)
+        }
+        if(workingEnv.devProcess!=null){
+            if(workingEnv.devProcess.getProc().isAlive())
+                return true;
+            else{
+                log.info("devProcess is dead:"+workingEnv.getWorkdir());
+                return false;
+            }
+        }
+
+        if(workingEnv.pid==null){
+            log.info("pid is null:"+workingEnv.getWorkdir());
             return false;
-        return isProcessValid(workingEnv);
+        }
+
+        return isPidExist(workingEnv.pid);
     }
 
     private void persistWorkingEnv(WorkingEnv workingEnv){
+        log.info("persist workdir:"+workingEnv.getWorkdir()+", prj id:"+workingEnv.getPrjId());
         workingDirs.put(workingEnv.prjId,workingEnv);
         String weData = JsonUtilUnderline.toJson(workingEnv);
         redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId+"",weData);
     }
 
-    private boolean isProcessValid(WorkingEnv workingEnv){
-        if(workingEnv.devProcess!=null&&workingEnv.devProcess.getProc().isAlive())
-            return true;
-        if(workingEnv.pid==null)
-            return false;
-        return isPidExist(workingEnv.pid);
-    }
 
     public static boolean isPidExist(long pid) {
         String os = System.getProperty("os.name").toLowerCase();
@@ -111,8 +122,18 @@ public class DeployService {
                     new InputStreamReader(process.getInputStream()));
 
             // 解析输出判断结果
-            return reader.lines().anyMatch(line ->
+            StringBuilder output = new StringBuilder();
+            boolean ret= reader.lines().map(l->{
+                output.append(l).append("\n");
+                return l;
+            }).anyMatch(line ->
                     line.contains("" + pid) && !line.contains("grep"));
+            reader.close();
+            log.info(pid+" isPidExist:"+ret);
+            if(!ret){
+                log.info(output.toString());
+            }
+            return ret;
         } catch (IOException e) {
             return false;
         }
@@ -123,61 +144,79 @@ public class DeployService {
     }
 
     public R<String> devRun(Long prjId){
-        compilePages(prjId);
-        renderRoute(prjId);
-        inflate(prjId);
-        initNodeModule(prjId);
-        UiPrj prj = iUiPrjService.getById(prjId);
-        String nodejs="nvm use "+prj.getNodejsVer()+"\n";
-        SynchronousQueue<String> runningPort=new SynchronousQueue<>();
-        StringBuilder debugInfo=new StringBuilder();
-        StringBuilder errInfo=new StringBuilder();
-        WorkingEnv wr = createWorkingDir(prjId);
-        if(!isWorkingEnvValid(wr)) {
-            try {
-                wr.clear();
-                String dir = workdir + prj.getWorkDir();
-                String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
-                Process p = OsType.runCmd(cmd, new File(dir));
-                if(p==null){
-                    destroyWorkingEnv(wr);
-                    return R.fail("unable to run dev process");
-                }
-                wr.devProcess = new ProcessPump(p);
-                wr.devProcess.start(l -> {
-                    debugInfo.append(l).append("\n");
-                    if (l.trim().contains("Network")) {
-                        try {
-                            runningPort.offer(l.trim(), 1, TimeUnit.SECONDS);
-                        } catch (InterruptedException e) {
-
-                        }
+        synchronized (prjId.toString()) {
+            compilePages(prjId);
+            renderRoute(prjId);
+            inflate(prjId);
+            initNodeModule(prjId);
+            UiPrj prj = iUiPrjService.getById(prjId);
+            String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
+            SynchronousQueue<String> runningPort = new SynchronousQueue<>();
+            StringBuilder debugInfo = new StringBuilder();
+            StringBuilder errInfo = new StringBuilder();
+            WorkingEnv wr = createWorkingDir(prjId);
+            boolean isValid = isWorkingEnvValid(wr);
+            log.info(wr.getWorkdir()+" isValid:" + isValid);
+            if (!isValid) {
+                try {
+                    wr.clear();
+                    String dir = workdir + prj.getWorkDir();
+                    String cmd = nodejs + "npm run dev -- --host 0.0.0.0";
+                    Process p = OsType.runCmd(cmd, new File(dir));
+                    if (p == null) {
+                        destroyWorkingEnv(wr);
+                        return R.fail("unable to run dev process");
                     }
-                }, l -> {
-                    errInfo.append(l).append("\n");
-                });
+                    wr.devProcess = new ProcessPump(p);
+                    wr.devProcess.start(l -> {
+                        debugInfo.append(l).append("\n");
+                        if (l.trim().contains("Network")) {
+                            try {
+                                runningPort.offer(l.trim(), 1, TimeUnit.SECONDS);
+                            } catch (InterruptedException e) {
+
+                            }
+                        }
+                    }, l -> {
+                        errInfo.append(l).append("\n");
+                    });
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            } else {
+                return R.ok(wr.runningEnv);
+            }
+
+            try {
+                String ss = runningPort.poll(10, TimeUnit.SECONDS);
+                if (ss != null) {
+                    wr.runningEnv = ss;
+                    Number pid = getProcessPid(wr.devProcess.getProc());
+                    if(pid!=null) {
+                        wr.setPid(pid.longValue());
+                        persistWorkingEnv(wr);
+                    }
+                    return R.ok(ss);
+                } else {
+                    destroyWorkingEnv(wr);
+                    return R.ok(errInfo.toString());
+                }
+            } catch (InterruptedException e) {
+
+            }
+
+            return R.fail(debugInfo + "|" + errInfo);
+        }
+    }
+
+    public static Number getProcessPid(Process p) {
+        if (p.getClass().getName().equals("java.lang.UNIXProcess"))
+            try {
+                return (Number) FieldUtils.readDeclaredField(p, "pid", true);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
-        }else{
-            return R.ok(wr.runningEnv);
-        }
-
-        try {
-            String ss = runningPort.poll(10, TimeUnit.SECONDS);
-            if(ss!=null) {
-                wr.runningEnv=ss;
-                persistWorkingEnv(wr);
-                return R.ok(ss);
-            }else{
-                destroyWorkingEnv(wr);
-                return R.ok(errInfo.toString());
-            }
-        } catch (InterruptedException e) {
-
-        }
-
-        return R.fail(debugInfo+"|"+errInfo);
+        return null;
     }
 
     public R<String> dryRun(Long prjId){
@@ -190,109 +229,117 @@ public class DeployService {
 
 
     public void compilePages(Long prjId){
-        log.info("compile project:"+prjId);
-        UiPageCompositeDTO param=new UiPageCompositeDTO();
-        param.setRprjId(prjId);
-        List<UiPageCompositeDTO> pages = uiPageCompositeService.selectList(param);
-        pages.forEach(p->{
-            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
-                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
-                    .eq(Fileset::getPath, p.getPath()));
-            renderPage(p,targetFile);
-        });
+        synchronized (prjId.toString()) {
+            log.info("compile project:" + prjId);
+            UiPageCompositeDTO param = new UiPageCompositeDTO();
+            param.setRprjId(prjId);
+            List<UiPageCompositeDTO> pages = uiPageCompositeService.selectList(param);
+            pages.forEach(p -> {
+                Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
+                        .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                        .eq(Fileset::getPath, p.getPath()));
+                renderPage(p, targetFile);
+            });
+        }
     }
 
     public void initNodeModule(Long prjId){
-        WorkingEnv workingEnv = createWorkingDir(prjId);
-        log.info("init node_module for project:"+prjId+", working dir:"+workingEnv.workdir);
-        UiPrj prj = iUiPrjService.getById(prjId);
-        try {
-            String nodejs="nvm use "+prj.getNodejsVer()+"\n";
-            String cmd=nodejs+" npm config set registry http://wukong.zjht100.com:10003/ \n npm i";
-            Process p = OsType.runCmd(cmd, new File(workingEnv.workdir));
-            new ProcessPump(p).start(null,null);
-            p.waitFor();
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+        synchronized (prjId.toString()) {
+            WorkingEnv workingEnv = createWorkingDir(prjId);
+            log.info("init node_module for project:" + prjId + ", working dir:" + workingEnv.workdir);
+            UiPrj prj = iUiPrjService.getById(prjId);
+            try {
+                String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
+                String cmd = nodejs + " npm config set registry http://wukong.zjht100.com:10003/ \n npm i";
+                Process p = OsType.runCmd(cmd, new File(workingEnv.workdir));
+                new ProcessPump(p).start(null, null);
+                p.waitFor();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
     public R<String> inflate(Long prjId){
-        WorkingEnv workingEnv = createWorkingDir(prjId);
-        log.info("inflate project:"+prjId+", working dir:"+workingEnv.workdir);
+        synchronized (prjId.toString()) {
+            WorkingEnv workingEnv = createWorkingDir(prjId);
+            log.info("inflate project:" + prjId + ", working dir:" + workingEnv.workdir);
 
-        List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                .eq(Fileset::getBelongtoId, prjId));
-        Set<String> pfSet=pfiles.stream().map(pf->pf.getPath()).collect(Collectors.toSet());
-        File fdir = new File(workingEnv.workdir);
-        // clean dir
-        if(fdir.exists())
-            FileSetUtils.traverseDirDeepNoRoot(fdir.listFiles(),(f)->{
-                try {
-                    String fpath = f.getAbsolutePath().replace(workdir + File.separator, "");
-                    if(pfSet.contains(fpath)){
-                        log.info("delete project file:"+fpath);
-                        f.delete();
+            List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoId, prjId));
+            Set<String> pfSet = pfiles.stream().map(pf -> pf.getPath()).collect(Collectors.toSet());
+            File fdir = new File(workingEnv.workdir);
+            // clean dir
+            if (fdir.exists())
+                FileSetUtils.traverseDirDeepNoRoot(fdir.listFiles(), (f) -> {
+                    try {
+                        String fpath = f.getAbsolutePath().replace(workdir + File.separator, "");
+                        if (pfSet.contains(fpath)) {
+                            log.info("delete project file:" + fpath);
+                            f.delete();
+                        }
+                    } catch (Exception e) {
+
                     }
-                }catch (Exception e){
+                    return null;
+                });
 
-                }
+            traversePrjectFiles(prjId, f -> {
+                writeFile(fdir.getAbsolutePath(), f);
                 return null;
             });
 
-        traversePrjectFiles(prjId,f->{
-            writeFile(fdir.getAbsolutePath(), f);
-            return null;
-        });
-
-        return R.ok();
+            return R.ok();
+        }
     }
 
-    private void renderRoute(Long prjId) {
-        Fileset sf = filesetService.getOne(new LambdaQueryWrapper<Fileset>()
-                .eq(Fileset::getBelongtoId, prjId).eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_ROUTE));
+    public void renderRoute(Long prjId) {
+        synchronized (prjId.toString()) {
+            Fileset sf = filesetService.getOne(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoId, prjId).eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_ROUTE));
 
-        if(sf==null){
-            throw new RuntimeException("prj has no route file:"+prjId);
-        }
-
-        List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
-        StaticRoutor sr=new StaticRoutor();
-
-        if(StringUtils.isEmpty(sf.getPath())){
-            throw new RuntimeException("route file has no path:"+ sf.getId()+", prj id:"+prjId);
-        }
-
-        // 计算路径有几个父目录
-        String[] p1=sf.getPath().split("/");
-        String[] p2=sf.getPath().split("\\\\");
-        int actual=Math.max(p1.length,p2.length)-1;
-        StringBuilder pfx=new StringBuilder();
-        for (int i = 0; i < actual; i++) {
-            pfx.append("../");
-        }
-        pages.forEach(p->{
-            if(StringUtils.isNotBlank(p.getRoute())) {
-                RoutingInfoInternal ri = JsonUtilUnderline.readValue(p.getRoute(), RoutingInfoInternal.class);
-                ri.component="() => import('"+pfx+ri.component+"')";
-                sr.routes.add(ri);
+            if (sf == null) {
+                throw new RuntimeException("prj has no route file:" + prjId);
             }
-        });
-        StringBuilder rf=new StringBuilder();
-        rf.append("import { createRouter, createWebHistory } from 'vue-router'\n");
-        rf.append("const router=createRouter(\n").append(NoQuotesJsonUtils.toJson(sr)).append(")\n");
-        rf.append("export default router");
-        if(sf==null){
-            UiPrj prj = iUiPrjService.getById(prjId);
-            sf=new Fileset();
-            sf.setBelongtoId(prjId);
-            sf.setPath("src/router/index.ts");
-            sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_ROUTE);
-            sf.setStorageType(prj.getStorageType());
-            sf.setStatus(Constants.STATUS_CONFIGURE);
+
+            List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
+            StaticRoutor sr = new StaticRoutor();
+
+            if (StringUtils.isEmpty(sf.getPath())) {
+                throw new RuntimeException("route file has no path:" + sf.getId() + ", prj id:" + prjId);
+            }
+
+            // 计算路径有几个父目录
+            String[] p1 = sf.getPath().split("/");
+            String[] p2 = sf.getPath().split("\\\\");
+            int actual = Math.max(p1.length, p2.length) - 1;
+            StringBuilder pfx = new StringBuilder();
+            for (int i = 0; i < actual; i++) {
+                pfx.append("../");
+            }
+            pages.forEach(p -> {
+                if (StringUtils.isNotBlank(p.getRoute())) {
+                    RoutingInfoInternal ri = JsonUtilUnderline.readValue(p.getRoute(), RoutingInfoInternal.class);
+                    ri.component = "() => import('" + pfx + ri.component + "')";
+                    sr.routes.add(ri);
+                }
+            });
+            StringBuilder rf = new StringBuilder();
+            rf.append("import { createRouter, createWebHistory } from 'vue-router'\n");
+            rf.append("const router=createRouter(\n").append(NoQuotesJsonUtils.toJson(sr)).append(")\n");
+            rf.append("export default router");
+            if (sf == null) {
+                UiPrj prj = iUiPrjService.getById(prjId);
+                sf = new Fileset();
+                sf.setBelongtoId(prjId);
+                sf.setPath("src/router/index.ts");
+                sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_ROUTE);
+                sf.setStorageType(prj.getStorageType());
+                sf.setStatus(Constants.STATUS_CONFIGURE);
+            }
+            sf.setContent(rf.toString());
+            filesetService.saveOrUpdate(sf);
         }
-        sf.setContent(rf.toString());
-        filesetService.saveOrUpdate(sf);
     }
 
     private void writeFile(String workdir, Fileset f){
@@ -450,24 +497,26 @@ public class DeployService {
     }
 
     private WorkingEnv createWorkingDir(Long prjId){
-        WorkingEnv wr = workingDirs.get(prjId);
-        if(wr==null){
-            Object wrData = redisTemplate.opsForHash().get(Constants.VITE_IN_RUNNING, prjId+"");
-            if(wrData!=null){
-                wr=JsonUtilUnderline.parse(wrData.toString(),WorkingEnv.class);
-                workingDirs.put(prjId,wr);
-                return wr;
+        synchronized (prjId.toString()) {
+            WorkingEnv wr = workingDirs.get(prjId);
+            if (wr == null) {
+                Object wrData = redisTemplate.opsForHash().get(Constants.VITE_IN_RUNNING, prjId + "");
+                if (wrData != null) {
+                    wr = JsonUtilUnderline.parse(wrData.toString(), WorkingEnv.class);
+                    workingDirs.put(prjId, wr);
+                    return wr;
+                }
             }
+            if (wr == null) {
+                UiPrj prj = iUiPrjService.getById(prjId);
+                wr = new WorkingEnv();
+                wr.setWorkdir(sanitizeWorkDir(workdir + prj.getWorkDir()));
+                wr.setPrjId(prjId);
+                new File(wr.workdir).mkdirs();
+                workingDirs.put(prjId, wr);
+            }
+            return wr;
         }
-        if(wr==null){
-            UiPrj prj = iUiPrjService.getById(prjId);
-            wr = new WorkingEnv();
-            wr.setWorkdir(sanitizeWorkDir(workdir+prj.getWorkDir()));
-            wr.setPrjId(prjId);
-            new File(wr.workdir).mkdirs();
-            workingDirs.put(prjId,wr);
-        }
-        return wr;
     }
 
     private String sanitizeWorkDir(String dir){
