@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
+import com.wukong.core.weblog.utils.StringUtil;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.DeleteConstants;
 import com.zjht.unified.common.core.controller.BaseController;
@@ -12,6 +13,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.IdUtils;
 import com.zjht.unified.vo.ClazzDefVo;
 import com.zjht.unified.wrapper.ClazzDefWrapper;
 import com.zjht.unified.entity.ClazzDef;
@@ -88,6 +90,9 @@ public class ClazzDefController extends BaseController{
     public R<Long> add(@RequestBody ClazzDef clazzDef)
     {
         clazzDef.setCreateTime(DateUtil.now());
+        if (StringUtil.isNotBlank(clazzDef.getGuid())) {
+            clazzDef.setGuid(IdUtils.fastUUID());
+        }
         Boolean b = clazzDefService.save(clazzDef);
         R r = b ? R.ok(clazzDef.getId()) : R.fail();
         return r;

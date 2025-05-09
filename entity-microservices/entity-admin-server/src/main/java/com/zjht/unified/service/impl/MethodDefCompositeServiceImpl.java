@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wukong.core.weblog.utils.StringUtil;
+import com.zjht.unified.common.core.util.IdUtils;
 import com.zjht.unified.service.IMethodDefService;
 
 import com.zjht.unified.service.*;
@@ -50,6 +52,9 @@ public class MethodDefCompositeServiceImpl implements IMethodDefCompositeService
             return null;
         MethodDefCompositeValidate.preValidate(entity);
         if(entity.getId()==null){
+            if (StringUtil.isBlank(entity.getGuid())) {
+                entity.setGuid(IdUtils.fastUUID());
+            }
             methodDefService.save(entity);
         }else{
             methodDefService.updateById(entity);

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wukong.core.weblog.utils.StringUtil;
+import com.zjht.unified.common.core.util.IdUtils;
 import com.zjht.unified.service.IFieldDefService;
 
 import com.zjht.unified.service.*;
@@ -48,6 +50,9 @@ public class FieldDefCompositeServiceImpl implements IFieldDefCompositeService {
             return null;
         FieldDefCompositeValidate.preValidate(entity);
         if(entity.getId()==null){
+            if (StringUtil.isBlank(entity.getGuid())) {
+                entity.setGuid(IdUtils.fastUUID());
+            }
             fieldDefService.save(entity);
         }else{
             fieldDefService.updateById(entity);
