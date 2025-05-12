@@ -7,12 +7,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.mp.base.BaseEntity;
 import com.zjht.ui.dto.ModelPrjDTO;
+import com.zjht.ui.entity.Fileset;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.entity.UiPrj;
-import com.zjht.ui.service.IUiPageCompositeService;
-import com.zjht.ui.service.IUiPageService;
-import com.zjht.ui.service.IUiPrjService;
-import com.zjht.ui.service.PageModelService;
+import com.zjht.ui.service.*;
 import com.zjht.ui.vo.UiPageVo;
 import com.zjht.ui.wrapper.UiPageWrapper;
 import com.zjht.unified.common.core.constants.Constants;
@@ -49,6 +47,9 @@ public class PageModelController {
     @Autowired
     private IUiPageService uiPageService;
 
+    @Autowired
+    private IFilesetService filesetService;
+
     @ApiOperation(value = "整体更新页面数据")
     @PostMapping("/updateModel")
     public R<PageSpec> updateModel(@RequestBody PageSpec pageSpec){
@@ -74,6 +75,9 @@ public class PageModelController {
         }
         if(id!=null){
             uiPageCompositeService.removeById(id);
+            filesetService.remove(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoId, id)
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE));
         }
         return R.ok();
     }
