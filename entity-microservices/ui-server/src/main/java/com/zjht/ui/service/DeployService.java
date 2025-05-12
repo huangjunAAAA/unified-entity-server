@@ -172,7 +172,6 @@ public class DeployService {
             renderRoute(prjId);
             inflate(prjId);
             initNodeModule(prjId);
-            String trait=computeTrait(prjId);
             UiPrj prj = uiPrjService.getById(prjId);
             String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
             SynchronousQueue<String> runningPort = new SynchronousQueue<>();
@@ -186,7 +185,7 @@ public class DeployService {
                 isValid = isWorkingEnvValid(wr);
                 log.info(wr.getWorkdir()+" isValid:" + isValid);
                 // check trait;
-                if(!Objects.equals(wr.trait,trait)){
+                if(compareTrait(wr,prjId)){
                     isValid=false;
                     log.info(wr.getWorkdir()+" trait comparison:" + isValid);
                 }
@@ -229,7 +228,7 @@ public class DeployService {
                     Number pid = getProcessPid(wr.devProcess.getProc());
                     if(pid!=null) {
                         wr.setPid(pid.longValue());
-                        wr.setTrait(trait);
+                        setTrait(wr,prjId);
                         persistWorkingEnv(wr);
                     }
                     return R.ok(ss);
@@ -243,6 +242,14 @@ public class DeployService {
 
             return R.fail(debugInfo + "|" + errInfo);
         }
+    }
+
+    private boolean compareTrait(WorkingEnv wr, Long prjId) {
+        return !wr.trait.equals(computeTrait(prjId));
+    }
+
+    private void setTrait(WorkingEnv wr, Long prjId) {
+        wr.trait = computeTrait(prjId);
     }
 
     private String computeTrait(Long prjId) {
