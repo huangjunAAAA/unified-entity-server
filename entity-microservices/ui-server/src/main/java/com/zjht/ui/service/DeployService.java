@@ -166,7 +166,7 @@ public class DeployService {
         workingDirs.remove(workingEnv.workdir);
     }
 
-    public R<String> devRun(Long prjId,boolean restart){
+    public R<String> devRun(Long prjId,Boolean restart){
         synchronized (prjId.toString()) {
             compilePages(prjId);
             renderRoute(prjId);
@@ -179,7 +179,7 @@ public class DeployService {
             StringBuilder errInfo = new StringBuilder();
             WorkingEnv wr = createWorkingDir(prjId);
             boolean isValid = false;
-            if(restart){
+            if(restart!=null && restart){
                 shutdownWorkingEnv(wr);
             }else{
                 isValid = isWorkingEnvValid(wr);
