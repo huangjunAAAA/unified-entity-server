@@ -42,24 +42,25 @@ public class ClassUtils {
 
     @V8Function(name = "new")
     public V8Value newInstance(String className, V8Value... args) throws Exception {
-        log.info("args = " + Arrays.toString(args));
-
+        log.info("new args = " + Arrays.toString(args));
+        ClazzDefCompositeDO classDef = null;
         String cguid = CoreClazzDef.getCoreClassGuid(className);
         if (cguid != null) {
-            return V8EngineService.getRuntime(taskContext, prjGuid, prjVer).createV8ValueNull();
+            classDef = CoreClazzDef.getCoreClassObject(cguid);
         } else {
-            ClazzDefCompositeDO classDef = entityDepService.getClsByName(taskContext,className);
-            if (classDef == null) {
-                log.error("ClassName not found in newInstance:  {}", className);
-                return null;
-            }
-            ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
-            V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
-            V8Value v8Value = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
-            bindMethodsToV8Object(v8Value, classDef, v8Runtime);
-            parseConstructMethod(args, classDef, v8Value);
-            return v8Value;
+            classDef = entityDepService.getClsByName(taskContext, className);
         }
+        if (classDef == null) {
+            log.error("ClassName not found in newInstance:  {}", className);
+            return null;
+        }
+        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
+        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
+        V8Value v8Value = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+        bindMethodsToV8Object(v8Value, classDef, v8Runtime);
+        parseConstructMethod(args, classDef, v8Value);
+        return v8Value;
+
     }
 
     private static void parseConstructMethod(V8Value[] args, ClazzDefCompositeDO classDef, V8Value v8Value) throws JavetException {
@@ -83,9 +84,16 @@ public class ClassUtils {
 
     @V8Function(name = "newPersist")
     public V8Value newPersistInstance(String className, V8Value... args) throws Exception {
-        ClazzDefCompositeDO classDef = entityDepService.getClsByName(taskContext,className);
+        log.info("newPersist args = " + Arrays.toString(args));
+        ClazzDefCompositeDO classDef = null;
+        String cguid = CoreClazzDef.getCoreClassGuid(className);
+        if (cguid != null) {
+            classDef = CoreClazzDef.getCoreClassObject(cguid);
+        } else {
+            classDef = entityDepService.getClsByName(taskContext, className);
+        }
         if (classDef == null) {
-            log.error("ClassName not found in newPersistInstance:  {}", className);
+            log.error("ClassName not found in newInstance:  {}", className);
             return null;
         }
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, true);
