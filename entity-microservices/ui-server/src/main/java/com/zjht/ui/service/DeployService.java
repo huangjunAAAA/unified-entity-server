@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.wukong.redis.service.RedisService;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.unified.common.core.constants.Constants;
@@ -22,14 +21,12 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +43,7 @@ public class DeployService {
     @Resource
     private IFilesetService filesetService;
     @Resource
-    private IUiPrjService iUiPrjService;
+    private IUiPrjService uiPrjService;
 
     @Resource
     private IUiPageService uiPageService;
@@ -70,6 +67,7 @@ public class DeployService {
         private String runningEnv;
         private Long pid;
         private Long prjId;
+        private String trait;
 
         public void clear(){
             devProcess=null;
@@ -174,7 +172,8 @@ public class DeployService {
             renderRoute(prjId);
             inflate(prjId);
             initNodeModule(prjId);
-            UiPrj prj = iUiPrjService.getById(prjId);
+            String trait=computeTrait(prjId);
+            UiPrj prj = uiPrjService.getById(prjId);
             String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
             SynchronousQueue<String> runningPort = new SynchronousQueue<>();
             StringBuilder debugInfo = new StringBuilder();
@@ -186,6 +185,11 @@ public class DeployService {
             }else{
                 isValid = isWorkingEnvValid(wr);
                 log.info(wr.getWorkdir()+" isValid:" + isValid);
+                // check trait;
+                if(!Objects.equals(wr.trait,trait)){
+                    isValid=false;
+                    log.info(wr.getWorkdir()+" trait comparison:" + isValid);
+                }
             }
 
             if (!isValid) {
@@ -225,6 +229,7 @@ public class DeployService {
                     Number pid = getProcessPid(wr.devProcess.getProc());
                     if(pid!=null) {
                         wr.setPid(pid.longValue());
+                        wr.setTrait(trait);
                         persistWorkingEnv(wr);
                     }
                     return R.ok(ss);
@@ -238,6 +243,17 @@ public class DeployService {
 
             return R.fail(debugInfo + "|" + errInfo);
         }
+    }
+
+    private String computeTrait(Long prjId) {
+        Fileset f=filesetService.getOne(new LambdaQueryWrapper<Fileset>()
+                .eq(Fileset::getBelongtoId, prjId)
+                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .eq(Fileset::getPath, "package.json"));
+        if(f!=null)
+            return f.getContent();
+        else
+            return "";
     }
 
     public static Number getProcessPid(Process p) {
@@ -278,7 +294,7 @@ public class DeployService {
         synchronized (prjId.toString()) {
             WorkingEnv workingEnv = createWorkingDir(prjId);
             log.info("init node_module for project:" + prjId + ", working dir:" + workingEnv.workdir);
-            UiPrj prj = iUiPrjService.getById(prjId);
+            UiPrj prj = uiPrjService.getById(prjId);
             try {
                 String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
                 String cmd = nodejs + " npm config set registry http://wukong.zjht100.com:10003/ \n npm i";
@@ -298,6 +314,14 @@ public class DeployService {
 
             List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
                     .eq(Fileset::getBelongtoId, prjId));
+
+            List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
+            List<Long> ids=pages.stream().map(p->p.getId()).collect(Collectors.toList());
+            List<Fileset> pfiles2=filesetService.list(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
+                    .in(Fileset::getBelongtoId,ids));
+            pfiles.addAll(pfiles2);
+
             Set<String> pfSet = pfiles.stream().map(pf -> pf.getPath()).collect(Collectors.toSet());
             File fdir = new File(workingEnv.workdir);
             // clean dir
@@ -360,7 +384,7 @@ public class DeployService {
             rf.append("const router=createRouter(\n").append(NoQuotesJsonUtils.toJson(sr)).append(")\n");
             rf.append("export default router");
             if (sf == null) {
-                UiPrj prj = iUiPrjService.getById(prjId);
+                UiPrj prj = uiPrjService.getById(prjId);
                 sf = new Fileset();
                 sf.setBelongtoId(prjId);
                 sf.setPath("src/router/index.ts");
@@ -482,7 +506,7 @@ public class DeployService {
             return null;
         });
 
-        UiPrj prj = iUiPrjService.getById(prjId);
+        UiPrj prj = uiPrjService.getById(prjId);
 
         FileSetUtils.traverseDirDeepNoRoot(new File(path).listFiles(),f->{
             if(f.isDirectory())
@@ -541,7 +565,7 @@ public class DeployService {
                 }
             }
             if (wr == null) {
-                UiPrj prj = iUiPrjService.getById(prjId);
+                UiPrj prj = uiPrjService.getById(prjId);
                 wr = new WorkingEnv();
                 wr.setWorkdir(sanitizeWorkDir(workdir + prj.getWorkDir()));
                 wr.setPrjId(prjId);
