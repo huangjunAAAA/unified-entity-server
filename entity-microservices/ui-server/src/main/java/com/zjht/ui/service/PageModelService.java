@@ -238,7 +238,8 @@ public class PageModelService {
 
 
         Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getRprjId())
-                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
+                .eq(Fileset::getBelongtoId, uiPage.getId())
                 .eq(Fileset::getPath, uiPage.getPath()));
 
         if(targetFile!=null){
@@ -336,8 +337,8 @@ public class PageModelService {
                 BeanUtils.copyProperties(targetFile,sf);
             }else{
                 UiPrj prj = uiPrjService.getById(uiPage.getRprjId());
-                sf.setBelongtoId(uiPage.getRprjId());
-                sf.setBelongtoType(Constants.FILE_TYPE_PROJECT_EXTRA);
+                sf.setBelongtoId(uiPage.getId());
+                sf.setBelongtoType(Constants.FILE_TYPE_PAGE);
                 sf.setStorageType(prj.getStorageType());
             }
             sf.setPath(uiPage.getPath());

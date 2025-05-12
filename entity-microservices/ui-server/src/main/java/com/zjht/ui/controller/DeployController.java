@@ -19,9 +19,9 @@ public class DeployController {
 
     @ApiOperation(value = "编译并运行")
     @GetMapping("/compile-run")
-    public R<String> compileAndRun(@RequestParam Long prjId)
+    public R<String> compileAndRun(@RequestParam Long prjId,@RequestParam boolean restart)
     {
-        return deployService.devRun(prjId);
+        return deployService.devRun(prjId,restart);
     }
 
     @ApiOperation(value = "编译")

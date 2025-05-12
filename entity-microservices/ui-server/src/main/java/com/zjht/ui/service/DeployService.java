@@ -78,6 +78,19 @@ public class DeployService {
         }
     }
 
+    private static void shutdownWorkingEnv(WorkingEnv workingEnv){
+        if(workingEnv.devProcess!=null && workingEnv.devProcess.getProc().isAlive()){
+            workingEnv.devProcess.getProc().destroy();
+            return;
+        }
+        if(workingEnv.getPid()!=null){
+            killPid(workingEnv.getPid());
+        }
+    }
+
+
+
+
     private boolean isWorkingEnvValid(WorkingEnv workingEnv){
         if(workingEnv==null)
             return false;
@@ -109,6 +122,18 @@ public class DeployService {
         redisTemplate.opsForHash().put(Constants.VITE_IN_RUNNING,workingEnv.prjId+"",weData);
     }
 
+
+    public static boolean killPid(long pid){
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            String command = os.contains("win")? "taskkill /F /PID " + pid: "kill -9 " + pid;
+            Process process = Runtime.getRuntime().exec(command);
+            int exitCode = process.waitFor();
+            return exitCode == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public static boolean isPidExist(long pid) {
         String os = System.getProperty("os.name").toLowerCase();
@@ -143,7 +168,7 @@ public class DeployService {
         workingDirs.remove(workingEnv.workdir);
     }
 
-    public R<String> devRun(Long prjId){
+    public R<String> devRun(Long prjId,boolean restart){
         synchronized (prjId.toString()) {
             compilePages(prjId);
             renderRoute(prjId);
@@ -155,8 +180,14 @@ public class DeployService {
             StringBuilder debugInfo = new StringBuilder();
             StringBuilder errInfo = new StringBuilder();
             WorkingEnv wr = createWorkingDir(prjId);
-            boolean isValid = isWorkingEnvValid(wr);
-            log.info(wr.getWorkdir()+" isValid:" + isValid);
+            boolean isValid = false;
+            if(restart){
+                shutdownWorkingEnv(wr);
+            }else{
+                isValid = isWorkingEnvValid(wr);
+                log.info(wr.getWorkdir()+" isValid:" + isValid);
+            }
+
             if (!isValid) {
                 try {
                     wr.clear();
@@ -235,8 +266,8 @@ public class DeployService {
             param.setRprjId(prjId);
             List<UiPageCompositeDTO> pages = uiPageCompositeService.selectList(param);
             pages.forEach(p -> {
-                Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
-                        .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, p.getId())
+                        .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
                         .eq(Fileset::getPath, p.getPath()));
                 renderPage(p, targetFile);
             });
@@ -458,6 +489,8 @@ public class DeployService {
                 return f;
            String rPath=FileSetUtils.translatePath(f.getPath().substring(path.length()+1));
            if(rPath.startsWith("node_modules")||rPath.startsWith("dist"))
+               return f;
+           if(rPath.startsWith("src/views"))
                return f;
             Fileset sf = files.remove(rPath);
             if(sf==null){
