@@ -12,8 +12,10 @@ import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.MethodDefCompositeDO;
 import com.zjht.unified.domain.simple.MethodParamDO;
+import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
 import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.service.v8exec.model.ClsDf;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -117,7 +119,13 @@ public class ClassUtils {
 
     @V8Function(name = "getClassByName")
     public V8Value getClassObjectByName(V8ValueObject clsName) {
-        ClazzDefCompositeDO clsObj = entityDepService.getClsByName(taskContext,clsName.toString());
+        ClazzDefCompositeDO clsObj =null;
+        String cguid = CoreClazzDef.getCoreClassGuid(clsName.toString());
+        if (cguid != null) {
+            clsObj=CoreClazzDef.getCoreClassObject(cguid);
+        }else{
+            clsObj=entityDepService.getClsByName(taskContext,clsName.toString());
+        }
         if (clsObj != null) {
             return convertClassObject(clsObj, clsName.getV8Runtime());
         }
@@ -138,8 +146,14 @@ public class ClassUtils {
         }
     }
 
-    private static V8Value convertClassObject(ClazzDefCompositeDO cls, V8Runtime v8Runtime) {
-        return null;
+    private V8Value convertClassObject(ClazzDefCompositeDO cls, V8Runtime v8Runtime) {
+        ClsDf clsDf = ClsDf.from(cls, taskContext);
+        try {
+            return V8BeanUtils.toV8Value(v8Runtime, clsDf);
+        } catch (JavetException e) {
+            log.error(e.getMessage(),e);
+            throw new RuntimeException(e);
+        }
     }
 
     /***
