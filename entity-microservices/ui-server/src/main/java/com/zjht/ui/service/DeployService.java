@@ -185,8 +185,8 @@ public class DeployService {
                 isValid = isWorkingEnvValid(wr);
                 log.info(wr.getWorkdir()+" isValid:" + isValid);
                 // check trait;
-                if(compareTrait(wr,prjId)){
-                    isValid=false;
+                if(isValid){
+                    isValid=compareTrait(wr,prjId);
                     log.info(wr.getWorkdir()+" trait comparison:" + isValid);
                 }
             }
@@ -245,7 +245,7 @@ public class DeployService {
     }
 
     private boolean compareTrait(WorkingEnv wr, Long prjId) {
-        return !wr.trait.equals(computeTrait(prjId));
+        return wr!=null&&!wr.trait.equals(computeTrait(prjId));
     }
 
     private void setTrait(WorkingEnv wr, Long prjId) {
