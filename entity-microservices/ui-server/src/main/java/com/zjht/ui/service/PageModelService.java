@@ -329,8 +329,8 @@ public class PageModelService {
 
         if(uiPage.getId()!=null){
             UiPage page = uiPageService.getById(uiPage.getId());
-            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getRprjId())
-                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getId())
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
                     .eq(Fileset::getPath, page.getPath()));
             FilesetCompositeDTO sf=new FilesetCompositeDTO();
             if(targetFile!=null){
