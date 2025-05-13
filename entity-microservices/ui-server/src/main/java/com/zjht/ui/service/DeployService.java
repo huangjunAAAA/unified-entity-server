@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -324,11 +325,13 @@ public class DeployService {
                     .eq(Fileset::getBelongtoId, prjId));
 
             List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
-            List<Long> ids=pages.stream().map(p->p.getId()).collect(Collectors.toList());
-            List<Fileset> pfiles2=filesetService.list(new LambdaQueryWrapper<Fileset>()
-                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
-                    .in(Fileset::getBelongtoId,ids));
-            pfiles.addAll(pfiles2);
+            if(CollectionUtils.isNotEmpty(pages)) {
+                List<Long> ids = pages.stream().map(p -> p.getId()).collect(Collectors.toList());
+                List<Fileset> pfiles2 = filesetService.list(new LambdaQueryWrapper<Fileset>()
+                        .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
+                        .in(Fileset::getBelongtoId, ids));
+                pfiles.addAll(pfiles2);
+            }
 
             Set<String> pfSet = pfiles.stream().map(pf -> pf.getPath()).collect(Collectors.toSet());
             File fdir = new File(workingEnv.workdir);
