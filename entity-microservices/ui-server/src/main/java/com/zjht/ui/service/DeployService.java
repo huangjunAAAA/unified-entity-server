@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -346,11 +347,10 @@ public class DeployService {
                     return null;
                 });
 
-            traversePrjectFiles(prjId, f -> {
-                writeFile(fdir.getAbsolutePath(), f);
-                return null;
-            });
 
+            pfiles.forEach(f->{
+                writeFile(fdir.getAbsolutePath(), f);
+            });
             return R.ok();
         }
     }
@@ -508,7 +508,7 @@ public class DeployService {
     public R<String> syncWithSvr(Long prjId,String path){
 
         Map<String,Fileset> files=new HashMap<>();
-        traversePrjectFiles(prjId,f->{
+        traversePrjectExtraFiles(prjId,f->{
             files.put(FileSetUtils.translatePath(f.getPath()),f);
             return null;
         });
@@ -547,7 +547,7 @@ public class DeployService {
     }
 
 
-    private <T> List<T> traversePrjectFiles(Long prjId, Function<Fileset,T> func){
+    private <T> List<T> traversePrjectExtraFiles(Long prjId, Function<Fileset,T> func){
         List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
                 .ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE)
                 .eq(Fileset::getBelongtoId, prjId));
@@ -559,6 +559,8 @@ public class DeployService {
         });
         return ret;
     }
+
+
 
     private WorkingEnv createWorkingDir(Long prjId){
         synchronized (prjId.toString()) {
