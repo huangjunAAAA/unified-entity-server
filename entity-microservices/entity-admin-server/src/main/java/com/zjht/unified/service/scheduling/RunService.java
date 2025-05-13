@@ -148,7 +148,7 @@ public class RunService {
 
         List<InitialInstance> iiList=initialInstanceService.list(new LambdaQueryWrapper<InitialInstance>().eq(InitialInstance::getPrjId, prjId));
         if(CollectionUtils.isNotEmpty(iiList)){
-            target.setViewDefList(new ArrayList<>());
+            target.setInstanceList(new ArrayList<>());
             iiList.forEach(ss->{
                 InitialInstanceDO ssdo=JsonUtilExt.jsonCast(ss, InitialInstanceDO.class);
                 target.getInstanceList().add(ssdo);
