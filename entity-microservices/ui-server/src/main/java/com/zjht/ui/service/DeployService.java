@@ -322,7 +322,7 @@ public class DeployService {
             log.info("inflate project:" + prjId + ", working dir:" + workingEnv.workdir);
 
             List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                    .eq(Fileset::getBelongtoId, prjId));
+                    .eq(Fileset::getBelongtoId, prjId).ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE));
 
             List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
             if(CollectionUtils.isNotEmpty(pages)) {
