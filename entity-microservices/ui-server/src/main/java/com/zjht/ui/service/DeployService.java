@@ -245,7 +245,7 @@ public class DeployService {
     }
 
     private boolean compareTrait(WorkingEnv wr, Long prjId) {
-        return wr!=null&&!wr.trait.equals(computeTrait(prjId));
+        return wr!=null&&Objects.equals(wr.trait,(computeTrait(prjId)));
     }
 
     private void setTrait(WorkingEnv wr, Long prjId) {
