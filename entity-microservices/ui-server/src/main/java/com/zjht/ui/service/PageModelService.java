@@ -3,10 +3,7 @@ package com.zjht.ui.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.zjht.ui.dto.FilesetCompositeDTO;
-import com.zjht.ui.dto.UiComponentCompositeDTO;
-import com.zjht.ui.dto.UiEventHandleCompositeDTO;
-import com.zjht.ui.dto.UiPageCompositeDTO;
+import com.zjht.ui.dto.*;
 import com.zjht.ui.entity.*;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.util.ScriptUtils;
@@ -168,8 +165,13 @@ public class PageModelService {
     }
 
     public PageSpec savePage(PageSpec page) {
-        UiPageCompositeDTO uiPage = convertToUiPage(page);
-        uiPageCompositeService.submit(uiPage);
+        UiPageCompositeDTOExt uiPage = convertToUiPage(page);
+        Long pageId = uiPageCompositeService.submit(uiPage);
+        if(uiPage.getFile()!=null){
+            Fileset f = uiPage.getFile();
+            f.setBelongtoId(pageId);
+            filesetService.saveOrUpdate(f);
+        }
         Map<String, UiComponentCompositeDTO> cMap = uiPage.getPageIdUiComponentList().stream().collect(Collectors.toMap(UiComponent::getGuid, v -> v));
         if(page.getCell()!=null) {
             UiComponentCompositeDTO rootCC = cMap.get(page.getCell().getId().getGuid());
@@ -303,12 +305,12 @@ public class PageModelService {
 
 
 
-    public UiPageCompositeDTO convertToUiPage(PageSpec pageSpec) {
+    public UiPageCompositeDTOExt convertToUiPage(PageSpec pageSpec) {
         if (pageSpec == null) {
             return null;
         }
 
-        UiPageCompositeDTO uiPage = new UiPageCompositeDTO();
+        UiPageCompositeDTOExt uiPage = new UiPageCompositeDTOExt();
         uiPage.setId(pageSpec.getPageId().getId());
         uiPage.setGuid(pageSpec.getPageId().getGuid());
         if(pageSpec.getRoute()!=null){
@@ -359,7 +361,7 @@ public class PageModelService {
             content.append("<style></style>");
         }
         sf.setContent(content.toString());
-        filesetService.saveOrUpdate(sf);
+        uiPage.setFile(sf);
 
         return uiPage;
     }
