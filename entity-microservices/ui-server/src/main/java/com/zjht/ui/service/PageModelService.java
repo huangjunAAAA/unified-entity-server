@@ -327,38 +327,39 @@ public class PageModelService {
             uiPage.setPageIdUiComponentList(uiComponents);
         }
 
+        Fileset targetFile = null;
         if(uiPage.getId()!=null){
             UiPage page = uiPageService.getById(uiPage.getId());
-            Fileset targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getId())
+            targetFile = filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, uiPage.getId())
                     .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
                     .eq(Fileset::getPath, page.getPath()));
-            FilesetCompositeDTO sf=new FilesetCompositeDTO();
-            if(targetFile!=null){
-                BeanUtils.copyProperties(targetFile,sf);
-            }else{
-                UiPrj prj = uiPrjService.getById(uiPage.getRprjId());
-                sf.setBelongtoId(uiPage.getId());
-                sf.setBelongtoType(Constants.FILE_TYPE_PAGE);
-                sf.setStorageType(prj.getStorageType());
-            }
-            sf.setPath(uiPage.getPath());
-
-            StringBuilder content=new StringBuilder();
-            if(pageSpec.getTemplateTag()!=null){
-                content.append(pageSpec.getTemplateTag());
-            }else{
-                content.append("<template></template>").append("\\n");
-            }
-            content.append("<script setup lang=\"ts\"></script>").append("\\n");
-
-            if(pageSpec.getStyleTag()!=null){
-                content.append(pageSpec.getStyleTag());
-            }else{
-                content.append("<style></style>");
-            }
-            sf.setContent(content.toString());
-            filesetService.saveOrUpdate(sf);
         }
+        FilesetCompositeDTO sf=new FilesetCompositeDTO();
+        if(targetFile!=null){
+            BeanUtils.copyProperties(targetFile,sf);
+        }else{
+            UiPrj prj = uiPrjService.getById(uiPage.getRprjId());
+            sf.setBelongtoId(uiPage.getId());
+            sf.setBelongtoType(Constants.FILE_TYPE_PAGE);
+            sf.setStorageType(prj.getStorageType());
+        }
+        sf.setPath(uiPage.getPath());
+
+        StringBuilder content=new StringBuilder();
+        if(pageSpec.getTemplateTag()!=null){
+            content.append(pageSpec.getTemplateTag());
+        }else{
+            content.append("<template></template>").append("\\n");
+        }
+        content.append("<script setup lang=\"ts\"></script>").append("\\n");
+
+        if(pageSpec.getStyleTag()!=null){
+            content.append(pageSpec.getStyleTag());
+        }else{
+            content.append("<style></style>");
+        }
+        sf.setContent(content.toString());
+        filesetService.saveOrUpdate(sf);
 
         return uiPage;
     }
