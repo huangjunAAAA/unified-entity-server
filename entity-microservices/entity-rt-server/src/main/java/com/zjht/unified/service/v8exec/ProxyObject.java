@@ -90,7 +90,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
     @Override
     public V8Value symbolToPrimitive(V8Value... v8Values) throws JavetException, Exception {
-        System.out.println("==========symbolToPrimitive called=============================");
+        log.info("==========symbolToPrimitive called=============================");
         return IJavetDirectProxyHandler.super.symbolToPrimitive(v8Values);
     }
 
@@ -101,6 +101,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
         if (methodSet.contains(property.toString())) {
             try {
+                V8EngineService.setMe(getV8Runtime(), new UnifiedObject(guid, clazzGUID, true, prjGuid, prjVer, taskContext.getVer()));
                 return IJavetDirectProxyHandler.super.proxyGet(target, property, receiver);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -136,10 +137,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
         if (target instanceof V8ValueString) {
             for (ChronoField value : ChronoField.values()) {
-                System.out.println("value.toString() = " + value.toString());
-                System.out.println();
-                System.out.println();
-
+                log.info("value.toString() = " + value.toString());
             }
         }
 
@@ -259,8 +257,8 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             UnifiedObject object = rtRedisObjectStorageService.getObject(taskContext, guid,prjGuid,prjVer);
             boolean dispatch = false;
             if (object.getPersistTag()) {
-                String finalKey = key;
-                dispatch = fieldDefMap.values().stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(finalKey));
+                String existField = key;
+                dispatch = fieldDefMap.values().stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(existField));
             }
 
             if (Objects.nonNull(attrWrapper)) {
@@ -271,7 +269,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                     log.info("attrWrapper.getEval() = {} " ,attrWrapper.getEval());
                     String script = "'" + lastValue + "'" + attrWrapper.getEval();
                     System.out.println("eval script = " + script);
-                    Boolean evalResult = (Boolean)engineService.exec(script,taskContext,prjGuid,prjVer);
+                    Boolean evalResult = (Boolean)engineService.exec(script, null, taskContext,prjGuid,prjVer);
                     if (Objects.nonNull(evalResult) && evalResult) {
                         attrWrapper.setLastEV(lastValue);
                     }

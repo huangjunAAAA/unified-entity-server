@@ -9,6 +9,8 @@ import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
 import com.zjht.unified.dto.Increment;
+import com.zjht.unified.dto.MethodInvokeParam;
+import com.zjht.unified.service.ClsMethodService;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
 import com.zjht.unified.service.TaskService;
@@ -36,6 +38,9 @@ public class ExecController {
     private IScriptEngine scriptEngine;
 
     @Autowired
+    private ClsMethodService clsMethodService;
+
+    @Autowired
     private TaskService taskService;
 
     @Autowired
@@ -50,7 +55,7 @@ public class ExecController {
         TaskContext runningContext = rtContextService.getRunningContext(script.getVer());
         log.info("runningContext = " + runningContext);
         if (Objects.nonNull(runningContext)) {
-            Object exec = scriptEngine.exec(script.getData(), runningContext, runningContext.getPrjInfo().getPrjGuid(), runningContext.getPrjInfo().getPrjVer());
+            Object exec = scriptEngine.exec(script.getData(), null, runningContext, runningContext.getPrjInfo().getPrjGuid(), runningContext.getPrjInfo().getPrjVer());
             return R.ok(exec);
         }else{
             return R.fail("task not found:"+script.getVer());
@@ -133,5 +138,17 @@ public class ExecController {
         }
         taskService.initSpecDefinition(ctx, spec.getData());
         return R.ok();
+    }
+
+    @ApiOperation(value = "在指定运行环境运行某个对象的方法")
+    @PostMapping("/exec-object-method")
+    public R<Object> execObjMethod(@RequestBody MethodInvokeParam methodInvokeParam){
+        TaskContext ctx = rtContextService.getRunningContext(methodInvokeParam.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+methodInvokeParam.getVer());
+        }
+
+        Object ret = clsMethodService.execMethod(methodInvokeParam);
+        return R.ok(ret);
     }
 }

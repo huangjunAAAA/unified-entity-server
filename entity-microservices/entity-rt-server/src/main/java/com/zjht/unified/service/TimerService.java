@@ -1,14 +1,12 @@
 package com.zjht.unified.service;
 
 import com.alibaba.fastjson.JSON;
-import com.wukong.core.weblog.utils.JsonUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.config.RedisKeyName;
-import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.FsmDefDO;
@@ -19,8 +17,6 @@ import com.zjht.unified.feign.model.ReturnMap;
 import com.zjht.unified.feign.model.ReturnT;
 import com.zjht.unified.feign.model.XxlJobGroup;
 import com.zjht.unified.feign.model.XxlJobInfo;
-import com.zjht.unified.service.ctx.EntityDepService;
-import com.zjht.unified.service.ctx.PrjUniqueInfo;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.utils.JsonUtilUnderline;
@@ -163,7 +159,7 @@ public class TimerService {
         String objKey = RedisKeyName.getStaticKey(Constants.STATIC_TYPE_SENTINEL, id.getVer(), id.getPrjGuid(), id.getPrjVer());
         SentinelDefDO ss = (SentinelDefDO) rtRedisObjectStorageService.getObjectAttrValue(ctx,objKey,id.getGuid(),id.getPrjGuid(),id.getPrjVer());
         log.info("sentinel-exec job get SentinelDefDO:{}",JSON.toJSONString(ss));
-        scriptEngine.exec(ss.getBody(),ctx,id.getPrjGuid(),id.getPrjVer());
+        scriptEngine.exec(ss.getBody(), null, ctx,id.getPrjGuid(),id.getPrjVer());
         return com.xxl.job.core.biz.model.ReturnT.SUCCESS;
     }
 

@@ -26,9 +26,9 @@ public class FsmService {
         for (Iterator<FsmConditionDO> iterator = fsm.getFsmIdFsmConditionList().iterator(); iterator.hasNext(); ) {
             FsmConditionDO fc =  iterator.next();
             if(Objects.equals(fc.getCurrentState(),cState)){
-                Object result = scriptEngine.exec(fc.getConditionExpr(), ctx,prjGuid,prjVer);
+                Object result = scriptEngine.exec(fc.getConditionExpr(), null, ctx,prjGuid,prjVer);
                 if(isTrue(result)){
-                    scriptEngine.exec(fc.getScript(),ctx,prjGuid,prjVer);
+                    scriptEngine.exec(fc.getScript(), null, ctx,prjGuid,prjVer);
                     setCurrentState(ctx,fsm.getGuid(),fc.getNextState(),prjGuid,prjVer);
                     return;
                 }
