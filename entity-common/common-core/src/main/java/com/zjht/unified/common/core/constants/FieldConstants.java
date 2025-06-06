@@ -18,4 +18,8 @@ public class FieldConstants {
     public static final String ADMIN_REGION="admin_region";
     public static final String REFERENCE_ID="ref_id";
     public static final String STATUS="status";
+
+    public static final String PROJECT_GUID="prjGuid";
+    public static final String PROJECT_VER="prjVer";
+    public static final String CLASS="cls";
 }

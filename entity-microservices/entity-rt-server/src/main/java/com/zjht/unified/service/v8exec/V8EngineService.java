@@ -143,7 +143,7 @@ public class V8EngineService implements IScriptEngine {
         }
     }
 
-    public static void setMe(V8Runtime v8Runtime, UnifiedObject me){
+    public static void setMe(V8Runtime v8Runtime, ProxyObject me){
         try {
             v8Runtime.getGlobalObject().set("me", new JavetProxyConverter().toV8Value(v8Runtime, me));
         } catch (Exception e) {

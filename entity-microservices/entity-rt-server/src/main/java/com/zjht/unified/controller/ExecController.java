@@ -5,15 +5,18 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
+import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
+import com.zjht.unified.dto.GetParam;
 import com.zjht.unified.dto.Increment;
 import com.zjht.unified.dto.MethodInvokeParam;
-import com.zjht.unified.service.ClsMethodService;
+import com.zjht.unified.service.FrontObjectService;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
 import com.zjht.unified.service.TaskService;
+import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -38,7 +42,7 @@ public class ExecController {
     private IScriptEngine scriptEngine;
 
     @Autowired
-    private ClsMethodService clsMethodService;
+    private FrontObjectService frontObjectService;
 
     @Autowired
     private TaskService taskService;
@@ -148,7 +152,29 @@ public class ExecController {
             return R.fail("task not found:"+methodInvokeParam.getVer());
         }
 
-        Object ret = clsMethodService.execMethod(methodInvokeParam);
+        Object ret = frontObjectService.execMethod(methodInvokeParam);
+        return R.ok(ret);
+    }
+
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/get-object")
+    public R<Object> getObject(@RequestBody GetParam param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        Map<String, Object> ret = frontObjectService.getObject(param);
+        return R.ok(ret);
+    }
+
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/get-object-value")
+    public R<Object> getObjectValue(@RequestBody GetParam param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        Object ret=frontObjectService.getObjectValue(param);
         return R.ok(ret);
     }
 }

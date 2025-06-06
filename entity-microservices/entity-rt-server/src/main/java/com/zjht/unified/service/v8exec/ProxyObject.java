@@ -16,6 +16,8 @@ import com.caoccao.javet.values.reference.V8ValueProxy;
 import com.caoccao.javet.values.reference.V8ValueSymbol;
 import com.caoccao.javet.values.reference.builtin.V8ValueBuiltInSymbol;
 import com.wukong.core.weblog.utils.StringUtil;
+import com.zjht.unified.common.core.constants.AttrConstants;
+import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
@@ -101,7 +103,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
         if (methodSet.contains(property.toString())) {
             try {
-                V8EngineService.setMe(getV8Runtime(), new UnifiedObject(guid, clazzGUID, true, prjGuid, prjVer, taskContext.getVer()));
+                V8EngineService.setMe(getV8Runtime(), this);
                 return IJavetDirectProxyHandler.super.proxyGet(target, property, receiver);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -177,18 +179,18 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
         if (key == null)
             return getV8Runtime().createV8ValueUndefined();
-        if ("guid".equalsIgnoreCase(key))
+        if (FieldConstants.GUID.equalsIgnoreCase(key))
             return convertToV8Value(guid);
-        if ("prjGuid".equalsIgnoreCase(key))
+        if (FieldConstants.PROJECT_GUID.equalsIgnoreCase(key))
             return convertToV8Value(prjGuid);
-        if ("prjVer".equalsIgnoreCase(key))
+        if (FieldConstants.PROJECT_VER.equalsIgnoreCase(key))
             return convertToV8Value(prjVer);
-        if("cls".equalsIgnoreCase(key)){
+        if(FieldConstants.CLASS.equalsIgnoreCase(key)){
             RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
             ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, prjVer, clazzGUID);
             return V8BeanUtils.toV8Value(getV8Runtime(), ClsDf.from(clazzDef,taskContext));
         }
-        if ("pv".equalsIgnoreCase(key)){
+        if (AttrConstants._OBJ_CURRENT_VALUE.equalsIgnoreCase(key)){
             RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
             ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, prjVer, clazzGUID);
             key = clazzDef.getPvAttr();
