@@ -53,15 +53,25 @@ public class FrontObjectService {
     }
 
     public Map<String, Object> getObject(GetParam param) {
-        TaskContext tcxt = rtContextService.getRunningContext(param.getVer());
-        UnifiedObject obj = objectStorageService.getObject(tcxt, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
-        Map<String, Object> pureObj = getObject(tcxt, obj);
+        TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
+        UnifiedObject obj=null;
+        if(param.getPrjGuid()!=null){
+            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
+        }else{
+            obj = entityDepService.getObject(taskContext,param.getObjGuid());
+        }
+        Map<String, Object> pureObj = getObject(taskContext, obj);
         return pureObj;
     }
 
     public Object getObjectValue(GetParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
-        UnifiedObject obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
+        UnifiedObject obj=null;
+        if(param.getPrjGuid()!=null){
+            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
+        }else{
+            obj = entityDepService.getObject(taskContext,param.getObjGuid());
+        }
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
         ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, param.getPrjVer(), obj.getClazzGUID());
         String field = clazzDef.getPvAttr();
