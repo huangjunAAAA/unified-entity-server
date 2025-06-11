@@ -180,11 +180,4 @@ public class ClazzDef extends BaseCopyEntity {
 	@TableField(value = "inherit_write")  
 	private Integer inheritWrite;
 
-	 /**
-	 * 构建函数脚本
-	 */
-	@ApiModelProperty(value = "构建函数脚本")
-	@Column(name = "constructor")
-	@TableField(value = "constructor")  
-	private String constructor;
 }
