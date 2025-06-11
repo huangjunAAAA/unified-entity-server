@@ -66,6 +66,8 @@ public class ScriptUtils {
         result.put("templateTag", "<template>");
         result.put("scriptTag", "<script setup lang=\"ts\">");
         result.put("styleTag", "<style>");
+        if(StringUtils.isBlank(content))
+            return result;
 
         // 解析template部分
         int templateStart = findTagStart(content, "<template");

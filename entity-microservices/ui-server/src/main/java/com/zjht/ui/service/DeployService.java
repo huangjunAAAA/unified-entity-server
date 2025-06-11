@@ -53,6 +53,9 @@ public class DeployService {
     @Resource
     private RedisTemplate<String,Object> redisTemplate;
 
+    @Resource
+    private IUiLayoutService uiLayoutService;
+
     @Value("${workdir:f:/tmp}")
     private String workdir;
 
@@ -433,8 +436,13 @@ public class DeployService {
         StringBuilder pf=new StringBuilder();
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());
 
+        Map<String, String> layoutParts = ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getLayoutSpec());
+
         // 加入template部分
         pf.append(vueParts.get("templateTag")).append("\n");
+        if(page.getLayoutIdUiLayoutComposite()!=null) {
+            pf.append(layoutParts.get("template")).append("\n");
+        }
         pf.append(vueParts.get("template")).append("\n").append("</template>").append("\n");
 
         // 加入 component的script部分
@@ -461,9 +469,13 @@ public class DeployService {
                 }
             }
         });
-
         scripts.forEach((tag,script)->{
-            Pair<String, List<String>> sParts = ScriptUtils.parseImports(script.toString());
+            StringBuilder completeScript=new StringBuilder();
+            if(page.getLayoutIdUiLayoutComposite()!=null){
+                completeScript.append(page.getLayoutIdUiLayoutComposite().getTemplateData()).append("\n");
+            }
+            completeScript.append(script.toString());
+            Pair<String, List<String>> sParts = ScriptUtils.parseImports(completeScript.toString());
             List<String> imports = ScriptUtils.mergeImports(sParts.getValue());
             pf.append(tag).append("\n");
             imports.forEach(i->{
@@ -503,6 +515,9 @@ public class DeployService {
 
         // 加入style部分
         pf.append(vueParts.get("styleTag")).append("\n");
+        if(page.getLayoutIdUiLayoutComposite()!=null) {
+            pf.append(layoutParts.get("style")).append("\n");
+        }
         pf.append(vueParts.get("style")).append("\n").append("</style>");
         fFile.setContent(pf.toString());
         filesetService.updateById(fFile);
