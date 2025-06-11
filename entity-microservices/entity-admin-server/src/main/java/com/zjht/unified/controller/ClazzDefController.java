@@ -90,8 +90,15 @@ public class ClazzDefController extends BaseController{
     public R<Long> add(@RequestBody ClazzDef clazzDef)
     {
         clazzDef.setCreateTime(DateUtil.now());
-        if (StringUtil.isNotBlank(clazzDef.getGuid())) {
+        if (StringUtil.isBlank(clazzDef.getGuid())) {
             clazzDef.setGuid(IdUtils.fastUUID());
+        }
+        if(clazzDef.getParentId()!=null) {
+            ClazzDef parent = clazzDefService.getById(clazzDef.getParentId());
+            if (parent != null) {
+                clazzDef.setParentGuid(parent.getGuid());
+                clazzDef.setParentPrj(parent.getPrjId());
+            }
         }
         Boolean b = clazzDefService.save(clazzDef);
         R r = b ? R.ok(clazzDef.getId()) : R.fail();
@@ -105,6 +112,16 @@ public class ClazzDefController extends BaseController{
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody ClazzDef clazzDef)
     {
+        if (StringUtil.isBlank(clazzDef.getGuid())) {
+            clazzDef.setGuid(IdUtils.fastUUID());
+        }
+        if(clazzDef.getParentId()!=null) {
+            ClazzDef parent = clazzDefService.getById(clazzDef.getParentId());
+            if (parent != null) {
+                clazzDef.setParentGuid(parent.getGuid());
+                clazzDef.setParentPrj(parent.getPrjId());
+            }
+        }
         clazzDef.setUpdateTime(DateUtil.now());
         Boolean b = clazzDefService.updateById(clazzDef);
         R r = b ? R.ok() : R.fail();
