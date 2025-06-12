@@ -17,6 +17,7 @@ import com.zjht.unified.service.v8exec.ProxyObject;
 import com.zjht.unified.service.v8exec.V8RttiService;
 import com.zjht.unified.service.v8exec.model.ClsDf;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
@@ -75,7 +76,7 @@ public class FrontObjectService {
     public Map<String, Object> createObject(CreateObjectParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
         ClazzDefCompositeDO classDef=null;
-        if(param.getPrjVer()!=null&&param.getClsGuid()!=null){
+        if(StringUtils.isNotBlank(param.getPrjVer())&&StringUtils.isNotBlank(param.getClsGuid())){
             classDef = objectStorageService.getClsDef(taskContext, param.getPrjVer(), param.getClsGuid());
         }else{
             if(param.getClsGuid()!=null)
