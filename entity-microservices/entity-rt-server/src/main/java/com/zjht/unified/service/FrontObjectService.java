@@ -48,15 +48,19 @@ public class FrontObjectService {
         TaskContext tcxt = rtContextService.getRunningContext(param.getVer());
         UnifiedObject me = objectStorageService.getObject(tcxt, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
         if (me == null)
-            return null;
+            return "error:object not found:"+param.getObjGuid();
         MethodDefCompositeDO mf = (MethodDefCompositeDO) objectStorageService.getAttrDef(tcxt, param.getPrjVer(), param.getClazzGuid(), param.getMethodName());
+        if (mf == null)
+            return "error:method not found:"+param.getMethodName();
         Map<String, Object> params = new HashMap<>();
-        for (int i = 0; i < mf.getMethodIdMethodParamList().size() && i < param.getParams().length; i++)
-            try {
-                params.put(mf.getMethodIdMethodParamList().get(i).getName(), param.getParams()[i]);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+        if(mf.getMethodIdMethodParamList()!=null&&param.getParams()!=null) {
+            for (int i = 0; i < mf.getMethodIdMethodParamList().size() && i < param.getParams().length; i++)
+                try {
+                    params.put(mf.getMethodIdMethodParamList().get(i).getName(), param.getParams()[i]);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+        }
         params.put("me", me);
         return scriptEngine.exec(mf.getBody(), params, tcxt, param.getPrjGuid(), param.getPrjVer());
     }

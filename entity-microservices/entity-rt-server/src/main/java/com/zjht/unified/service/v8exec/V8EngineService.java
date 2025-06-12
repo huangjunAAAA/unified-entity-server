@@ -45,6 +45,7 @@ public class V8EngineService implements IScriptEngine {
             return o;
         }catch (Exception e){
             log.error(e.getMessage(),e);
+            return e.getMessage();
         }finally {
             try {
                 if(params!=null){
@@ -56,7 +57,6 @@ public class V8EngineService implements IScriptEngine {
                 log.error(e.getMessage(), e);
             }
         }
-        return null;
     }
 
     public Object exec(String script) {
