@@ -15,5 +15,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "entity-rt-server", configuration = IgnoreValidateFormDataConfiguration.class)
 public interface RemoteRT {
     @PostMapping("/rt/task/run-project")
-    R startProject(@RequestBody PrjSpecDO spec);
+    R<String> startProject(@RequestBody PrjSpecDO spec);
 }

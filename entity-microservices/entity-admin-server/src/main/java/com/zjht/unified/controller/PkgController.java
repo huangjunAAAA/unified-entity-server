@@ -11,6 +11,7 @@ import com.zjht.unified.service.scheduling.RunService;
 import com.zjht.unified.vo.MethodDefVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -30,7 +31,10 @@ public class PkgController {
 
     @ApiOperation(value = "运行特定统一实体项目")
     @PostMapping("/run")
-    public R<String> run(@RequestParam Long prjId,@RequestParam String version){
+    public R<String> run(@RequestParam Long prjId,@RequestParam(required = false) String version,@RequestParam(required = false) boolean force){
+        if(force&&StringUtils.isBlank(version)){
+            version="prj_"+prjId+"_"+System.currentTimeMillis();
+        }
         return runService.runProject(prjId,version);
     }
 

@@ -41,13 +41,18 @@ public class TaskController {
     @ApiOperation(value = "启动统一实体项目")
     @PostMapping("/run-project")
     public R<String> run(@RequestBody PrjSpecDO prjSpec){
+        Long prjId = prjSpec.getUePrj().getId();
         if(StringUtils.isNotBlank(prjSpec.getCtxVer())){
-            taskService.stopTask(prjSpec.getCtxVer());
-        }else {
-            taskService.stopTask(prjSpec.getUePrj().getId());
+            taskService.stopTask(prjId);
         }
-        taskService.startTask(prjSpec,prjSpec.getCtxVer());
-        return R.ok();
+        TaskContext tc = rtContextService.getRunningContext(prjId);
+        if(tc!=null){
+            taskService.startTask(prjSpec,prjSpec.getCtxVer());
+            return R.ok(prjSpec.getCtxVer());
+        }else{
+            return R.ok(tc.getVer());
+        }
+
     }
 
     @ApiOperation(value = "停止统一实体项目")

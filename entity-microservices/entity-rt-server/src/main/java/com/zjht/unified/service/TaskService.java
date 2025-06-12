@@ -96,14 +96,15 @@ public class TaskService {
         }
     }
 
-    public void startTask(PrjSpecDO spec,String ver) {
+    public TaskContext startTask(PrjSpecDO spec,String ver) {
         if(ver==null){
-            ver=spec.getUePrj().getGuid()+":"+System.currentTimeMillis();
+            ver="prj_"+spec.getUePrj().getId()+"_"+System.currentTimeMillis();
         }
         // 初始化定义
         TaskContext ctx = rtContextService.startNewSession(spec, ver);
         initSpecDefinition(ctx, spec);
         rtContextService.saveRunningContext(ctx);
+        return ctx;
     }
 
     //
