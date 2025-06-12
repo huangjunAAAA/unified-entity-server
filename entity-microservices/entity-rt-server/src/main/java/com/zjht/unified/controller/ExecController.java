@@ -176,6 +176,8 @@ public class ExecController {
             return R.fail("task not found:"+param.getVer());
         }
         Map<String, Object> ret = frontObjectService.createObject(param);
+        if(ret==null)
+            return R.fail("class not found: "+param.getClsName()+"|"+param.getClsGuid());
         return R.ok(ret);
     }
 
