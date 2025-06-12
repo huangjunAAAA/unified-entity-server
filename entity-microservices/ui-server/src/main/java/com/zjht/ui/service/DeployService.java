@@ -436,11 +436,13 @@ public class DeployService {
         StringBuilder pf=new StringBuilder();
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());
 
-        Map<String, String> layoutParts = ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getLayoutSpec());
+        Map<String, String> layoutParts=null;
+        if(page.getLayoutIdUiLayoutComposite()!=null)
+            layoutParts=ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getLayoutSpec());
 
         // 加入template部分
         pf.append(vueParts.get("templateTag")).append("\n");
-        if(page.getLayoutIdUiLayoutComposite()!=null) {
+        if(page.getLayoutIdUiLayoutComposite()!=null&&layoutParts!=null) {
             pf.append(layoutParts.get("template")).append("\n");
         }
         pf.append(vueParts.get("template")).append("\n").append("</template>").append("\n");
@@ -515,7 +517,7 @@ public class DeployService {
 
         // 加入style部分
         pf.append(vueParts.get("styleTag")).append("\n");
-        if(page.getLayoutIdUiLayoutComposite()!=null) {
+        if(page.getLayoutIdUiLayoutComposite()!=null&&layoutParts!=null) {
             pf.append(layoutParts.get("style")).append("\n");
         }
         pf.append(vueParts.get("style")).append("\n").append("</style>");
