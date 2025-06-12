@@ -437,8 +437,9 @@ public class DeployService {
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());
 
         Map<String, String> layoutParts=null;
-        if(page.getLayoutIdUiLayoutComposite()!=null)
-            layoutParts=ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getLayoutSpec());
+        if(page.getLayoutIdUiLayoutComposite()!=null){
+            layoutParts=ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getTemplateData());
+        }
 
         // 加入template部分
         pf.append(vueParts.get("templateTag")).append("\n");
@@ -471,10 +472,11 @@ public class DeployService {
                 }
             }
         });
+        Map<String, String> tmpScripts = layoutParts;
         scripts.forEach((tag,script)->{
             StringBuilder completeScript=new StringBuilder();
             if(page.getLayoutIdUiLayoutComposite()!=null){
-                completeScript.append(page.getLayoutIdUiLayoutComposite().getTemplateData()).append("\n");
+                completeScript.append(tmpScripts.get("script")).append("\n");
             }
             completeScript.append(script.toString());
             Pair<String, List<String>> sParts = ScriptUtils.parseImports(completeScript.toString());
