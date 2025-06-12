@@ -58,14 +58,14 @@ public class ClassUtils {
         }
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
-        V8Value v8Value = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
-        bindMethodsToV8Object(v8Value, classDef, v8Runtime);
-        parseConstructMethod(args, classDef, v8Value);
-        return v8Value;
+        V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+        bindMethodsToV8Object(target, classDef, v8Runtime);
+        parseConstructMethod(args, classDef, target);
+        return target;
 
     }
 
-    private static void parseConstructMethod(V8Value[] args, ClazzDefCompositeDO classDef, V8Value v8Value) throws JavetException {
+    private static void parseConstructMethod(V8Value[] args, ClazzDefCompositeDO classDef, V8Value target) throws JavetException {
         if (args.length > 0) {
             MethodDefCompositeDO matchingConstructor = classDef.getClazzIdMethodDefList().stream()
                     .filter(m -> m.getType() == 1) //
@@ -75,11 +75,25 @@ public class ClassUtils {
 
             log.info(" found match constructor : {}", matchingConstructor);
             if (Objects.nonNull(matchingConstructor)) {
-                if (v8Value instanceof V8ValueObject) {
-                    V8ValueObject v8ValueObject = (V8ValueObject) v8Value;
+                if (target instanceof V8ValueObject) {
+                    V8ValueObject v8ValueObject = (V8ValueObject) target;
                     v8ValueObject.invoke(matchingConstructor.getName(), args);
                 }
             }
+        }
+    }
+
+    public static void parseConstructMethod(V8Runtime v8Runtime,List<Object> args, ClazzDefCompositeDO classDef, ProxyObject target){
+        try {
+            List<V8Value> v8args = new ArrayList<>();
+            for (Object arg : args) {
+                V8Value v8Value = V8BeanUtils.toV8Value(v8Runtime, arg);
+                v8args.add(v8Value);
+            }
+            V8Value v8Target = new JavetProxyConverter().toV8Value(v8Runtime, target);
+            parseConstructMethod(v8args.toArray(new V8Value[0]), classDef, v8Target);
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
         }
     }
 

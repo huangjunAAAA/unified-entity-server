@@ -35,6 +35,9 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private RtContextService rtContextService;
+
     @ApiOperation(value = "启动统一实体项目")
     @PostMapping("/run-project")
     public R<String> run(@RequestBody PrjSpecDO prjSpec){
@@ -45,6 +48,29 @@ public class TaskController {
         }
         taskService.startTask(prjSpec,prjSpec.getCtxVer());
         return R.ok();
+    }
+
+    @ApiOperation(value = "停止统一实体项目")
+    @PostMapping("/stop-project")
+    public R<String> stop(@RequestParam Long prjId){
+        taskService.stopTask(prjId);
+        return R.ok();
+    }
+
+    @ApiOperation(value = "获取一个正在执行的实体项目")
+    @PostMapping("/project-runtime")
+    public R<TaskContext> getContext(@RequestParam Long prjId){
+        TaskContext tc = rtContextService.getRunningContext(prjId);
+        if(tc==null)
+            return R.fail("prject not running:"+prjId);
+        return R.ok(tc);
+    }
+
+    @ApiOperation(value = "列出所有正在执行的统一实体项目")
+    @PostMapping("/all-project-runtime")
+    public R<List<TaskContext>> getAllContext(){
+        List<TaskContext> tc = rtContextService.getAllRunningContext();
+        return R.ok(tc);
     }
 
 }

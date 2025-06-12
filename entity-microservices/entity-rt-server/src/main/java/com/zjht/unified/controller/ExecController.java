@@ -9,6 +9,7 @@ import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
+import com.zjht.unified.dto.CreateObjectParam;
 import com.zjht.unified.dto.GetParam;
 import com.zjht.unified.dto.Increment;
 import com.zjht.unified.dto.MethodInvokeParam;
@@ -164,6 +165,17 @@ public class ExecController {
             return R.fail("task not found:"+param.getVer());
         }
         Map<String, Object> ret = frontObjectService.getObject(param);
+        return R.ok(ret);
+    }
+
+    @ApiOperation(value = "在指定运行环境创建对象")
+    @PostMapping("/create-object")
+    public R<Object> createObject(@RequestBody CreateObjectParam param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        Map<String, Object> ret = frontObjectService.createObject(param);
         return R.ok(ret);
     }
 
