@@ -46,7 +46,7 @@ public class TaskController {
             taskService.stopTask(prjId);
         }
         TaskContext tc = rtContextService.getRunningContext(prjId);
-        if(tc!=null){
+        if(tc==null){
             taskService.startTask(prjSpec,prjSpec.getCtxVer());
             return R.ok(prjSpec.getCtxVer());
         }else{
