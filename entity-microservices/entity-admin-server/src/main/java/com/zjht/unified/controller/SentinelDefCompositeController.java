@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(sentinelDef)维护",tags = {"整图结构关系(sentinelDef)维护"})
+@Api(value = "哨兵定义(sentinelDef)维护",tags = {"哨兵定义(sentinelDef)维护"})
 @RestController
 @RequestMapping("/sentinelDef-composite")
 public class SentinelDefCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class SentinelDefCompositeController extends BaseController{
     private ISentinelDefCompositeService sentinelDefCompositeService;
 
     /**
-     * 查询整图结构关系(sentinelDef)列表, 对象形式
+     * 查询哨兵定义(sentinelDef)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(sentinelDef)列表")
+    @ApiOperation(value = "查询哨兵定义(sentinelDef)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<SentinelDefCompositeVO> listExt(@RequestBody BaseQueryDTO<SentinelDef> sentinelDef)
     {
@@ -60,9 +60,9 @@ public class SentinelDefCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(sentinelDef)列表
+     * 查询哨兵定义(sentinelDef)列表
      */
-    @ApiOperation(value = "查询整图结构关系(sentinelDef)列表")
+    @ApiOperation(value = "查询哨兵定义(sentinelDef)列表")
     @GetMapping("/list")
     public TableDataInfo<SentinelDefCompositeVO> list(SentinelDef sentinelDef, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class SentinelDefCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(sentinelDef)Composite详细信息
+     * 获取哨兵定义(sentinelDef)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(sentinelDef)Composite详细信息")
+    @ApiOperation(value = "获取哨兵定义(sentinelDef)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<SentinelDefCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class SentinelDefCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(sentinelDef)
+     * 新增哨兵定义(sentinelDef)
      */
-    @ApiOperation(value = "新增整图结构关系(sentinelDef)Composite")
+    @ApiOperation(value = "新增哨兵定义(sentinelDef)Composite")
     @PostMapping
     public R<Long> add(@RequestBody SentinelDefCompositeDTO sentinelDef)
     {
@@ -107,9 +107,9 @@ public class SentinelDefCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(sentinelDef)
+     * 修改哨兵定义(sentinelDef)
      */
-    @ApiOperation(value = "修改整图结构关系(sentinelDef)Composite")
+    @ApiOperation(value = "修改哨兵定义(sentinelDef)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody SentinelDefCompositeDTO sentinelDef)
     {
@@ -120,9 +120,9 @@ public class SentinelDefCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(sentinelDef)Composite
+     * 删除哨兵定义(sentinelDef)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(sentinelDef)Composite")
+    @ApiOperation(value = "删除哨兵定义(sentinelDef)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

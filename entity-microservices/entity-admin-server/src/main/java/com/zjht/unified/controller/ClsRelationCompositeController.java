@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(clsRelation)维护",tags = {"整图结构关系(clsRelation)维护"})
+@Api(value = "类关系(clsRelation)维护",tags = {"类关系(clsRelation)维护"})
 @RestController
 @RequestMapping("/clsRelation-composite")
 public class ClsRelationCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class ClsRelationCompositeController extends BaseController{
     private IClsRelationCompositeService clsRelationCompositeService;
 
     /**
-     * 查询整图结构关系(clsRelation)列表, 对象形式
+     * 查询类关系(clsRelation)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(clsRelation)列表")
+    @ApiOperation(value = "查询类关系(clsRelation)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<ClsRelationCompositeVO> listExt(@RequestBody BaseQueryDTO<ClsRelation> clsRelation)
     {
@@ -60,9 +60,9 @@ public class ClsRelationCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(clsRelation)列表
+     * 查询类关系(clsRelation)列表
      */
-    @ApiOperation(value = "查询整图结构关系(clsRelation)列表")
+    @ApiOperation(value = "查询类关系(clsRelation)列表")
     @GetMapping("/list")
     public TableDataInfo<ClsRelationCompositeVO> list(ClsRelation clsRelation, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class ClsRelationCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(clsRelation)Composite详细信息
+     * 获取类关系(clsRelation)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(clsRelation)Composite详细信息")
+    @ApiOperation(value = "获取类关系(clsRelation)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<ClsRelationCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class ClsRelationCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(clsRelation)
+     * 新增类关系(clsRelation)
      */
-    @ApiOperation(value = "新增整图结构关系(clsRelation)Composite")
+    @ApiOperation(value = "新增类关系(clsRelation)Composite")
     @PostMapping
     public R<Long> add(@RequestBody ClsRelationCompositeDTO clsRelation)
     {
@@ -107,9 +107,9 @@ public class ClsRelationCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(clsRelation)
+     * 修改类关系(clsRelation)
      */
-    @ApiOperation(value = "修改整图结构关系(clsRelation)Composite")
+    @ApiOperation(value = "修改类关系(clsRelation)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody ClsRelationCompositeDTO clsRelation)
     {
@@ -120,9 +120,9 @@ public class ClsRelationCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(clsRelation)Composite
+     * 删除类关系(clsRelation)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(clsRelation)Composite")
+    @ApiOperation(value = "删除类关系(clsRelation)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

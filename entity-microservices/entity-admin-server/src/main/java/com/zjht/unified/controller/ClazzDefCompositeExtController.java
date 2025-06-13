@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(clazzDef)维护",tags = {"整图结构关系(clazzDef)维护"})
+@Api(value = "类定义(clazzDef)维护",tags = {"类定义(clazzDef)维护"})
 @RestController
 @RequestMapping("/clazzDef-composite-ext")
 public class ClazzDefCompositeExtController extends BaseController{

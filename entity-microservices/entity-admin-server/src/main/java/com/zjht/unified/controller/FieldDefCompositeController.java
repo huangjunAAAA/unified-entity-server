@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(fieldDef)维护",tags = {"整图结构关系(fieldDef)维护"})
+@Api(value = "属性定义(fieldDef)维护",tags = {"属性定义(fieldDef)维护"})
 @RestController
 @RequestMapping("/fieldDef-composite")
 public class FieldDefCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class FieldDefCompositeController extends BaseController{
     private IFieldDefCompositeService fieldDefCompositeService;
 
     /**
-     * 查询整图结构关系(fieldDef)列表, 对象形式
+     * 查询属性定义(fieldDef)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(fieldDef)列表")
+    @ApiOperation(value = "查询属性定义(fieldDef)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<FieldDefCompositeVO> listExt(@RequestBody BaseQueryDTO<FieldDef> fieldDef)
     {
@@ -60,9 +60,9 @@ public class FieldDefCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(fieldDef)列表
+     * 查询属性定义(fieldDef)列表
      */
-    @ApiOperation(value = "查询整图结构关系(fieldDef)列表")
+    @ApiOperation(value = "查询属性定义(fieldDef)列表")
     @GetMapping("/list")
     public TableDataInfo<FieldDefCompositeVO> list(FieldDef fieldDef, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class FieldDefCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(fieldDef)Composite详细信息
+     * 获取属性定义(fieldDef)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(fieldDef)Composite详细信息")
+    @ApiOperation(value = "获取属性定义(fieldDef)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<FieldDefCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class FieldDefCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(fieldDef)
+     * 新增属性定义(fieldDef)
      */
-    @ApiOperation(value = "新增整图结构关系(fieldDef)Composite")
+    @ApiOperation(value = "新增属性定义(fieldDef)Composite")
     @PostMapping
     public R<Long> add(@RequestBody FieldDefCompositeDTO fieldDef)
     {
@@ -107,9 +107,9 @@ public class FieldDefCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(fieldDef)
+     * 修改属性定义(fieldDef)
      */
-    @ApiOperation(value = "修改整图结构关系(fieldDef)Composite")
+    @ApiOperation(value = "修改属性定义(fieldDef)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody FieldDefCompositeDTO fieldDef)
     {
@@ -120,9 +120,9 @@ public class FieldDefCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(fieldDef)Composite
+     * 删除属性定义(fieldDef)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(fieldDef)Composite")
+    @ApiOperation(value = "删除属性定义(fieldDef)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

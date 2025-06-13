@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(methodParam)维护",tags = {"整图结构关系(methodParam)维护"})
+@Api(value = "方法参数(methodParam)维护",tags = {"方法参数(methodParam)维护"})
 @RestController
 @RequestMapping("/methodParam-composite")
 public class MethodParamCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class MethodParamCompositeController extends BaseController{
     private IMethodParamCompositeService methodParamCompositeService;
 
     /**
-     * 查询整图结构关系(methodParam)列表, 对象形式
+     * 查询方法参数(methodParam)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(methodParam)列表")
+    @ApiOperation(value = "查询方法参数(methodParam)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<MethodParamCompositeVO> listExt(@RequestBody BaseQueryDTO<MethodParam> methodParam)
     {
@@ -60,9 +60,9 @@ public class MethodParamCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(methodParam)列表
+     * 查询方法参数(methodParam)列表
      */
-    @ApiOperation(value = "查询整图结构关系(methodParam)列表")
+    @ApiOperation(value = "查询方法参数(methodParam)列表")
     @GetMapping("/list")
     public TableDataInfo<MethodParamCompositeVO> list(MethodParam methodParam, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class MethodParamCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(methodParam)Composite详细信息
+     * 获取方法参数(methodParam)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(methodParam)Composite详细信息")
+    @ApiOperation(value = "获取方法参数(methodParam)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<MethodParamCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class MethodParamCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(methodParam)
+     * 新增方法参数(methodParam)
      */
-    @ApiOperation(value = "新增整图结构关系(methodParam)Composite")
+    @ApiOperation(value = "新增方法参数(methodParam)Composite")
     @PostMapping
     public R<Long> add(@RequestBody MethodParamCompositeDTO methodParam)
     {
@@ -107,9 +107,9 @@ public class MethodParamCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(methodParam)
+     * 修改方法参数(methodParam)
      */
-    @ApiOperation(value = "修改整图结构关系(methodParam)Composite")
+    @ApiOperation(value = "修改方法参数(methodParam)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody MethodParamCompositeDTO methodParam)
     {
@@ -120,9 +120,9 @@ public class MethodParamCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(methodParam)Composite
+     * 删除方法参数(methodParam)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(methodParam)Composite")
+    @ApiOperation(value = "删除方法参数(methodParam)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

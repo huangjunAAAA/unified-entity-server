@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(viewDef)维护",tags = {"整图结构关系(viewDef)维护"})
+@Api(value = "视图定义(viewDef)维护",tags = {"视图定义(viewDef)维护"})
 @RestController
 @RequestMapping("/viewDef-composite")
 public class ViewDefCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class ViewDefCompositeController extends BaseController{
     private IViewDefCompositeService viewDefCompositeService;
 
     /**
-     * 查询整图结构关系(viewDef)列表, 对象形式
+     * 查询视图定义(viewDef)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(viewDef)列表")
+    @ApiOperation(value = "查询视图定义(viewDef)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<ViewDefCompositeVO> listExt(@RequestBody BaseQueryDTO<ViewDef> viewDef)
     {
@@ -60,9 +60,9 @@ public class ViewDefCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(viewDef)列表
+     * 查询视图定义(viewDef)列表
      */
-    @ApiOperation(value = "查询整图结构关系(viewDef)列表")
+    @ApiOperation(value = "查询视图定义(viewDef)列表")
     @GetMapping("/list")
     public TableDataInfo<ViewDefCompositeVO> list(ViewDef viewDef, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class ViewDefCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(viewDef)Composite详细信息
+     * 获取视图定义(viewDef)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(viewDef)Composite详细信息")
+    @ApiOperation(value = "获取视图定义(viewDef)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<ViewDefCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class ViewDefCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(viewDef)
+     * 新增视图定义(viewDef)
      */
-    @ApiOperation(value = "新增整图结构关系(viewDef)Composite")
+    @ApiOperation(value = "新增视图定义(viewDef)Composite")
     @PostMapping
     public R<Long> add(@RequestBody ViewDefCompositeDTO viewDef)
     {
@@ -107,9 +107,9 @@ public class ViewDefCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(viewDef)
+     * 修改视图定义(viewDef)
      */
-    @ApiOperation(value = "修改整图结构关系(viewDef)Composite")
+    @ApiOperation(value = "修改视图定义(viewDef)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody ViewDefCompositeDTO viewDef)
     {
@@ -120,9 +120,9 @@ public class ViewDefCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(viewDef)Composite
+     * 删除视图定义(viewDef)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(viewDef)Composite")
+    @ApiOperation(value = "删除视图定义(viewDef)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

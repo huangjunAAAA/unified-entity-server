@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(fsmCondition)维护",tags = {"整图结构关系(fsmCondition)维护"})
+@Api(value = "状态机条件(fsmCondition)维护",tags = {"状态机条件(fsmCondition)维护"})
 @RestController
 @RequestMapping("/fsmCondition-composite")
 public class FsmConditionCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class FsmConditionCompositeController extends BaseController{
     private IFsmConditionCompositeService fsmConditionCompositeService;
 
     /**
-     * 查询整图结构关系(fsmCondition)列表, 对象形式
+     * 查询状态机条件(fsmCondition)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(fsmCondition)列表")
+    @ApiOperation(value = "查询状态机条件(fsmCondition)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<FsmConditionCompositeVO> listExt(@RequestBody BaseQueryDTO<FsmCondition> fsmCondition)
     {
@@ -60,9 +60,9 @@ public class FsmConditionCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(fsmCondition)列表
+     * 查询状态机条件(fsmCondition)列表
      */
-    @ApiOperation(value = "查询整图结构关系(fsmCondition)列表")
+    @ApiOperation(value = "查询状态机条件(fsmCondition)列表")
     @GetMapping("/list")
     public TableDataInfo<FsmConditionCompositeVO> list(FsmCondition fsmCondition, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class FsmConditionCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(fsmCondition)Composite详细信息
+     * 获取状态机条件(fsmCondition)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(fsmCondition)Composite详细信息")
+    @ApiOperation(value = "获取状态机条件(fsmCondition)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<FsmConditionCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class FsmConditionCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(fsmCondition)
+     * 新增状态机条件(fsmCondition)
      */
-    @ApiOperation(value = "新增整图结构关系(fsmCondition)Composite")
+    @ApiOperation(value = "新增状态机条件(fsmCondition)Composite")
     @PostMapping
     public R<Long> add(@RequestBody FsmConditionCompositeDTO fsmCondition)
     {
@@ -107,9 +107,9 @@ public class FsmConditionCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(fsmCondition)
+     * 修改状态机条件(fsmCondition)
      */
-    @ApiOperation(value = "修改整图结构关系(fsmCondition)Composite")
+    @ApiOperation(value = "修改状态机条件(fsmCondition)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody FsmConditionCompositeDTO fsmCondition)
     {
@@ -120,9 +120,9 @@ public class FsmConditionCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(fsmCondition)Composite
+     * 删除状态机条件(fsmCondition)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(fsmCondition)Composite")
+    @ApiOperation(value = "删除状态机条件(fsmCondition)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

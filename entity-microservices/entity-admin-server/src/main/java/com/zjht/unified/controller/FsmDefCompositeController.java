@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(fsmDef)维护",tags = {"整图结构关系(fsmDef)维护"})
+@Api(value = "状态机定义(fsmDef)维护",tags = {"状态机定义(fsmDef)维护"})
 @RestController
 @RequestMapping("/fsmDef-composite")
 public class FsmDefCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class FsmDefCompositeController extends BaseController{
     private IFsmDefCompositeService fsmDefCompositeService;
 
     /**
-     * 查询整图结构关系(fsmDef)列表, 对象形式
+     * 查询状态机定义(fsmDef)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(fsmDef)列表")
+    @ApiOperation(value = "查询状态机定义(fsmDef)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<FsmDefCompositeVO> listExt(@RequestBody BaseQueryDTO<FsmDef> fsmDef)
     {
@@ -60,9 +60,9 @@ public class FsmDefCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(fsmDef)列表
+     * 查询状态机定义(fsmDef)列表
      */
-    @ApiOperation(value = "查询整图结构关系(fsmDef)列表")
+    @ApiOperation(value = "查询状态机定义(fsmDef)列表")
     @GetMapping("/list")
     public TableDataInfo<FsmDefCompositeVO> list(FsmDef fsmDef, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class FsmDefCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(fsmDef)Composite详细信息
+     * 获取状态机定义(fsmDef)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(fsmDef)Composite详细信息")
+    @ApiOperation(value = "获取状态机定义(fsmDef)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<FsmDefCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class FsmDefCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(fsmDef)
+     * 新增状态机定义(fsmDef)
      */
-    @ApiOperation(value = "新增整图结构关系(fsmDef)Composite")
+    @ApiOperation(value = "新增状态机定义(fsmDef)Composite")
     @PostMapping
     public R<Long> add(@RequestBody FsmDefCompositeDTO fsmDef)
     {
@@ -107,9 +107,9 @@ public class FsmDefCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(fsmDef)
+     * 修改状态机定义(fsmDef)
      */
-    @ApiOperation(value = "修改整图结构关系(fsmDef)Composite")
+    @ApiOperation(value = "修改状态机定义(fsmDef)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody FsmDefCompositeDTO fsmDef)
     {
@@ -120,9 +120,9 @@ public class FsmDefCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(fsmDef)Composite
+     * 删除状态机定义(fsmDef)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(fsmDef)Composite")
+    @ApiOperation(value = "删除状态机定义(fsmDef)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {

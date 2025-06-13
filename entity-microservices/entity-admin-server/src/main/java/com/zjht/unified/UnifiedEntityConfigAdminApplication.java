@@ -28,10 +28,10 @@ public class UnifiedEntityConfigAdminApplication {
         ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityConfigAdminApplication.class, args);
         log.info("统一实体组态模块启动成功");
 
-        Map<Object,Object> allSettings=new LinkedHashMap<>();
-        allSettings.put("instanceExport",new InstancePermitAll());
-        allSettings.put("classExport",new InstancePermitAll());
-        System.out.println(GsonUtil.toJson(allSettings));
+//        Map<Object,Object> allSettings=new LinkedHashMap<>();
+//        allSettings.put("instanceExport",new InstancePermitAll());
+//        allSettings.put("classExport",new InstancePermitAll());
+//        System.out.println(GsonUtil.toJson(allSettings));
     }
 
     static class InstancePermitAll{
