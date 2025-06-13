@@ -109,11 +109,6 @@ public class ClazzDefDO {
 	 */
 	@ApiModelProperty(value = "继承的类是否可写基类")
 	private Integer inheritWrite;
-	 /**
-	 * 构建函数脚本
-	 */
-	@ApiModelProperty(value = "构建函数脚本")
-	private String constructor;
 
 	/**
 	 * 所属项目GUID
