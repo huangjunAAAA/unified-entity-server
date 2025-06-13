@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  *
  * @author wangy
  */
-@Api(value = "整图结构关系(clazzDef)维护",tags = {"整图结构关系(clazzDef)维护"})
+@Api(value = "类定义(clazzDef)维护",tags = {"类定义(clazzDef)维护"})
 @RestController
 @RequestMapping("/clazzDef-composite")
 public class ClazzDefCompositeController extends BaseController{
@@ -50,9 +50,9 @@ public class ClazzDefCompositeController extends BaseController{
     private IClazzDefCompositeService clazzDefCompositeService;
 
     /**
-     * 查询整图结构关系(clazzDef)列表, 对象形式
+     * 查询类定义(clazzDef)列表, 对象形式
      */
-    @ApiOperation(value = "查询整图结构关系(clazzDef)列表")
+    @ApiOperation(value = "查询类定义(clazzDef)列表")
     @PostMapping("/list-ext")
     public TableDataInfo<ClazzDefCompositeVO> listExt(@RequestBody BaseQueryDTO<ClazzDef> clazzDef)
     {
@@ -60,9 +60,9 @@ public class ClazzDefCompositeController extends BaseController{
     }
 
     /**
-     * 查询整图结构关系(clazzDef)列表
+     * 查询类定义(clazzDef)列表
      */
-    @ApiOperation(value = "查询整图结构关系(clazzDef)列表")
+    @ApiOperation(value = "查询类定义(clazzDef)列表")
     @GetMapping("/list")
     public TableDataInfo<ClazzDefCompositeVO> list(ClazzDef clazzDef, PageDomain  pageDomain)
     {
@@ -81,9 +81,9 @@ public class ClazzDefCompositeController extends BaseController{
     }
 
     /**
-     * 获取整图结构关系(clazzDef)Composite详细信息
+     * 获取类定义(clazzDef)Composite详细信息
      */
-    @ApiOperation(value = "获取整图结构关系(clazzDef)Composite详细信息")
+    @ApiOperation(value = "获取类定义(clazzDef)Composite详细信息")
     @GetMapping(value = "/{id}")
     public R<ClazzDefCompositeVO> getInfo(@PathVariable("id") Long id)
     {
@@ -93,9 +93,9 @@ public class ClazzDefCompositeController extends BaseController{
 
 
     /**
-     * 新增整图结构关系(clazzDef)
+     * 新增类定义(clazzDef)
      */
-    @ApiOperation(value = "新增整图结构关系(clazzDef)Composite")
+    @ApiOperation(value = "新增类定义(clazzDef)Composite")
     @PostMapping
     public R<Long> add(@RequestBody ClazzDefCompositeDTO clazzDef)
     {
@@ -107,9 +107,9 @@ public class ClazzDefCompositeController extends BaseController{
     }
 
     /**
-     * 修改整图结构关系(clazzDef)
+     * 修改类定义(clazzDef)
      */
-    @ApiOperation(value = "修改整图结构关系(clazzDef)Composite")
+    @ApiOperation(value = "修改类定义(clazzDef)Composite")
     @PostMapping("/edit")
     public R<Long> edit(@RequestBody ClazzDefCompositeDTO clazzDef)
     {
@@ -120,9 +120,9 @@ public class ClazzDefCompositeController extends BaseController{
     }
 
     /**
-     * 删除整图结构关系(clazzDef)Composite
+     * 删除类定义(clazzDef)Composite
      */
-    @ApiOperation(value = "删除整图结构关系(clazzDef)Composite")
+    @ApiOperation(value = "删除类定义(clazzDef)Composite")
     @PostMapping("/delete/{id}")
     public R<Long> remove(@PathVariable Long id)
     {
