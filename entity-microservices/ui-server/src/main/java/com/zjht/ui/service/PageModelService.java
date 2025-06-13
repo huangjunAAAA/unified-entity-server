@@ -311,6 +311,8 @@ public class PageModelService {
         }
 
         UiPageCompositeDTOExt uiPage = new UiPageCompositeDTOExt();
+        // 默认模版1
+        uiPage.setLayoutId(1L);
         uiPage.setId(pageSpec.getPageId().getId());
         uiPage.setGuid(pageSpec.getPageId().getGuid());
         if(pageSpec.getRoute()!=null){
