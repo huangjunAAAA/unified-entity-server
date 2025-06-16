@@ -6,8 +6,10 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.dto.IdAndNameDTO;
 import com.zjht.unified.entity.FieldDef;
 import com.zjht.unified.entity.MethodDef;
+import com.zjht.unified.entity.MethodParam;
 import com.zjht.unified.service.IFieldDefService;
 import com.zjht.unified.service.IMethodDefService;
+import com.zjht.unified.service.IMethodParamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class FieldAndMethodDelController {
 
     @Autowired
     private IMethodDefService methodDefService;
+
+    @Autowired
+    private IMethodParamService methodParamService;
 
     /**
      * 删除类字段
@@ -54,6 +59,23 @@ public class FieldAndMethodDelController {
         if(m!=null){
             methodDefService.removeById(m.getId());
             return R.ok(m.getId());
+        }
+        return R.fail();
+    }
+
+    /**
+     * 删除方法的参数
+     */
+    @ApiOperation(value = "删除方法的参数")
+    @PostMapping("/delete/param")
+    public R<Long> removeParamByName(@RequestBody  IdAndNameDTO paramName)
+    {
+        MethodParam p = methodParamService.getOne(new LambdaQueryWrapper<MethodParam>()
+                .eq(MethodParam::getName, paramName.getName())
+                .eq(MethodParam::getMethodId, paramName.getId()));
+        if(p!=null){
+            methodParamService.removeById(p.getId());
+            return R.ok(p.getId());
         }
         return R.fail();
     }
