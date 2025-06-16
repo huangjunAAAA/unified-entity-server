@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "MethodDef对象", description = "")
 public class MethodDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 5471687146959749663L;
+	private static final long serialVersionUID = 2149797936666259261L;
 
 
 
@@ -93,14 +93,6 @@ public class MethodDef extends BaseCopyEntity {
 	private Long originalId;
 
 	 /**
-	 * 方法说明
-	 */
-	@ApiModelProperty(value = "方法说明")
-	@Column(name = "description")
-	@TableField(value = "description")
-	private String description;
-
-	 /**
 	 * 显示名称
 	 */
 	@ApiModelProperty(value = "显示名称")
@@ -123,4 +115,20 @@ public class MethodDef extends BaseCopyEntity {
 	@Column(name = "clazz_guid")
 	@TableField(value = "clazz_guid")  
 	private String clazzGuid;
+
+	 /**
+	 * private/public/protected
+	 */
+	@ApiModelProperty(value = "private/public/protected")
+	@Column(name = "modifier")
+	@TableField(value = "modifier")  
+	private String modifier;
+
+	 /**
+	 * 方法说明
+	 */
+	@ApiModelProperty(value = "方法说明")
+	@Column(name = "description")
+	@TableField(value = "description")  
+	private String description;
 }
