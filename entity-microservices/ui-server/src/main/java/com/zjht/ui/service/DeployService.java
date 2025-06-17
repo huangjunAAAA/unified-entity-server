@@ -31,12 +31,15 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 @Slf4j
@@ -320,22 +323,57 @@ public class DeployService {
         }
     }
 
+    /**
+     * 将所有文件打包成zip压缩包并将文件流写入out
+     * @param prjId
+     * @param out
+     */
+    public void compressProject(Long prjId, OutputStream out) {
+        synchronized (prjId.toString()) {
+            log.info("compress project: {}", prjId);
+            List<Fileset> pfiles = getProjectFiles(prjId); // 获取项目文件列表
+
+            try (ZipOutputStream zipOut = new ZipOutputStream(out)) {
+                for (Fileset fileset : pfiles) {
+                    String filePath = fileset.getPath(); // 文件路径
+                    String sanitizedPath = FileSetUtils.translatePath(filePath); // 规范化路径
+                    String entryName = sanitizedPath.replace(File.separator, "/"); // 统一为 ZIP 使用的路径格式
+
+                    // 创建 ZIP 条目
+                    ZipEntry zipEntry = new ZipEntry(entryName);
+                    zipOut.putNextEntry(zipEntry);
+
+                    // 写入文件内容
+                    byte[] contentBytes = fileset.getContent().getBytes(StandardCharsets.UTF_8);
+                    zipOut.write(contentBytes);
+                    zipOut.closeEntry();
+                }
+            } catch (IOException e) {
+                log.error("Error occurred during compression for project ID {}: {}", prjId, e.getMessage(), e);
+            }
+        }
+    }
+    public List<Fileset> getProjectFiles(Long prjId){
+        List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
+                .eq(Fileset::getBelongtoId, prjId).ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE));
+
+        List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
+        if(CollectionUtils.isNotEmpty(pages)) {
+            List<Long> ids = pages.stream().map(p -> p.getId()).collect(Collectors.toList());
+            List<Fileset> pfiles2 = filesetService.list(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
+                    .in(Fileset::getBelongtoId, ids));
+            pfiles.addAll(pfiles2);
+        }
+        return pfiles;
+    }
+
     public R<String> inflate(Long prjId){
         synchronized (prjId.toString()) {
             WorkingEnv workingEnv = createWorkingDir(prjId);
             log.info("inflate project:" + prjId + ", working dir:" + workingEnv.workdir);
 
-            List<Fileset> pfiles = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                    .eq(Fileset::getBelongtoId, prjId).ne(Fileset::getPath, Constants.FILE_TYPE_PROJECT_NODE_MODULE));
-
-            List<UiPage> pages = uiPageService.list(new LambdaQueryWrapper<UiPage>().eq(UiPage::getRprjId, prjId));
-            if(CollectionUtils.isNotEmpty(pages)) {
-                List<Long> ids = pages.stream().map(p -> p.getId()).collect(Collectors.toList());
-                List<Fileset> pfiles2 = filesetService.list(new LambdaQueryWrapper<Fileset>()
-                        .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE)
-                        .in(Fileset::getBelongtoId, ids));
-                pfiles.addAll(pfiles2);
-            }
+            List<Fileset> pfiles=getProjectFiles(prjId);
 
             Set<String> pfSet = pfiles.stream().map(pf -> pf.getPath()).collect(Collectors.toSet());
             File fdir = new File(workingEnv.workdir);
