@@ -45,8 +45,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
   	@Autowired
     private IUiComponentService uiComponentService;
   
-    @Autowired
-    private IUiLayoutCompositeService  uiLayoutCompositeService;
     public Long submit(UiPageCompositeDTO entity) {
         if(entity==null)
             return null;
@@ -80,13 +78,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
             }
         }
         boolean updateRequired=false;
-        if(entity.getLayoutIdUiLayoutComposite()!=null){
-            if(entity.getLayoutId()!=null)
-                entity.getLayoutIdUiLayoutComposite().setId(entity.getLayoutId());
-            uiLayoutCompositeService.submit(entity.getLayoutIdUiLayoutComposite());
-           entity.setLayoutId(entity.getLayoutIdUiLayoutComposite().getId());
-           updateRequired=true;
-        }
         if(UiPageCompositeValidate.validateOnFlush(entity)||updateRequired)
           uiPageService.updateById(entity);
         return entity.getId();
@@ -99,8 +90,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
                 List<Long> uiComponentIdList = oldEntity.getPageIdUiComponentList().stream().map(t -> t.getId()).collect(Collectors.toList());
                 uiComponentCompositeService.batchRemove(uiComponentIdList);
             }
-            if(oldEntity.getLayoutIdUiLayoutComposite()!=null)
-                uiLayoutCompositeService.removeById(oldEntity.getLayoutIdUiLayoutComposite().getId());
         }
       uiPageService.removeById(id);
     }
@@ -128,7 +117,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
         UiComponentCompositeDTO uiComponentParam = new UiComponentCompositeDTO();
         uiComponentParam.setPageId(id);
         uiPageDTO.setPageIdUiComponentList(uiComponentCompositeService.selectList(uiComponentParam));
-        uiPageDTO.setLayoutIdUiLayoutComposite(uiLayoutCompositeService.selectById(uiPage.getLayoutId()));
         return uiPageDTO;
     }
 
@@ -168,11 +156,6 @@ public class UiPageCompositeServiceImpl implements IUiPageCompositeService {
             });
             entity.setPageIdUiComponentList(uiComponentList);
         }
-      if(entity.getLayoutIdUiLayoutComposite()!=null)	{
-        entity.setLayoutIdUiLayoutComposite(uiLayoutCompositeService.deepCopy(entity.getLayoutIdUiLayoutComposite()));
-        entity.setLayoutId(entity.getLayoutIdUiLayoutComposite().getId());      
-      }
-        uiPageService.updateById(entity);
         if(UiPageCompositeValidate.validateOnCopy(entity))
           uiPageService.updateById(entity);
         return entity;

@@ -66,11 +66,8 @@ public class RecordUtils {
         V8ValueArray v8ValueArray = v8Runtime.createV8ValueArray();
         JavetProxyConverter proxyConverter = new JavetProxyConverter();
 
-        for (Map<String, Object> result : results) {
-            ProxyObject proxyObject = new ProxyObject(taskContext, result.get("guid").toString(), clazzDef.getGuid());
-            proxyObject.setSnapshot(result);
-            v8ValueArray.push(proxyConverter.toV8Value(v8Runtime, proxyObject));
-        }
+        // TODO
+        // 新建一个对象来完成值传递操作
 
         return v8ValueArray;
     }
@@ -101,7 +98,6 @@ public class RecordUtils {
 
             for (Map<String, Object> result : results) {
                 ProxyObject proxyObject = new ProxyObject(taskContext, result.get("guid").toString(), clazzDef.getGuid());
-                proxyObject.setSnapshot(result);
                 v8ValueArray.push(proxyConverter.toV8Value(v8Runtime, proxyObject));
             }
         } else {

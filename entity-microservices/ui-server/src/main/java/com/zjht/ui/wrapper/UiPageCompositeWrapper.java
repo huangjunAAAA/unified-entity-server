@@ -26,8 +26,6 @@ public class UiPageCompositeWrapper{
       	if(CollectionUtils.isNotEmpty(uiPage.getPageIdUiComponentList())){
             uiPage.getPageIdUiComponentList().stream().forEach(t -> UiComponentCompositeWrapper.build().visitComposite(t,visitor));
         }
-      	if(uiPage.getLayoutIdUiLayoutComposite()!=null)
-            visitor.accept(uiPage.getLayoutIdUiLayoutComposite());
     }
 
     public static UiPageCompositeWrapper build() {
@@ -42,8 +40,6 @@ public class UiPageCompositeWrapper{
                     .map(t -> UiComponentCompositeWrapper.build().entityVO(t))
                     .collect(Collectors.toList()));
       	}
-      	if(uiPage.getLayoutIdUiLayoutComposite()!=null)
-           vo.setLayoutIdUiLayoutComposite(UiLayoutCompositeWrapper.build().entityVO(uiPage.getLayoutIdUiLayoutComposite()));
 
         return vo;
     }

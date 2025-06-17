@@ -72,7 +72,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
     }
 
 
-    private Map<String,Object> snapshot;
+    private final Map<String,Object> modified=new HashMap<>();
 
     private TaskContext taskContext;
 
@@ -137,12 +137,6 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                 log.error(e.getMessage(), e);
             }
 
-        if (target instanceof V8ValueString) {
-            for (ChronoField value : ChronoField.values()) {
-                log.info("value.toString() = " + value.toString());
-            }
-        }
-
         if (property instanceof V8ValueString)
             try {
                 final String propertyString = ((V8ValueString) property).getValue();
@@ -179,6 +173,14 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
 
         if (key == null)
             return getV8Runtime().createV8ValueUndefined();
+        if (key.equals(FieldConstants.OBJECT_SAVE)){
+            return getV8Runtime().createV8ValueFunction(
+                    new JavetCallbackContext(
+                            IJavetProxyHandler.FUNCTION_NAME_TO_V8_VALUE,
+                            V8ValueSymbolType.BuiltIn,
+                            JavetCallbackType.DirectCallNoThisAndResult,
+                            (IJavetDirectCallable.NoThisAndNoResult<?>) this::save));
+        }
         if (FieldConstants.GUID.equalsIgnoreCase(key))
             return convertToV8Value(guid);
         if (FieldConstants.PROJECT_GUID.equalsIgnoreCase(key))
@@ -196,8 +198,8 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             key = clazzDef.getPvAttr();
         }
 
-        if(snapshot!=null){
-            Object t = snapshot.get(key);
+        synchronized (modified){
+            Object t = modified.get(key);
             if(t!=null)
                 return convertToV8Value(t);
         }
@@ -225,6 +227,40 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         return getV8Runtime().createV8ValueUndefined();
     }
 
+    private void save(V8Value... v8Values) {
+        synchronized (modified) {
+            if (modified != null && modified.size() > 0) {
+                for (Iterator<Map.Entry<String, Object>> iterator = modified.entrySet().iterator(); iterator.hasNext(); ) {
+                    Map.Entry<String, Object> kv = iterator.next();
+                    Object o = kv.getValue();
+                    String key = kv.getKey();
+                    RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
+                    if (o != null) {
+                        AttrWrapper attrWrapper = fieldObjectMap.get(key);
+                        if (Objects.nonNull(attrWrapper)) {
+                            Object lastValue = attrWrapper.getCurrentValue();
+                            attrWrapper.setLastValue(lastValue);
+                            V8EngineService engineService = SpringUtils.getBean(V8EngineService.class);
+                            if (StringUtil.isNotBlank(attrWrapper.getEval())) {
+                                log.info("attrWrapper.getEval() = {} ", attrWrapper.getEval());
+                                String script = "'" + lastValue + "'" + attrWrapper.getEval();
+                                log.info("eval script = " + script);
+                                Boolean evalResult = (Boolean) engineService.exec(script, null, taskContext, prjGuid, prjVer);
+                                if (Objects.nonNull(evalResult) && evalResult) {
+                                    attrWrapper.setLastEV(lastValue);
+                                }
+                            }
+                        }
+                        rtRedisObjectStorageService.setObjectAttrValue(taskContext, this.guid, key, o, !iterator.hasNext());
+                    } else {
+                        rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key, prjGuid, prjVer);
+                    }
+                }
+            }
+            modified.clear();
+        }
+    }
+
     @Override
     public V8ValueBoolean proxySet(V8Value target, V8Value property, V8Value value, V8Value receiver) throws JavetException {
         log.info("proxyobj :{} proxySet  property:{} value:{}", guid, property, value);
@@ -248,43 +284,12 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             int archiveStatus = attrWrapper.getArchiveStatus();
             System.out.println("archiveStatus = " + archiveStatus);
             if (archiveStatus==1) {
-                return getV8Runtime().createV8ValueBoolean(true);
+                return getV8Runtime().createV8ValueBoolean(false);
             }
         }
-
-
-        Object o = convertFromV8Value(value);
-        RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-        if (o != null) {
-            UnifiedObject object = rtRedisObjectStorageService.getObject(taskContext, guid,prjGuid,prjVer);
-            boolean dispatch = false;
-            if (object.getPersistTag()) {
-                String existField = key;
-                dispatch = fieldDefMap.values().stream().anyMatch(fieldDefCompositeDO -> fieldDefCompositeDO.getName().equals(existField));
-            }
-
-            if (Objects.nonNull(attrWrapper)) {
-                Object lastValue = attrWrapper.getCurrentValue();
-                attrWrapper.setLastValue(lastValue);
-                V8EngineService engineService = SpringUtils.getBean(V8EngineService.class);
-                if (StringUtil.isNotBlank(attrWrapper.getEval())) {
-                    log.info("attrWrapper.getEval() = {} " ,attrWrapper.getEval());
-                    String script = "'" + lastValue + "'" + attrWrapper.getEval();
-                    System.out.println("eval script = " + script);
-                    Boolean evalResult = (Boolean)engineService.exec(script, null, taskContext,prjGuid,prjVer);
-                    if (Objects.nonNull(evalResult) && evalResult) {
-                        attrWrapper.setLastEV(lastValue);
-                    }
-                }
-            }
-
-            rtRedisObjectStorageService.setObjectAttrValue(taskContext, this.guid, key, o, dispatch);
-        } else {
-            rtRedisObjectStorageService.delObjectAttr(taskContext, this.guid, key,prjGuid,prjVer);
-        }
-
-        if(snapshot!=null){
-            snapshot.remove(key);
+        Object actualValue = convertFromV8Value(value);
+        synchronized ( modified) {
+            modified.put(key, actualValue);
         }
         return getV8Runtime().createV8ValueBoolean(true);
     }
@@ -292,7 +297,9 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
     private V8Value convertToV8Value(Object value) throws JavetException {
         if (value == null)
             return getV8Runtime().createV8ValueNull();
-
+        if(value instanceof V8Value){
+            return (V8Value) value;
+        }
         if (value instanceof Integer) {
             return getV8Runtime().createV8ValueInteger((Integer) value);
         } else if (value instanceof Long) {
@@ -306,7 +313,9 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
     }
 
     private Object convertFromV8Value(V8Value value) throws JavetException {
-        if (value instanceof V8ValueString) {
+        if (value == null ||value instanceof V8ValueNull) {
+            return null;
+        } else if (value instanceof V8ValueString) {
             return ((V8ValueString) value).getValue();
         } else if (value instanceof V8ValueInteger) {
             return ((V8ValueInteger) value).getValue();
@@ -314,8 +323,6 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             return ((V8ValueBoolean) value).getValue();
         } else if (value instanceof V8ValueDouble) {
             return ((V8ValueDouble) value).getValue();
-        } else if (value instanceof V8ValueNull) {
-            return null;
         } else if (value instanceof V8ValueProxy) {
             V8Value tid = ((V8ValueProxy) value).get("guid");
             if (tid != null) {

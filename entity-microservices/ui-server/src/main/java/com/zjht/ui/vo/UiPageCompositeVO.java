@@ -11,5 +11,4 @@ import java.util.List;
 @ApiModel(value = "VO", description = "",parent = UiPage.class)
 public class UiPageCompositeVO extends UiPageVo{
   private List<UiComponentCompositeVO> pageIdUiComponentList;
-  private UiLayoutCompositeVO layoutIdUiLayoutComposite;
 }

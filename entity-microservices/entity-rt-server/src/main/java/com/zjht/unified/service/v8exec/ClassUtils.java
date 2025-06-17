@@ -59,7 +59,7 @@ public class ClassUtils {
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
-        bindMethodsToV8Object(target, classDef, v8Runtime);
+        bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), v8Runtime);
         parseConstructMethod(args, classDef, target);
         return target;
 
@@ -115,7 +115,7 @@ public class ClassUtils {
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, true);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8Value v8Value = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
-        bindMethodsToV8Object(v8Value, classDef, v8Runtime);
+        bindMethodsToV8Object(v8Value, classDef.getClazzIdMethodDefList(), v8Runtime);
         parseConstructMethod(args, classDef, v8Value);
         return v8Value;
     }
@@ -177,10 +177,10 @@ public class ClassUtils {
      * @param v8Runtime
      * @throws JavetException
      */
-    public static void bindMethodsToV8Object(V8Value v8Object, ClazzDefCompositeDO classDef, V8Runtime v8Runtime) throws JavetException {
+    public static void bindMethodsToV8Object(V8Value v8Object, List<MethodDefCompositeDO> methodDefList, V8Runtime v8Runtime) throws JavetException {
         if (v8Object instanceof V8ValueObject) {
             V8ValueObject value = (V8ValueObject) v8Object;
-            for (MethodDefCompositeDO methodDef : classDef.getClazzIdMethodDefList()) {
+            for (MethodDefCompositeDO methodDef : methodDefList) {
                 String methodName = methodDef.getName();
                 String methodBody = methodDef.getBody();
                 List<MethodParamDO> params = methodDef.getMethodIdMethodParamList();

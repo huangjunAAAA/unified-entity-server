@@ -22,4 +22,5 @@ public class FieldConstants {
     public static final String PROJECT_GUID="prjGuid";
     public static final String PROJECT_VER="prjVer";
     public static final String CLASS="cls";
+    public static final String OBJECT_SAVE="save";
 }

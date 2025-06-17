@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.zjht.ui.entity.UiLayout;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.unified.common.core.constants.Constants;
@@ -437,13 +438,14 @@ public class DeployService {
         Map<String, String> vueParts = ScriptUtils.parseVueFile(fFile.getContent());
 
         Map<String, String> layoutParts=null;
-        if(page.getLayoutIdUiLayoutComposite()!=null){
-            layoutParts=ScriptUtils.parseVueFile(page.getLayoutIdUiLayoutComposite().getTemplateData());
+        if(page.getLayoutId()!=null){
+            UiLayout layout = uiLayoutService.getById(page.getLayoutId());
+            layoutParts=ScriptUtils.parseVueFile(layout.getTemplateData());
         }
 
         // 加入template部分
         pf.append(vueParts.get("templateTag")).append("\n");
-        if(page.getLayoutIdUiLayoutComposite()!=null&&layoutParts!=null) {
+        if(page.getLayoutId()!=null&&layoutParts!=null) {
             pf.append(layoutParts.get("template")).append("\n");
         }
         pf.append(vueParts.get("template")).append("\n").append("</template>").append("\n");
@@ -475,7 +477,7 @@ public class DeployService {
         Map<String, String> tmpScripts = layoutParts;
         scripts.forEach((tag,script)->{
             StringBuilder completeScript=new StringBuilder();
-            if(page.getLayoutIdUiLayoutComposite()!=null){
+            if(page.getLayoutId()!=null){
                 completeScript.append(tmpScripts.get("script")).append("\n");
             }
             completeScript.append(script.toString());
@@ -519,7 +521,7 @@ public class DeployService {
 
         // 加入style部分
         pf.append(vueParts.get("styleTag")).append("\n");
-        if(page.getLayoutIdUiLayoutComposite()!=null&&layoutParts!=null) {
+        if(page.getLayoutId()!=null&&layoutParts!=null) {
             pf.append(layoutParts.get("style")).append("\n");
         }
         pf.append(vueParts.get("style")).append("\n").append("</style>");

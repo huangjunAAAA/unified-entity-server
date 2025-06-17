@@ -1,5 +1,7 @@
 package com.zjht.unified.service;
 
+import com.caoccao.javet.interop.converters.JavetProxyConverter;
+import com.caoccao.javet.values.V8Value;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -93,7 +95,13 @@ public class FrontObjectService {
 
 
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, param.isPersist());
-        ClassUtils.parseConstructMethod(proxyObject.getV8Runtime(), param.getArgs(), classDef, proxyObject);
+        try {
+            V8Value target = new JavetProxyConverter().toV8Value(proxyObject.getV8Runtime(), proxyObject);
+            ClassUtils.bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), proxyObject.getV8Runtime());
+            ClassUtils.parseConstructMethod(proxyObject.getV8Runtime(), param.getArgs(), classDef, proxyObject);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         UnifiedObject unified = new UnifiedObject(proxyObject.getGuid(), classDef.getGuid(), param.isPersist(), classDef.getPrjGuid(), classDef.getPrjVer(), taskContext.getVer());
         return getObject(taskContext, unified);
     }

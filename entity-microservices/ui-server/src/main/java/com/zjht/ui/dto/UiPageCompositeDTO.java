@@ -11,5 +11,4 @@ import lombok.Data;
 public class UiPageCompositeDTO extends UiPage {
   private Long originalId;
   private List<UiComponentCompositeDTO> pageIdUiComponentList;
-  private UiLayoutCompositeDTO layoutIdUiLayoutComposite;
 }
