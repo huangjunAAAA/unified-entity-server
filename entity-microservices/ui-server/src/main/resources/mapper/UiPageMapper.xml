@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.unified.mapper.UiPageMapper">
+<mapper namespace="com.zjht.ui.mapper.UiPageMapper">
     
 		<resultMap id="uiPageResultMap" type="com.zjht.ui.entity.UiPage">
         <result column="id" property="id"/>
@@ -19,5 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="rprj_id" property="rprjId"/>
         <result column="original_id" property="originalId"/>
         <result column="guid" property="guid"/>
+        <result column="canvas_data" property="canvasData"/>
+        <result column="root_com_id" property="rootComId"/>
     </resultMap>
 </mapper>

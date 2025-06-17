@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.unified.mapper.UiEventHandleMapper">
+<mapper namespace="com.zjht.ui.mapper.UiEventHandleMapper">
     
 		<resultMap id="uiEventHandleResultMap" type="com.zjht.ui.entity.UiEventHandle">
         <result column="id" property="id"/>
@@ -19,5 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_time" property="updateTime"/>
         <result column="update_user" property="updateUser"/>
         <result column="original_id" property="originalId"/>
+        <result column="event_method" property="eventMethod"/>
+        <result column="event_engine" property="eventEngine"/>
     </resultMap>
 </mapper>

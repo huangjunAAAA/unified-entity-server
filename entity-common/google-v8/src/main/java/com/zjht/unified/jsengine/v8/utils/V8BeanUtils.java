@@ -1,7 +1,9 @@
 package com.zjht.unified.jsengine.v8.utils;
 
+import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interop.V8Runtime;
+import com.caoccao.javet.interop.callback.JavetCallbackContext;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.reference.V8ValueArray;
 import com.caoccao.javet.values.reference.V8ValueObject;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,6 +108,14 @@ public class V8BeanUtils {
                 log.error(e.getMessage(), e);
             }
         }
+
+        for(Method method:getAllMethods(pojo.getClass())){
+            V8Function fn = method.getAnnotation(V8Function.class);
+            if(fn!=null){
+                JavetCallbackContext javetCallbackContext = new JavetCallbackContext(fn.name(), pojo, method);
+                v8Obj.bindFunction(javetCallbackContext);
+            }
+        }
         return v8Obj;
     }
 
@@ -181,6 +192,16 @@ public class V8BeanUtils {
             clazz = clazz.getSuperclass();
         }
         return fields;
+    }
+
+    // 辅助方法：获取类及其父类的所有字段
+    private static List<Method> getAllMethods(Class<?> clazz) {
+        List<Method> methods = new ArrayList<>();
+        while (clazz != null) {
+            Collections.addAll(methods, clazz.getMethods());
+            clazz = clazz.getSuperclass();
+        }
+        return methods;
     }
 
     // 判断基础类型

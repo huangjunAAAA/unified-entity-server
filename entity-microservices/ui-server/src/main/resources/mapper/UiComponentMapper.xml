@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjht.unified.mapper.UiComponentMapper">
+<mapper namespace="com.zjht.ui.mapper.UiComponentMapper">
     
 		<resultMap id="uiComponentResultMap" type="com.zjht.ui.entity.UiComponent">
         <result column="id" property="id"/>
@@ -33,5 +33,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="dynamic_container" property="dynamicContainer"/>
         <result column="dynamic_attached" property="dynamicAttached"/>
         <result column="render_data" property="renderData"/>
+        <result column="z_index" property="zIndex"/>
     </resultMap>
 </mapper>

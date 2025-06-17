@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "MethodParam对象", description = "")
 public class MethodParam extends BaseCopyEntity {
 
-	private static final long serialVersionUID = -8594321990879862613L;
+	private static final long serialVersionUID = 2919209194183838751L;
 
 
 
@@ -77,14 +77,6 @@ public class MethodParam extends BaseCopyEntity {
 	private Integer sort;
 
 	 /**
-	 * 参数说明
-	 */
-	@ApiModelProperty(value = "参数说明")
-	@Column(name = "description")
-	@TableField(value = "description")
-	private String description;
-
-	 /**
 	 * 方法ID
 	 */
 	@ApiModelProperty(value = "方法ID")
@@ -123,4 +115,12 @@ public class MethodParam extends BaseCopyEntity {
 	@Column(name = "method_guid")
 	@TableField(value = "method_guid")  
 	private String methodGuid;
+
+	 /**
+	 * 参数说明
+	 */
+	@ApiModelProperty(value = "参数说明")
+	@Column(name = "description")
+	@TableField(value = "description")  
+	private String description;
 }
