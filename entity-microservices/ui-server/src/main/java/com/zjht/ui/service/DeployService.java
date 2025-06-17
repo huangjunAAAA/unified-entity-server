@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.zjht.ui.entity.UiLayout;
 import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
+import com.zjht.ui.utils.PackageLockChecker;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.util.*;
@@ -307,9 +308,24 @@ public class DeployService {
     }
 
     public void initNodeModule(Long prjId){
+        Fileset packageJson=filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
+                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .eq(Fileset::getPath, "package.json"));
+        Fileset packageLockJson=filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
+                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
+                .eq(Fileset::getPath, "package-lock.json"));
+        if (packageJson != null && packageLockJson != null)
+            try {
+                List<String> mismatches = PackageLockChecker.checkDependenciesMatch(packageJson.getContent(), packageLockJson.getContent());
+                if (!mismatches.isEmpty()) {
+                    log.info("package.json and package-lock.json mismatches:{}", mismatches);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         synchronized (prjId.toString()) {
             WorkingEnv workingEnv = createWorkingDir(prjId);
-            log.info("init node_module for project:" + prjId + ", working dir:" + workingEnv.workdir);
+            log.info("init node_module for project:{}, working dir:{}", prjId, workingEnv.workdir);
             UiPrj prj = uiPrjService.getById(prjId);
             try {
                 String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
