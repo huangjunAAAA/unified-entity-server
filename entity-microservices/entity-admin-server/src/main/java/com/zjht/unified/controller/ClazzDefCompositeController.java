@@ -2,6 +2,7 @@ package com.zjht.unified.controller ;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
@@ -100,6 +101,12 @@ public class ClazzDefCompositeController extends BaseController{
     @PostMapping
     public R<Long> add(@RequestBody ClazzDefCompositeDTO clazzDef)
     {
+        if(StringUtils.isBlank(clazzDef.getName())){
+            return R.fail("类名不能为空");
+        }
+        if(StringUtils.isBlank(clazzDef.getNameZh())){
+            return R.fail("类中文名不能为空");
+        }
         // 检查name或name_zh是否重复
         List<ClazzDef> tmp = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>()
                 .eq(ClazzDef::getName, clazzDef.getName())
