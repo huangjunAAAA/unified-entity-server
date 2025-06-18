@@ -433,4 +433,7 @@ public class Constants {
     public static final String STATIC_TYPE_SENTINEL="static_sentinel";
     public static final String STATIC_TYPE_FSM="static_fsm";
     public static final String STATIC_NAME_GUID="name_guid";
+
+    public static final String CLASS_TYPE_SYSTEM="System";
+    public static final String CLASS_TYPE_USER="User";
 }

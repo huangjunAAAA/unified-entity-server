@@ -2,6 +2,7 @@ package com.zjht.unified.service;
 
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
+import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -82,14 +83,24 @@ public class FrontObjectService {
     public Map<String, Object> createObject(CreateObjectParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
         ClazzDefCompositeDO classDef=null;
-        if(StringUtils.isNotBlank(param.getPrjVer())&&StringUtils.isNotBlank(param.getClsGuid())){
-            classDef = objectStorageService.getClsDef(taskContext, param.getPrjVer(), param.getClsGuid());
-        }else{
-            if(param.getClsGuid()!=null)
-                classDef = entityDepService.getClsDefByGuid(taskContext,param.getClsGuid());
-            else if (param.getClsName() != null)
-                classDef = entityDepService.getClsByName(taskContext, param.getClsName());
+        String prjVer= param.getPrjVer();
+        if(prjVer==null){
+            prjVer=taskContext.getVer();
         }
+        if(StringUtils.isNotBlank(param.getClsGuid())){
+            classDef = CoreClazzDef.getCoreClassObject(param.getClsGuid());;
+            if (classDef != null) {
+                classDef = entityDepService.getClsDefByGuid(taskContext, param.getClsGuid());
+            }
+        }else{
+            String cguid = CoreClazzDef.getCoreClassGuid(param.getClsName());
+            if (cguid != null) {
+                classDef = CoreClazzDef.getCoreClassObject(cguid);
+            } else {
+                classDef = entityDepService.getClsByName(taskContext, param.getClsName());
+            }
+        }
+
         if(classDef==null)
             return null;
 

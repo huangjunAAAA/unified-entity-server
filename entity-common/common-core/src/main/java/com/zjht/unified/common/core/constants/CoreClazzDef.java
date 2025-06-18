@@ -79,6 +79,7 @@ public class CoreClazzDef {
         clazzDefCompositeDO.setModifer("public");
         clazzDefCompositeDO.setInheritRead(1);
         clazzDefCompositeDO.setInheritWrite(1);
+        clazzDefCompositeDO.setType("System");
 
         Field[] fields = cls.getDeclaredFields();
 

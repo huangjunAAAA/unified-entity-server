@@ -1,6 +1,8 @@
 package com.zjht.unified.service.v8exec;
 
 import com.wukong.bigdata.storage.gather.client.GatherClient;
+import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -37,10 +39,15 @@ public class V8RttiService {
 
 
     public ProxyObject createNewObject(ClazzDefCompositeDO classDef, TaskContext taskContext, Boolean isPersist){
-
-        PrjUniqueInfo prjInfo = entityDepService.getPrjInfoByGuid(taskContext, classDef.getGuid());
+        String prjGuid=taskContext.getPrjInfo().getPrjGuid();
+        String prjVer=taskContext.getPrjInfo().getPrjVer();
+        if(!classDef.getType().equals(Constants.CLASS_TYPE_SYSTEM)) {
+            PrjUniqueInfo prjInfo = entityDepService.getPrjInfoByGuid(taskContext, classDef.getGuid());
+            prjGuid=prjInfo.getPrjGuid();
+            prjVer=prjInfo.getPrjVer();
+        }
         String guid = UUID.randomUUID().toString();
-        ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid(),prjInfo.getPrjGuid(),prjInfo.getPrjVer());
+        ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid(),prjGuid,prjVer);
 
         //加载默认值
         List<FieldDefCompositeDO> clazzIdFieldDefList = classDef.getClazzIdFieldDefList();
@@ -49,14 +56,14 @@ public class V8RttiService {
         }
 
         if (isPersist) {
-            Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid,  prjInfo.getPrjGuid(),prjInfo.getPrjVer());
+            Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid,  prjGuid,prjVer);
             objectAttrValueMap.put("clazz_guid",classDef.getGuid());
             EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap,true);
             log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
         }
 
-        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(), isPersist,prjInfo.getPrjGuid(),prjInfo.getPrjVer(),taskContext.getVer()));
+        redisObjectStorageService.setObject(taskContext,new UnifiedObject(guid,classDef.getGuid(), isPersist,prjGuid,prjVer,taskContext.getVer()));
         return proxyObject;
     }
 

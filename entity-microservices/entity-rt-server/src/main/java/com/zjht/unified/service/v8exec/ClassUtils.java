@@ -42,8 +42,8 @@ public class ClassUtils {
         this.prjVer = prjVer;
     }
 
-    @V8Function(name = "new")
-    public V8Value newInstance(String className, V8Value... args) throws Exception {
+    @V8Function(name = "createEntity")
+    public V8Value newInstance(String className, Boolean isPersist,V8Value... args) throws Exception {
         log.info("new args = " + Arrays.toString(args));
         ClazzDefCompositeDO classDef = null;
         String cguid = CoreClazzDef.getCoreClassGuid(className);
@@ -56,13 +56,31 @@ public class ClassUtils {
             log.error("ClassName not found in newInstance:  {}", className);
             return null;
         }
-        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, false);
+        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, isPersist);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
         bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), v8Runtime);
         parseConstructMethod(args, classDef, target);
         return target;
+    }
 
+    @V8Function(name = "createEntityByGuid")
+    public V8Value newInstanceByGuid(String classGuid, Boolean isPersist,V8Value... args) throws Exception {
+        log.info("new args = " + Arrays.toString(args));
+        ClazzDefCompositeDO classDef = CoreClazzDef.getCoreClassObject(classGuid);;
+        if (classDef != null) {
+            classDef = entityDepService.getClsDefByGuid(taskContext, classGuid);
+        }
+        if (classDef == null) {
+            log.error("ClassName not found in newInstance:  {}", classGuid);
+            return null;
+        }
+        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, isPersist);
+        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
+        V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+        bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), v8Runtime);
+        parseConstructMethod(args, classDef, target);
+        return target;
     }
 
     private static void parseConstructMethod(V8Value[] args, ClazzDefCompositeDO classDef, V8Value target) throws JavetException {
@@ -95,29 +113,6 @@ public class ClassUtils {
         }catch (Exception e){
             log.error(e.getMessage(),e);
         }
-    }
-
-
-    @V8Function(name = "newPersist")
-    public V8Value newPersistInstance(String className, V8Value... args) throws Exception {
-        log.info("newPersist args = " + Arrays.toString(args));
-        ClazzDefCompositeDO classDef = null;
-        String cguid = CoreClazzDef.getCoreClassGuid(className);
-        if (cguid != null) {
-            classDef = CoreClazzDef.getCoreClassObject(cguid);
-        } else {
-            classDef = entityDepService.getClsByName(taskContext, className);
-        }
-        if (classDef == null) {
-            log.error("ClassName not found in newInstance:  {}", className);
-            return null;
-        }
-        ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, true);
-        V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
-        V8Value v8Value = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
-        bindMethodsToV8Object(v8Value, classDef.getClazzIdMethodDefList(), v8Runtime);
-        parseConstructMethod(args, classDef, v8Value);
-        return v8Value;
     }
 
 
@@ -170,12 +165,13 @@ public class ClassUtils {
         }
     }
 
-    /***
-     * 绑定js对象方法
-     * @param v8Object
-     * @param classDef
-     * @param v8Runtime
-     * @throws JavetException
+    /**
+     * 绑定方法到 V8 对象
+     *
+     * @param v8Object      V8 对象
+     * @param methodDefList 方法定义列表
+     * @param v8Runtime     V8 运行时
+     * @throws JavetException Javet 异常
      */
     public static void bindMethodsToV8Object(V8Value v8Object, List<MethodDefCompositeDO> methodDefList, V8Runtime v8Runtime) throws JavetException {
         if (v8Object instanceof V8ValueObject) {
