@@ -101,11 +101,15 @@ public class ClazzDefCompositeController extends BaseController{
     public R<Long> add(@RequestBody ClazzDefCompositeDTO clazzDef)
     {
         // 检查name或name_zh是否重复
-        List<ClazzDef> tmp = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>().eq(ClazzDef::getName, clazzDef.getName()));
+        List<ClazzDef> tmp = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>()
+                .eq(ClazzDef::getName, clazzDef.getName())
+                .eq(ClazzDef::getPrjId, clazzDef.getPrjId()));
         if(tmp.size()>0){
             return R.fail("类名已存在:"+clazzDef.getName());
         }
-        List<ClazzDef> tmp2 = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>().eq(ClazzDef::getNameZh, clazzDef.getNameZh()));
+        List<ClazzDef> tmp2 = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>()
+                .eq(ClazzDef::getNameZh, clazzDef.getNameZh())
+                .eq(ClazzDef::getPrjId, clazzDef.getPrjId()));
         if(tmp2.size()>0){
             return R.fail("类中文名已存在:"+clazzDef.getNameZh());
         }
