@@ -13,11 +13,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 @Slf4j
 public class MemUtils {
 
+    private String prjGuid;
+
+    private String prjVer;
+
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
 
-    public MemUtils(TaskContext taskContext) {
+    public MemUtils(TaskContext taskContext, String prjGuid, String prjVer) {
         this.taskContext = taskContext;
+        this.prjGuid = prjGuid;
+        this.prjVer = prjVer;
     }
 
     private TaskContext taskContext;

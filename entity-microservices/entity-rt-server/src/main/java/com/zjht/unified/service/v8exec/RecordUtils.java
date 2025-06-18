@@ -33,7 +33,7 @@ public class RecordUtils {
     private EntityDepService entityDepService;
 
 
-    public RecordUtils(String prjGuid, String prjVer, TaskContext taskContext) {
+    public RecordUtils(TaskContext taskContext,String prjGuid, String prjVer) {
         this.prjGuid = prjGuid;
         this.prjVer = prjVer;
         this.taskContext = taskContext;
