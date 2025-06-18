@@ -1,12 +1,17 @@
 package com.zjht.unified.controller;
 
 
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.PageDomain;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
+import com.zjht.unified.domain.simple.UiPrjDO;
 import com.zjht.unified.entity.MethodDef;
+import com.zjht.unified.entity.UePrj;
+import com.zjht.unified.feign.RemoteUIAdmin;
+import com.zjht.unified.service.IUePrjService;
 import com.zjht.unified.service.scheduling.RunService;
 import com.zjht.unified.vo.MethodDefVo;
 import io.swagger.annotations.Api;
@@ -15,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  *  控制器
@@ -28,6 +34,12 @@ public class PkgController {
 
     @Resource
     private RunService runService;
+
+    @Resource
+    private IUePrjService uePrjService;
+
+    @Resource
+    private RemoteUIAdmin uiAdmin;
 
     @ApiOperation(value = "运行特定统一实体项目")
     @PostMapping("/run")
@@ -43,5 +55,27 @@ public class PkgController {
     @PostMapping("/genPrjSpec")
     public R<PrjSpecDO> genPrjSpec(@RequestParam Long prjId) {
         return R.ok(runService.genPrjSpec(prjId));
+    }
+
+    @ApiOperation(value = "联系UE项目和UI项目")
+    @PostMapping("/link-prj")
+    public R linkPrjs(@RequestParam Long ueId,@RequestParam Long uiId){
+        UePrj uePrj = uePrjService.getById(ueId);
+        uePrj.setUiPrjId(uiId);
+
+
+        R<UiPrjDO> r = uiAdmin.getPrjInfo(uiId);
+        if(r.getData()!=null){
+            UiPrjDO uiPrj = r.getData();
+            uiPrj.setExternalId(ueId+"");
+            if(Objects.equals(uePrj.getTemplate()+"", Constants.YES)){
+                uiPrj.setExternalType("ue");
+            }else{
+                uiPrj.setExternalType("ue_template");
+            }
+            uiAdmin.editPrjInfo(uiPrj);
+            uePrjService.updateById(uePrj);
+        }
+        return R.ok();
     }
 }
