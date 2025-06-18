@@ -1,5 +1,6 @@
 package com.zjht.unified.service.v8exec;
 
+import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interception.logging.JavetStandardConsoleInterceptor;
 import com.caoccao.javet.interop.V8Runtime;
@@ -7,6 +8,7 @@ import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.interop.engine.IJavetEngine;
 import com.caoccao.javet.interop.engine.IJavetEnginePool;
 import com.caoccao.javet.interop.engine.JavetEnginePool;
+import com.caoccao.javet.values.reference.V8ValueFunction;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.wukong.core.util.ThreadLocalUtil;
 import com.zjht.unified.common.core.util.SpringUtils;
@@ -20,7 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.function.Supplier;
 
 
 @Slf4j
@@ -126,20 +131,62 @@ public class V8EngineService implements IScriptEngine {
         }
     }
 
-    private static void registerUtils(V8Runtime v8Runtime,TaskContext taskContext,String prjGuid,String prjVer) throws Exception{
-        ClassUtils classUtils = new ClassUtils(taskContext,prjGuid,prjVer);
-        AutowireCapableBeanFactory autowireCapableBeanFactory=SpringUtils.getApplicationContext().getAutowireCapableBeanFactory();
-        autowireCapableBeanFactory.autowireBean(classUtils);
-        try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
-            v8Runtime.getGlobalObject().set("ClassUtils", v8ValueObject);
-            v8ValueObject.bind(classUtils);
-        }
+    /**
+     * 注册所有需要暴露给 V8 JS 环境的工具类实例
+     */
+    private static void registerUtils(V8Runtime v8Runtime, TaskContext ctx, String prjGuid, String prjVer) {
+        AutowireCapableBeanFactory factory = SpringUtils.getApplicationContext().getAutowireCapableBeanFactory();
+        register(v8Runtime, factory, () -> new ClassUtils(ctx, prjGuid, prjVer));
+        register(v8Runtime, factory, () -> new InstanceUtils(ctx, prjGuid, prjVer));
+        register(v8Runtime, factory, () -> new LockUtils(ctx, prjGuid, prjVer));
+        register(v8Runtime, factory, () -> new MemUtils(ctx, prjGuid, prjVer));
+        register(v8Runtime, factory, () -> new RecordUtils(ctx, prjGuid, prjVer));
+    }
 
-        InstanceUtils instanceUtils=new InstanceUtils(taskContext,prjGuid,prjVer);
-        autowireCapableBeanFactory.autowireBean(instanceUtils);
+    /**
+     * 注册单个工具类到 V8 JS 环境
+     * @param v8Runtime JS 引擎运行时
+     * @param factory Spring 自动注入工厂
+     * @param supplier 工具类实例的构造函数
+     * @param <T> 工具类的类型
+     */
+    private static <T> void register(V8Runtime v8Runtime, AutowireCapableBeanFactory factory, Supplier<T> supplier) {
+        T instance = supplier.get();
+        factory.autowireBean(instance);
+        String bindName = instance.getClass().getSimpleName();
+        bind(v8Runtime, instance, bindName);
+    }
+
+
+    /**
+     * 将Util类对象绑定到 V8 全局作用域，并暴露所有 @V8Function 方法
+     *
+     * @param v8Runtime V8 引擎上下文
+     * @param target Java 对象
+     * @param globalAlias 全局变量名
+     */
+    public static void bind(V8Runtime v8Runtime, Object target, String globalAlias) {
         try (V8ValueObject v8ValueObject = v8Runtime.createV8ValueObject()) {
-            v8Runtime.getGlobalObject().set("InstanceUtils", v8ValueObject);
-            v8ValueObject.bind(instanceUtils);
+            // 绑定对象
+            v8Runtime.getGlobalObject().set(globalAlias, v8ValueObject);
+            v8ValueObject.bind(target);
+
+            // 扫描 @V8Function 方法，绑定到 global
+            for (Method method : target.getClass().getDeclaredMethods()) {
+                V8Function annotation = method.getAnnotation(V8Function.class);
+                if (annotation != null) {
+                    String jsFnName = annotation.name();
+                    V8ValueFunction jsFn = v8ValueObject.get(jsFnName);
+                    if (jsFn != null) {
+                        v8Runtime.getGlobalObject().set(jsFnName, jsFn);
+                        log.info("绑定 JS 全局函数 [{}] -> {}.{}", jsFnName, target.getClass().getSimpleName(), method.getName());
+                    }
+                }
+            }
+
+        } catch (JavetException e) {
+            log.error("绑定 {} 到 V8 全局作用域失败：{}", target.getClass().getSimpleName(), e.getMessage(), e);
+            throw new RuntimeException("V8 global method binding failed", e);
         }
     }
 
