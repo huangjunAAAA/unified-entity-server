@@ -1,5 +1,6 @@
 package com.zjht.unified.controller ;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -99,6 +100,15 @@ public class ClazzDefCompositeController extends BaseController{
     @PostMapping
     public R<Long> add(@RequestBody ClazzDefCompositeDTO clazzDef)
     {
+        // 检查name或name_zh是否重复
+        List<ClazzDef> tmp = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>().eq(ClazzDef::getName, clazzDef.getName()));
+        if(tmp.size()>0){
+            return R.fail("类名已存在:"+clazzDef.getName());
+        }
+        List<ClazzDef> tmp2 = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>().eq(ClazzDef::getNameZh, clazzDef.getNameZh()));
+        if(tmp2.size()>0){
+            return R.fail("类中文名已存在:"+clazzDef.getNameZh());
+        }
         clazzDef.setId(null);
         clazzDef.setCreateTime(DateUtil.now());
         Long id = clazzDefCompositeService.submit(clazzDef);
