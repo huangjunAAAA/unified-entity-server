@@ -4,9 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wukong.core.weblog.utils.BeanUtil;
 import com.wukong.core.weblog.utils.DateUtil;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.ui.dto.CreateUiPrjDTO;
 import com.zjht.ui.dto.UiPrjListDTO;
+import com.zjht.ui.entity.Fileset;
+import com.zjht.ui.service.IFilesetService;
 import com.zjht.ui.vo.UiPrjVo;
 import com.zjht.ui.wrapper.UiPrjWrapper;
 import com.zjht.ui.entity.UiPrj;
@@ -22,6 +26,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +47,8 @@ public class UiPrjController extends BaseController {
 	private static final Logger logger = LoggerFactory.getLogger(UiPrjController.class);
 	@Autowired
     private IUiPrjService uiPrjService;
+    @Autowired
+    private IFilesetService filesetService;
 	
 	/**
      * 查询UI项目表列表, 对象形式
@@ -95,6 +102,35 @@ public class UiPrjController extends BaseController {
         R r = b ? R.ok(uiPrj.getId()) : R.fail();
         return r;
     }
+
+    /**
+     * 新增UI项目表
+     */
+    @ApiOperation(value = "新增UI项目表")
+    @PostMapping("/create")
+    public R<Long> create(@RequestBody CreateUiPrjDTO uiPrj)
+    {
+        uiPrj.setCreateTime(DateUtil.now());
+        boolean b = uiPrjService.save(uiPrj);
+        if(!b){
+            return R.fail();
+        }
+        if(uiPrj.getBaseOn() != null) {
+            UiPrj baseOnPrj = uiPrjService.getById(uiPrj.getBaseOn());
+            BeanUtil.copyNonNull(uiPrj, baseOnPrj);
+            uiPrjService.updateById(baseOnPrj);
+            List<Fileset> files = filesetService.list(new LambdaQueryWrapper<Fileset>()
+                    .eq(Fileset::getBelongtoId, uiPrj.getBaseOn())
+                    .ne(Fileset::getBelongtoType, Constants.FILE_TYPE_PAGE));
+            files.forEach(f -> {
+                f.setId(null);
+                f.setBelongtoId(uiPrj.getId());
+                filesetService.save(f);
+            });
+        }
+        return R.ok(uiPrj.getId());
+    }
+
 
     /**
      * 修改UI项目表
