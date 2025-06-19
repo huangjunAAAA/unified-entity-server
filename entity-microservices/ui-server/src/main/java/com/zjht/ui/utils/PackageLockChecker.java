@@ -59,8 +59,8 @@ public class PackageLockChecker {
 
             if (actualVersion == null) {
                 mismatches.add(module + ": 在 package-lock.json 中缺失");
-            } else if (!expectedVersion.equals(actualVersion)) {
-                mismatches.add(module + ": 版本不一致 (期望: " + expectedVersion + ", 实际: " + actualVersion + ")");
+            } else if (!isVersionCompatible(expectedVersion, actualVersion)) {
+                mismatches.add(module + ": 兼容性不一致 (期望: " + expectedVersion + ", 实际: " + actualVersion + ")");
             }
         }
 
@@ -79,5 +79,56 @@ public class PackageLockChecker {
             });
         }
     }
+
+    /**
+     * 比较版本号是否符合要求
+     * @param version1 基准版本号（如 "1.2.3"）
+     * @param version2 待比较版本号（如 "a.b.c"）
+     * @return 如果 version2 符合 version1 的要求返回 true，否则返回 false
+     */
+    public static boolean isVersionCompatible(String version1, String version2) {
+        // 规则：第二个版本号为空直接返回 false
+        if (version2 == null || version2.isEmpty()) {
+            return false;
+        }
+        if(version1.startsWith("^")){
+            version1=version1.substring(1);
+        }
+
+        // 分割版本号
+        String[] v1Parts = version1.split("\\.");
+        String[] v2Parts = version2.split("\\.");
+        int minLength = Math.min(v1Parts.length, v2Parts.length);
+
+        // 逐段比较
+        for (int i = 0; i < minLength; i++) {
+            String seg1 = v1Parts[i];
+            String seg2 = v2Parts[i];
+
+            // 规则：双方都是数字时比较数值
+            if (seg1.matches("\\d+") && seg2.matches("\\d+")) {
+                int num1 = Integer.parseInt(seg1);
+                int num2 = Integer.parseInt(seg2);
+                if (num2 < num1) {
+                    return false; // 数字部分小于基准
+                }
+                // 数字部分大于等于时继续比较下一段
+            }
+            // 规则：包含字母时按字符串比较
+            else if (!seg1.matches("\\d+") && !seg2.matches("\\d+")) {
+                if (seg2.compareTo(seg1) < 0) {
+                    return false; // 字符串字典序小于基准
+                }
+            }
+            // 规则：数字和字母混合比较不符合
+            else {
+                return false;
+            }
+        }
+
+        // 规则：version2 缺省后续部分时，沿用已比较结果
+        return true;
+    }
+
 
 }

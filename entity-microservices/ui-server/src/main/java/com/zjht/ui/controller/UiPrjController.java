@@ -1,10 +1,12 @@
 package com.zjht.ui.controller ;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.ui.dto.UiPrjListDTO;
 import com.zjht.ui.vo.UiPrjVo;
 import com.zjht.ui.wrapper.UiPrjWrapper;
 import com.zjht.ui.entity.UiPrj;
@@ -15,6 +17,7 @@ import com.zjht.unified.common.core.domain.PageDomain;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
+import com.zjht.unified.common.core.domain.dto.ConditionLikeAndIn;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  *  控制器
@@ -126,6 +130,140 @@ public class UiPrjController extends BaseController {
     public List<UiPrj> dict(@RequestBody List<Long> ids) {
 		List<UiPrj> data = uiPrjService.listByIds(ids);
         return data;
-	}
-	
+    }
+
+    /**
+     * 查询UI项目表列表，接受like和in条件
+     */
+    @ApiOperation(value = "查询UI项目表列表，接受like和in条件")
+    @GetMapping("/list-like-in")
+    public TableDataInfo<UiPrjVo> listExt2(@RequestBody BaseQueryDTO<ConditionLikeAndIn<UiPrj, UiPrjListDTO>> baseQueryDTO) {
+        // 获取参数
+        ConditionLikeAndIn<UiPrj, UiPrjListDTO> condition = baseQueryDTO.getCondition();
+        UiPrj equalsCondition = condition.getEquals();
+        UiPrj likeCondition = condition.getLike();
+        UiPrjListDTO inCondition = condition.getInCondition();
+
+        // 初始化分页信息
+        Page<UiPrj> page = new Page<>(baseQueryDTO.getPage(), baseQueryDTO.getSize());
+
+        // 构建查询条件
+        LambdaQueryWrapper<UiPrj> queryWrapper = Wrappers.<UiPrj>lambdaQuery();
+
+        // 处理 equals 条件：精确匹配
+        if (equalsCondition != null) {
+            if (equalsCondition.getId() != null) {
+                queryWrapper.eq(UiPrj::getId, equalsCondition.getId());
+            }
+            if (equalsCondition.getName() != null) {
+                queryWrapper.eq(UiPrj::getName, equalsCondition.getName());
+            }
+            if (equalsCondition.getGitId() != null) {
+                queryWrapper.eq(UiPrj::getGitId, equalsCondition.getGitId());
+            }
+            if (equalsCondition.getWorkDir() != null) {
+                queryWrapper.eq(UiPrj::getWorkDir, equalsCondition.getWorkDir());
+            }
+            if (equalsCondition.getNodejsVer() != null) {
+                queryWrapper.eq(UiPrj::getNodejsVer, equalsCondition.getNodejsVer());
+            }
+            if (equalsCondition.getComponentLibVer() != null) {
+                queryWrapper.eq(UiPrj::getComponentLibVer, equalsCondition.getComponentLibVer());
+            }
+            if (equalsCondition.getStorageType() != null) {
+                queryWrapper.eq(UiPrj::getStorageType, equalsCondition.getStorageType());
+            }
+            if (equalsCondition.getVersion() != null) {
+                queryWrapper.eq(UiPrj::getVersion, equalsCondition.getVersion());
+            }
+            if (equalsCondition.getOriginalId() != null) {
+                queryWrapper.eq(UiPrj::getOriginalId, equalsCondition.getOriginalId());
+            }
+            if (equalsCondition.getExternalType() != null) {
+                queryWrapper.eq(UiPrj::getExternalType, equalsCondition.getExternalType());
+            }
+            if (equalsCondition.getExternalId() != null) {
+                queryWrapper.eq(UiPrj::getExternalId, equalsCondition.getExternalId());
+            }
+        }
+
+        // 处理 like 条件：模糊匹配
+        if (likeCondition != null) {
+            if (likeCondition.getName() != null) {
+                queryWrapper.like(UiPrj::getName, likeCondition.getName());
+            }
+            if (likeCondition.getWorkDir() != null) {
+                queryWrapper.like(UiPrj::getWorkDir, likeCondition.getWorkDir());
+            }
+            if (likeCondition.getNodejsVer() != null) {
+                queryWrapper.like(UiPrj::getNodejsVer, likeCondition.getNodejsVer());
+            }
+            if (likeCondition.getComponentLibVer() != null) {
+                queryWrapper.like(UiPrj::getComponentLibVer, likeCondition.getComponentLibVer());
+            }
+            if (likeCondition.getStorageType() != null) {
+                queryWrapper.like(UiPrj::getStorageType, likeCondition.getStorageType());
+            }
+            if (likeCondition.getVersion() != null) {
+                queryWrapper.like(UiPrj::getVersion, likeCondition.getVersion());
+            }
+            if (likeCondition.getExternalType() != null) {
+                queryWrapper.like(UiPrj::getExternalType, likeCondition.getExternalType());
+            }
+            if (likeCondition.getExternalId() != null) {
+                queryWrapper.like(UiPrj::getExternalId, likeCondition.getExternalId());
+            }
+        }
+
+        // 处理 inCondition 条件：IN 查询
+        if (inCondition != null) {
+            if (inCondition.getId() != null && !inCondition.getId().isEmpty()) {
+                queryWrapper.in(UiPrj::getId, inCondition.getId());
+            }
+            if (inCondition.getName() != null && !inCondition.getName().isEmpty()) {
+                queryWrapper.in(UiPrj::getName, inCondition.getName());
+            }
+            if (inCondition.getWorkDir() != null && !inCondition.getWorkDir().isEmpty()) {
+                queryWrapper.in(UiPrj::getWorkDir, inCondition.getWorkDir());
+            }
+            if (inCondition.getNodejsVer() != null && !inCondition.getNodejsVer().isEmpty()) {
+                queryWrapper.in(UiPrj::getNodejsVer, inCondition.getNodejsVer());
+            }
+            if (inCondition.getComponentLibVer() != null && !inCondition.getComponentLibVer().isEmpty()) {
+                queryWrapper.in(UiPrj::getComponentLibVer, inCondition.getComponentLibVer());
+            }
+            if (inCondition.getStorageType() != null && !inCondition.getStorageType().isEmpty()) {
+                queryWrapper.in(UiPrj::getStorageType, inCondition.getStorageType());
+            }
+            if (inCondition.getVersion() != null && !inCondition.getVersion().isEmpty()) {
+                queryWrapper.in(UiPrj::getVersion, inCondition.getVersion());
+            }
+            if (inCondition.getOriginalId() != null && !inCondition.getOriginalId().isEmpty()) {
+                queryWrapper.in(UiPrj::getOriginalId, inCondition.getOriginalId());
+            }
+            if (inCondition.getExternalType() != null && !inCondition.getExternalType().isEmpty()) {
+                queryWrapper.in(UiPrj::getExternalType, inCondition.getExternalType());
+            }
+            if (inCondition.getExternalId() != null && !inCondition.getExternalId().isEmpty()) {
+                queryWrapper.in(UiPrj::getExternalId, inCondition.getExternalId());
+            }
+        }
+
+        // 执行查询
+        IPage<UiPrj> uiPrjIPage = uiPrjService.page(page, queryWrapper);
+
+        // 转换为 VO
+        List<UiPrjVo> rows = uiPrjIPage.getRecords().stream()
+                .map(t -> UiPrjWrapper.build().entityVO(t))
+                .collect(Collectors.toList());
+
+        // 封装返回结果
+        TableDataInfo<UiPrjVo> dataInfo = new TableDataInfo<>();
+        dataInfo.setCode(Constants.SUCCESS);
+        dataInfo.setData(rows);
+        dataInfo.setMsg("查询成功");
+        dataInfo.setTotal(uiPrjIPage.getTotal());
+
+        return dataInfo;
+    }
 }

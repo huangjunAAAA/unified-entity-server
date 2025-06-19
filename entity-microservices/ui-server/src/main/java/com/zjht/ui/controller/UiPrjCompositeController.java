@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.ui.entity.Fileset;
 import com.zjht.ui.entity.UiPrj;
+import com.zjht.ui.service.IFilesetService;
 import com.zjht.ui.service.IUiPrjService;
 
 import com.zjht.ui.vo.UiPrjCompositeVO;
@@ -44,6 +46,8 @@ public class UiPrjCompositeController extends BaseController {
     private IUiPrjService uiPrjService;
     @Autowired
     private IUiPrjCompositeService uiPrjCompositeService;
+    @Autowired
+    private IFilesetService filesetService;
 
     /**
      * 查询项目与组件统一模型(uiPrj)列表, 对象形式
@@ -123,6 +127,8 @@ public class UiPrjCompositeController extends BaseController {
     public R<Long> remove(@PathVariable Long id)
     {
         uiPrjCompositeService.removeById(id);
+        filesetService.remove(Wrappers.<Fileset>lambdaQuery().eq(Fileset::getBelongtoId,id)
+                .ne(Fileset::getBelongtoType,Constants.FILE_TYPE_PAGE));
         return R.ok(id);
     }
 
