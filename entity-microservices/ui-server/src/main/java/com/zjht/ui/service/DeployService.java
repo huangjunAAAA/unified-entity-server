@@ -181,7 +181,8 @@ public class DeployService {
             compilePages(prjId);
             renderRoute(prjId);
             inflate(prjId);
-            initNodeModule(prjId);
+            boolean requireRestart = initNodeModule(prjId);
+
             UiPrj prj = uiPrjService.getById(prjId);
             String nodejs = "nvm use " + prj.getNodejsVer() + "\n";
             SynchronousQueue<String> runningPort = new SynchronousQueue<>();
@@ -189,7 +190,7 @@ public class DeployService {
             StringBuilder errInfo = new StringBuilder();
             WorkingEnv wr = createWorkingDir(prjId);
             boolean isValid = false;
-            if(restart!=null && restart){
+            if(requireRestart||(restart!=null && restart)){
                 shutdownWorkingEnv(wr);
             }else{
                 isValid = isWorkingEnvValid(wr);
@@ -307,24 +308,25 @@ public class DeployService {
         }
     }
 
-    public void initNodeModule(Long prjId){
+    public boolean initNodeModule(Long prjId){
         Fileset packageJson=filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
                 .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
                 .eq(Fileset::getPath, "package.json"));
-        Fileset packageLockJson=filesetService.getOne(new LambdaQueryWrapper<Fileset>().eq(Fileset::getBelongtoId, prjId)
-                .eq(Fileset::getBelongtoType, Constants.FILE_TYPE_PROJECT_EXTRA)
-                .eq(Fileset::getPath, "package-lock.json"));
-        if (packageJson != null && packageLockJson != null)
+        WorkingEnv workingEnv = createWorkingDir(prjId);
+        String pkgjson=new File(workingEnv.workdir).getAbsolutePath()+File.separator+FileSetUtils.translatePath("package-lock.json");
+        if (packageJson != null && new File(pkgjson).exists())
             try {
-                List<String> mismatches = PackageLockChecker.checkDependenciesMatch(packageJson.getContent(), packageLockJson.getContent());
+                String actualContent=FileUtil.readString(pkgjson, "utf-8");
+                List<String> mismatches = PackageLockChecker.checkDependenciesMatch(packageJson.getContent(), actualContent);
                 if (!mismatches.isEmpty()) {
                     log.info("package.json and package-lock.json mismatches:{}", mismatches);
+                }else{
+                    return false;
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         synchronized (prjId.toString()) {
-            WorkingEnv workingEnv = createWorkingDir(prjId);
             log.info("init node_module for project:{}, working dir:{}", prjId, workingEnv.workdir);
             UiPrj prj = uiPrjService.getById(prjId);
             try {
@@ -337,6 +339,7 @@ public class DeployService {
                 log.error(e.getMessage(), e);
             }
         }
+        return true;
     }
 
     /**

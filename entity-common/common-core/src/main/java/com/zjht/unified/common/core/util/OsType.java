@@ -27,7 +27,7 @@ public class OsType {
         try {
             String[] run = null;
             if (isWindows()) {
-                run = new String[]{"cmd", "/c", cmd};
+                run = new String[]{"powershell", "-command", cmd};
             } else {
                 run = new String[]{"/bin/bash", "-c", ". ~/.nvm/nvm.sh\n"+cmd};
             }

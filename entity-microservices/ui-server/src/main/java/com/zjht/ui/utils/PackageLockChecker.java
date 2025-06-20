@@ -41,11 +41,9 @@ public class PackageLockChecker {
 
                 if (key.startsWith("node_modules/")) {
                     String moduleName = key.replace("node_modules/", "");
-                    if (!moduleName.contains("/")) { // 只处理一级依赖
-                        JsonNode versionNode = value.get("version");
-                        if (versionNode != null && versionNode.isTextual()) {
-                            lockDependencies.put(moduleName, versionNode.asText());
-                        }
+                    JsonNode versionNode = value.get("version");
+                    if (versionNode != null && versionNode.isTextual()) {
+                        lockDependencies.put(moduleName, versionNode.asText());
                     }
                 }
             });
@@ -91,7 +89,7 @@ public class PackageLockChecker {
         if (version2 == null || version2.isEmpty()) {
             return false;
         }
-        if(version1.startsWith("^")){
+        if(version1.startsWith("^")||version1.startsWith("~")){
             version1=version1.substring(1);
         }
 
