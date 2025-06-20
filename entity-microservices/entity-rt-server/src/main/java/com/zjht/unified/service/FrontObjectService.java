@@ -12,6 +12,7 @@ import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.dto.CreateObjectParam;
 import com.zjht.unified.dto.GetParam;
 import com.zjht.unified.dto.MethodInvokeParam;
+import com.zjht.unified.dto.SetParam;
 import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -22,7 +23,6 @@ import com.zjht.unified.service.v8exec.model.ClsDf;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -70,27 +70,22 @@ public class FrontObjectService {
 
     public Map<String, Object> getObject(GetParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
-        UnifiedObject obj=null;
-        if(param.getPrjGuid()!=null){
-            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
-        }else{
-            obj = entityDepService.getObject(taskContext,param.getObjGuid());
-        }
+        UnifiedObject obj=entityDepService.getObject(taskContext,param.getObjGuid());
         Map<String, Object> pureObj = getObject(taskContext, obj);
         return pureObj;
     }
 
     public void delObject(GetParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
-        UnifiedObject obj=null;
-        if(param.getPrjGuid()!=null){
-            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
-        }else{
-            obj = entityDepService.getObject(taskContext,param.getObjGuid());
-        }
+        UnifiedObject obj=entityDepService.getObject(taskContext,param.getObjGuid());
         if(obj!=null)
             objectStorageService.deleteObject(taskContext, obj.getGuid(), obj.getPrjGuid(), obj.getPrjVer());
+    }
 
+    public void setObject(SetParam  param){
+        TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
+        ProxyObject proxyObject = v8RttiService.getObject(taskContext, param.getObjGuid());
+        proxyObject.mergeFields(param.getValue());
     }
 
     public Map<String, Object> createObject(CreateObjectParam param) {
@@ -132,14 +127,9 @@ public class FrontObjectService {
 
     public Object getObjectValue(GetParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
-        UnifiedObject obj=null;
-        if(param.getPrjGuid()!=null){
-            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
-        }else{
-            obj = entityDepService.getObject(taskContext,param.getObjGuid());
-        }
+        UnifiedObject obj=entityDepService.getObject(taskContext,param.getObjGuid());;
         RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-        ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, param.getPrjVer(), obj.getClazzGUID());
+        ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, obj.getPrjVer(), obj.getClazzGUID());
         String field = clazzDef.getPvAttr();
         Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field, obj.getPrjGuid(), obj.getPrjVer());
         if (val != null && val instanceof UnifiedObject) {

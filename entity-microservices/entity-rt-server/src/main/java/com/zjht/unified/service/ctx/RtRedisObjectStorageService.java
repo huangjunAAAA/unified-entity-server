@@ -58,7 +58,11 @@ public class RtRedisObjectStorageService {
 
         if (dispatch) {
             HashMap<String, Object> kvMap = Maps.newHashMap();
-            kvMap.put(attrName,val);
+            if(val instanceof UnifiedObject){
+                kvMap.put(attrName,((UnifiedObject) val).getGuid());
+            }else{
+                kvMap.put(attrName,val);
+            }
             kvMap.put("guid", guid);
             EntityDepService entityDepService=SpringUtils.getBean(EntityDepService.class);
             UnifiedObject object = entityDepService.getObject(ctx, guid);

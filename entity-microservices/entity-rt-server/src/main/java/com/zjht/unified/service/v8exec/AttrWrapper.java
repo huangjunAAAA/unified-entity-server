@@ -33,36 +33,15 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
     private String propertyKey;
     private String prjGuid;
     private String prjVer;
+    private Object currentValue;
 
 
     @Override
     public V8Value symbolToPrimitive(V8Value... v8Values) throws JavetException, Exception {
         log.info("AttrWrapper symbolToPrimitive callback  and source attr is:{} ", propertyKey);
         Object objectAttrValue = getCurrentValue();
-        return convertToV8Value(objectAttrValue);
+        return ProxyObject.convertToV8Value(objectAttrValue, getV8Runtime(), taskContext);
 
-    }
-
-    public Object getCurrentValue() {
-        RtRedisObjectStorageService rtRedisObjectStorageService = SpringUtils.getBean(RtRedisObjectStorageService.class);
-        return rtRedisObjectStorageService.getObjectAttrValue(taskContext, objGUID, propertyKey,prjGuid,prjVer);
-    }
-
-
-    private V8Value convertToV8Value(Object value) throws JavetException {
-        if (value == null)
-            return getV8Runtime().createV8ValueNull();
-
-        if (value instanceof Integer) {
-            return getV8Runtime().createV8ValueInteger((Integer) value);
-        } else if (value instanceof Long) {
-            return getV8Runtime().createV8ValueLong((Long) value);
-        } else if (value instanceof Double) {
-            return getV8Runtime().createV8ValueDouble((Double) value);
-        } else if (value instanceof Boolean) {
-            return getV8Runtime().createV8ValueBoolean((Boolean) value);
-        }
-        return getV8Runtime().createV8ValueString(value.toString());
     }
 
     @Override
@@ -75,7 +54,7 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
             Field field = this.getClass().getDeclaredField(property.toString());
             field.setAccessible(true);
             Object value = field.get(this);
-            return convertToV8Value(value);
+            return ProxyObject.convertToV8Value(value, getV8Runtime(), taskContext);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             return IJavetDirectProxyHandler.super.proxyGet(target, property, receiver);
         }

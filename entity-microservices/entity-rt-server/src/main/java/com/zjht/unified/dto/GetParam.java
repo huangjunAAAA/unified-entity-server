@@ -6,6 +6,4 @@ import lombok.Data;
 public class GetParam {
     private String ver;
     private String objGuid;
-    private String prjGuid;
-    private String prjVer;
 }

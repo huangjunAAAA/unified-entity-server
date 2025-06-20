@@ -9,10 +9,7 @@ import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
-import com.zjht.unified.dto.CreateObjectParam;
-import com.zjht.unified.dto.GetParam;
-import com.zjht.unified.dto.Increment;
-import com.zjht.unified.dto.MethodInvokeParam;
+import com.zjht.unified.dto.*;
 import com.zjht.unified.service.FrontObjectService;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
@@ -176,6 +173,17 @@ public class ExecController {
             return R.fail("task not found:"+param.getVer());
         }
         frontObjectService.delObject(param);
+        return R.ok();
+    }
+
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/save-object")
+    public R<Object> saveObject(@RequestBody SetParam param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        frontObjectService.setObject(param);
         return R.ok();
     }
 

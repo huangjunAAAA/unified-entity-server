@@ -6,6 +6,7 @@ public class FieldConstants {
     public static final String SYSTEM_ID="sys_id";
     public static final String PROJECT_ID="prj_id";
     public static final String GUID="guid";
+    public static final String ID="id";
     public static final String CLAZZ_GUID="clazz_guid";
     public static final String DRIVER_ID="driver_id";
     public static final String DATATIME="data_time";
@@ -23,4 +24,13 @@ public class FieldConstants {
     public static final String PROJECT_VER="prjVer";
     public static final String CLASS="cls";
     public static final String OBJECT_SAVE="save";
+
+    // 0 任意类型 1 基础类型 2 普通类 3 结构 4 脚本 5 树节点 6 类关系
+    public static final String FIELD_TYPE_REGULAR_CLASS="2";
+    public static final String FIELD_TYPE_PRIMITIVE="1";
+    public static final String FIELD_TYPE_SCRIPT="4";
+    public static final String FIELD_TYPE_ANY="0";
+    public static final String FIELD_TYPE_STRUCT="3";
+    public static final String FIELD_TYPE_TREENODE="5";
+    public static final String FIELD_TYPE_CLS_REL="6";
 }
