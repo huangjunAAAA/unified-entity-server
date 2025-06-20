@@ -168,6 +168,17 @@ public class ExecController {
         return R.ok(ret);
     }
 
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/delete-object")
+    public R<Object> delObject(@RequestBody GetParam param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        frontObjectService.delObject(param);
+        return R.ok();
+    }
+
     @ApiOperation(value = "在指定运行环境创建对象")
     @PostMapping("/create-object")
     public R<Object> createObject(@RequestBody CreateObjectParam param){

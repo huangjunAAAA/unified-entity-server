@@ -80,6 +80,19 @@ public class FrontObjectService {
         return pureObj;
     }
 
+    public void delObject(GetParam param) {
+        TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
+        UnifiedObject obj=null;
+        if(param.getPrjGuid()!=null){
+            obj = objectStorageService.getObject(taskContext, param.getObjGuid(), param.getPrjGuid(), param.getPrjVer());
+        }else{
+            obj = entityDepService.getObject(taskContext,param.getObjGuid());
+        }
+        if(obj!=null)
+            objectStorageService.deleteObject(taskContext, obj.getGuid(), obj.getPrjGuid(), obj.getPrjVer());
+
+    }
+
     public Map<String, Object> createObject(CreateObjectParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
         ClazzDefCompositeDO classDef=null;
