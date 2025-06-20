@@ -52,6 +52,9 @@ public class DeployController {
             response.setContentType("application/zip");
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=files." + prjId + ".zip");
 
+            // 重新编译页面
+            deployService.compilePages(prjId);
+            deployService.renderRoute(prjId);
             // 调用服务层压缩并输出到响应流
             deployService.compressProject(prjId, response.getOutputStream());
         } catch (IOException e) {
