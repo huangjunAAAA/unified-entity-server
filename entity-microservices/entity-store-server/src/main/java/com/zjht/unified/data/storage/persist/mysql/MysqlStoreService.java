@@ -1,12 +1,15 @@
 package com.zjht.unified.data.storage.persist.mysql;
 
 import cn.hutool.core.util.StrUtil;
+import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 
+import com.zjht.unified.common.core.util.AliDruidUtils;
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
 
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import lombok.extern.slf4j.Slf4j;
@@ -64,11 +67,6 @@ public class MysqlStoreService extends AbstractStoreService {
     @PostConstruct
     protected void initDDL(){
         this.ddlService=mysqlDDLService;
-    }
-
-    @Override
-    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
-        return Collections.emptyList();
     }
 
     @Override

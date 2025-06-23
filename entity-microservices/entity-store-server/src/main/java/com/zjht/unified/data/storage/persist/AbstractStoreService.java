@@ -2,11 +2,15 @@ package com.zjht.unified.data.storage.persist;
 
 
 
+import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
+import com.zjht.unified.common.core.util.AliDruidUtils;
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
+import com.zjht.unified.common.core.util.StringUtils;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -14,6 +18,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import javax.annotation.Resource;
 import java.sql.SQLSyntaxErrorException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class AbstractStoreService implements IObjectEntityStore {
@@ -107,6 +112,21 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
         }
     }
 
+    @Override
+    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
+        List<String> cols = clazzDef.getClazzIdFieldDefList().stream().map(f -> StringUtils.toUnderScoreCase(f.getName())).collect(Collectors.toList());
 
+        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(clazzDef.getTbl(), cols, null);
+        AliDruidUtils.setOrderByAndLimit(sQuery,page,size,orderby,asc);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sQuery.toString());
+        return list;
+    }
 
+    @Override
+    public void deleteEntity(String table, String guid, Long id) {
+        if(id!=null)
+            jdbcTemplate.update("delete from "+table+" where id=?",id);
+        else if(guid!=null)
+            jdbcTemplate.update("delete from "+table+" where guid=?",guid);
+    }
 }

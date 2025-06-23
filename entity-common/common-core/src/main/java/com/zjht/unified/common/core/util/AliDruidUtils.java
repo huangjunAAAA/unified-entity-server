@@ -178,7 +178,7 @@ public class AliDruidUtils {
      * @param orderby 排序列
      * @param asc 排序方式（ASC 或 DESC）
      */
-    public static void setOrderByAndLimit(MySqlSelectQueryBlock sQuery,int page, int size,String orderby,String asc){
+    public static MySqlSelectQueryBlock setOrderByAndLimit(MySqlSelectQueryBlock sQuery,int page, int size,String orderby,String asc){
         SQLLimit limit = new SQLLimit();
         limit.setOffset(page * size);
         limit.setRowCount(size);
@@ -191,6 +191,7 @@ public class AliDruidUtils {
             }
             orderBy.addItem(new SQLSelectOrderByItem(new SQLIdentifierExpr(StrUtil.toUnderlineCase(orderby)), SQLOrderingSpecification.valueOf(asc.toUpperCase())));
         }
+        return sQuery;
     }
 
     /**
@@ -316,16 +317,17 @@ public class AliDruidUtils {
         MySqlSelectQueryBlock sQuery=new MySqlSelectQueryBlock();
         if(StringUtils.isNotBlank(tbl))
             sQuery.setFrom(new SQLExprTableSource(tbl));
-        for (Iterator<Map.Entry<String, Object>> iterator = fullCondition.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, Object> condi =  iterator.next();
-            if(sQuery.getWhere()==null){
-                SQLBinaryOpExpr b = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue());
-                sQuery.setWhere(b);
-            }else{
-                SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.BooleanAnd, sQuery.getWhere());
-                sQuery.setWhere(r);
+        if (fullCondition != null)
+            for (Iterator<Map.Entry<String, Object>> iterator = fullCondition.entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, Object> condi = iterator.next();
+                if (sQuery.getWhere() == null) {
+                    SQLBinaryOpExpr b = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue());
+                    sQuery.setWhere(b);
+                } else {
+                    SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.BooleanAnd, sQuery.getWhere());
+                    sQuery.setWhere(r);
+                }
             }
-        }
         return sQuery;
     }
 
