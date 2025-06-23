@@ -2,19 +2,21 @@ package com.zjht.unified.controller;
 
 
 import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
+import com.zjht.unified.common.core.domain.dto.GetParam;
+import com.zjht.unified.common.core.domain.dto.SetParam;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
-import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
 import com.zjht.unified.dto.*;
+import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.service.FrontObjectService;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
 import com.zjht.unified.service.TaskService;
-import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -209,5 +211,16 @@ public class ExecController {
         }
         Object ret=frontObjectService.getObjectValue(param);
         return R.ok(ret);
+    }
+
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/list-object-value")
+    public R<List<Map<String, Object>>> listObject(@RequestBody BaseQueryDTO<QueryObjectDTO>  param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getCondition().getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getCondition().getVer());
+        }
+        List<Map<String, Object>> result = frontObjectService.listObject(ctx,param);
+        return R.ok(result);
     }
 }

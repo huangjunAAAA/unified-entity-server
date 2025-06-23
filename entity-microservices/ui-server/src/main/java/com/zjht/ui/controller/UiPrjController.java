@@ -172,7 +172,7 @@ public class UiPrjController extends BaseController {
      * 查询UI项目表列表，接受like和in条件
      */
     @ApiOperation(value = "查询UI项目表列表，接受like和in条件")
-    @GetMapping("/list-like-in")
+    @PostMapping("/list-like-in")
     public TableDataInfo<UiPrjVo> listExt2(@RequestBody BaseQueryDTO<ConditionLikeAndIn<UiPrj, UiPrjListDTO>> baseQueryDTO) {
         // 获取参数
         ConditionLikeAndIn<UiPrj, UiPrjListDTO> condition = baseQueryDTO.getCondition();

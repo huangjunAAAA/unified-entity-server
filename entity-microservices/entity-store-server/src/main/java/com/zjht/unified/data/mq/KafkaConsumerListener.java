@@ -7,7 +7,6 @@ import com.wukong.core.weblog.utils.JsonUtil;
 
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
-import com.zjht.unified.common.core.domain.store.StoreMessageDO;
 import com.zjht.unified.data.dispatch.DispatchMqService;
 import com.zjht.unified.data.storage.persist.GeneralStoreService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +43,7 @@ public class KafkaConsumerListener implements ConsumerSeekAware {
 
         EntityStoreMessageDO sMsg = JsonUtil.parse(kMsg.getData().toString(), EntityStoreMessageDO.class);
         if (kMsg.getTable().equals("save")) {
-            List<Long> longs = storeService.saveObjectPoint(sMsg);
+            List<Long> longs = storeService.saveEntity(sMsg);
             log.info(" table : {} save object  return ids {} " , sMsg.getTblName(),longs);
         } else if (kMsg.getTable().equals("update")) {
             List<Integer> integers = storeService.updateEntity(sMsg);

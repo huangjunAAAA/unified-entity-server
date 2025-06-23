@@ -6,27 +6,21 @@ import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
-import com.zjht.unified.data.entity.RawData;
 
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
-import com.zjht.unified.data.storage.service.IRawDataService;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component("mysql-store")
 public class MysqlStoreService extends AbstractStoreService {
 
-    @Resource
-    private IRawDataService rawDataService;
     @Resource
     private MysqlDDLService mysqlDDLService;
 
@@ -67,29 +61,18 @@ public class MysqlStoreService extends AbstractStoreService {
         jdbcTemplate.execute(delSql);
     }
 
-    public Long saveSimpleRawData(String val, String processedData, String dataType, Date eventTime, Long colpId, Long driverId){
-        RawData rawData=new RawData();
-        rawData.setDataTime(eventTime);
-//        rawData.setSysId(ref.getSystemId());
-//        rawData.setPointId(ref.getPointId());
-//        rawData.setDeviceId(ref.getDeviceId());
-        rawData.setColpId(colpId);
-        rawData.setDriverId(driverId);
-        rawData.setRawData(val);
-        rawData.setProcessedData(processedData);
-        rawData.setStatus(1);
-        try{
-            Double d=Double.parseDouble(processedData);
-            rawData.setNumericData(d);
-        }catch (Exception e){
-
-        }
-        rawDataService.save(rawData);
-        return rawData.getId();
-    }
-
     @PostConstruct
     protected void initDDL(){
         this.ddlService=mysqlDDLService;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void deleteEntity(String table, String guid, Long id) {
+
     }
 }

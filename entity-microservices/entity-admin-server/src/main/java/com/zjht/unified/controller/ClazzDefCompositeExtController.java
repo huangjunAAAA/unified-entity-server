@@ -117,7 +117,7 @@ public class ClazzDefCompositeExtController extends BaseController{
 
 
     @ApiOperation(value = "查询(clazzDef)列表，接受like和in条件")
-    @GetMapping("/list-like-in")
+    @PostMapping("/list-like-in")
     public TableDataInfo<ClazzDefCompositeVO> listExt2(@RequestBody BaseQueryDTO<ConditionLikeAndIn<ClazzDef, ClassDefListDTO>> baseQueryDTO) {
         // 获取参数
         ConditionLikeAndIn<ClazzDef, ClassDefListDTO> condition = baseQueryDTO.getCondition();

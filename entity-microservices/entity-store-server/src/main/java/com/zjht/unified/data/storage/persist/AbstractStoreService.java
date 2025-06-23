@@ -16,7 +16,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.util.*;
 
 @Slf4j
-public abstract class AbstractStoreService implements IDeviceStore {
+public abstract class AbstractStoreService implements IObjectEntityStore {
 
 
     @Resource
@@ -42,19 +42,13 @@ public abstract class AbstractStoreService implements IDeviceStore {
     }
 
     @Override
-    public List<Long> saveObjectPoint(EntityStoreMessageDO sMsg) {
+    public List<Long> saveEntity(EntityStoreMessageDO sMsg) {
 
         List<TblCol> colDef = sMsg.getCols();
         List<Long> ids=new ArrayList<>();
         if(colDef!=null){
             List<Map<String,Object>> data= EntityStoreMessageDO.getDataAsObjectList(sMsg);
             List<TblIndex> indices = sMsg.getIndices();
-
-            //delete data not in this batch
-//            PointInfoDO pointInfo = persistPlanService.getPointInfo(sMsg.getRef().getPointId(), sMsg.getSessionId());
-//            if(pointInfo.getDataAppend()== Constants.DATA_MODE_REPLACE && CollectionUtils.isNotEmpty(data)){
-//                delExcludeObjectScope(data,pp.getTbl(),colDef);
-//            }
 
             for (Iterator<Map<String, Object>> iterator = data.iterator(); iterator.hasNext(); ) {
                 Map<String, Object> vals =  iterator.next();
@@ -68,10 +62,6 @@ public abstract class AbstractStoreService implements IDeviceStore {
 
     public abstract void delExcludeObjectScope(List<Map<String,Object>> vals,String tbl,List<TblCol> colDef);
 
-    @Override
-    public Long saveSimplePoint(EntityStoreMessageDO val) {
-        return null;
-    }
 
     public void createObjectTable(Map<String,Object> data,String tbl, List<TblCol> def,List<TblIndex> indices){
         if(!checkTableExist(tbl)){
@@ -87,7 +77,7 @@ public abstract class AbstractStoreService implements IDeviceStore {
                 }
             }
         }
-        MysqlDDLUtils.addSdpReferenceColumns(def);
+        MysqlDDLUtils.addEntityReferenceColumns(def);
     }
 
     public abstract Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices,Long colpId);

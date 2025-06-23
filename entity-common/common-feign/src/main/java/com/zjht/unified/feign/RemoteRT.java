@@ -1,6 +1,8 @@
 package com.zjht.unified.feign;
 
 import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.dto.GetParam;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.feign.model.ReturnMap;
 import com.zjht.unified.feign.model.ReturnT;
@@ -16,4 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface RemoteRT {
     @PostMapping("/rt/task/run-project")
     R<String> startProject(@RequestBody PrjSpecDO spec);
+    @PostMapping("/rt/task/stop-project")
+    R<String> stopProject(@RequestParam("prjId") Long prjId);
+    @PostMapping("/get-class-def")
+    R<ClazzDefCompositeDO> getObjectClassDef(@RequestBody GetParam param);
 }

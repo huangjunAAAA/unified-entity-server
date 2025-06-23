@@ -4,15 +4,20 @@ import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
 import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.constants.FieldConstants;
+import com.zjht.unified.common.core.domain.R;
+import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
+import com.zjht.unified.common.core.domain.dto.QueryClass;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.composite.MethodDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.dto.CreateObjectParam;
-import com.zjht.unified.dto.GetParam;
+import com.zjht.unified.common.core.domain.dto.GetParam;
 import com.zjht.unified.dto.MethodInvokeParam;
-import com.zjht.unified.dto.SetParam;
+import com.zjht.unified.common.core.domain.dto.SetParam;
+import com.zjht.unified.dto.QueryObjectDTO;
+import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
@@ -25,7 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -46,6 +53,9 @@ public class FrontObjectService {
 
     @Autowired
     private V8RttiService v8RttiService;
+
+    @Autowired
+    private RemoteStore remoteStore;
 
     public Object execMethod(MethodInvokeParam param) {
         TaskContext tcxt = rtContextService.getRunningContext(param.getVer());
@@ -159,6 +169,32 @@ public class FrontObjectService {
         ret.put(FieldConstants.PROJECT_VER, obj.getPrjVer());
         ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
         return ret;
+    }
+
+    public List<Map<String, Object>> listObject(TaskContext ctx,BaseQueryDTO<QueryObjectDTO> param){
+        ClazzDefCompositeDO def = null;
+        if(param.getCondition().getClazzGuid()!=null)
+            def=entityDepService.getClsDefByGuid(ctx, param.getCondition().getClazzGuid());
+        else if(param.getCondition().getClazzName()!=null)
+            def=entityDepService.getClsByName(ctx, param.getCondition().getClazzName());
+        if(def==null)
+            return new ArrayList<>();
+        QueryClass storeQuery = new QueryClass();
+        BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
+        query.setCondition(storeQuery);
+        R<List<Map<String, Object>>> result = remoteStore.query(query);
+        if(result.getData()!=null){
+            ClazzDefCompositeDO cls=def;
+            result.getData().stream().forEach(resData->{
+                resData.put(FieldConstants.CLAZZ_GUID, cls.getGuid());
+                resData.put(FieldConstants.PROJECT_GUID, cls.getPrjGuid());
+                resData.put(FieldConstants.PROJECT_VER, cls.getPrjVer());
+                resData.put(FieldConstants.CLASS, ClsDf.from(cls, ctx));
+            });
+            return result.getData();
+        }else{
+            return new ArrayList<>();
+        }
     }
 
 }

@@ -169,7 +169,7 @@ public class MysqlDDLUtils {
 
         // sdp ref columns
         if(hasSdpRef)
-            addSdpReferenceColumns(validColList);
+            addEntityReferenceColumns(validColList);
 
 
         MySqlCreateTableStatement create = new MySqlCreateTableStatement();
@@ -238,38 +238,8 @@ public class MysqlDDLUtils {
         return rLst;
     }
 
-    public static void addSdpReferenceColumns(List<TblCol> validColList){
+    public static void addEntityReferenceColumns(List<TblCol> validColList){
         Set<String> cSet = validColList.stream().map(c -> c.getNameEn()).collect(Collectors.toSet());
-
-//        if(!cSet.contains(FieldConstants.POINT_ID)) {
-//            TblCol pointCol = new TblCol();
-//            pointCol.setNameEn(FieldConstants.POINT_ID);
-//            pointCol.setType("Long");
-//            pointCol.setJdbcType("bigint");
-//            pointCol.setNameZh("点ID");
-//            pointCol.setIsTempstamp(0);
-//            validColList.add(pointCol);
-//        }
-
-//        if(!cSet.contains(FieldConstants.DEVICE_ID)) {
-//            TblCol devCol = new TblCol();
-//            devCol.setNameEn(FieldConstants.DEVICE_ID);
-//            devCol.setType("Long");
-//            devCol.setJdbcType("bigint");
-//            devCol.setNameZh("设备ID");
-//            devCol.setIsTempstamp(0);
-//            validColList.add(devCol);
-//        }
-
-//        if(!cSet.contains(FieldConstants.SYSTEM_ID)) {
-//            TblCol sysCol = new TblCol();
-//            sysCol.setNameEn(FieldConstants.SYSTEM_ID);
-//            sysCol.setType("Long");
-//            sysCol.setJdbcType("bigint");
-//            sysCol.setNameZh("系统ID");
-//            sysCol.setIsTempstamp(0);
-//            validColList.add(sysCol);
-//        }
 
         if(!cSet.contains(FieldConstants.PROJECT_ID)) {
             TblCol planCol = new TblCol();
@@ -300,16 +270,6 @@ public class MysqlDDLUtils {
             planCol.setIsTempstamp(0);
             validColList.add(planCol);
         }
-
-//        if(!cSet.contains(FieldConstants.DRIVER_ID)) {
-//            TblCol driverCol = new TblCol();
-//            driverCol.setNameEn(FieldConstants.DRIVER_ID);
-//            driverCol.setType("Long");
-//            driverCol.setJdbcType("bigint");
-//            driverCol.setNameZh("采集计划ID");
-//            driverCol.setIsTempstamp(0);
-//            validColList.add(driverCol);
-//        }
     }
 
     public static void addUpdateConditionColumns(List<TblCol> validColList){

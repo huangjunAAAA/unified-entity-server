@@ -1,4 +1,4 @@
-package com.zjht.unified.dto;
+package com.zjht.unified.common.core.domain.dto;
 
 import lombok.Data;
 

@@ -13,6 +13,7 @@ import com.zjht.unified.common.core.util.DorisDDLUtils;
 import com.zjht.unified.common.core.util.JsonUtilUnderline;
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
@@ -47,11 +48,6 @@ public class DorisStoreService extends AbstractStoreService {
     @Resource
     private Admin admin;
 
-
-//    @Override
-//    public Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices, Long colpId) {
-//        return 0L;
-//    }
 
     @Override
     public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
@@ -104,38 +100,6 @@ public class DorisStoreService extends AbstractStoreService {
             return exist;
         }
     }
-
-    public Long saveSimpleRawData(String val, String processedData,  String dataType, Date eventTime, Long colpId, Long driverId) {
-        String idName= Constants.DORIS_ID_PREFIX+ FieldConstants.SIMPLE_DATA_TABLE;
-        Long id = redisTemplate.opsForValue().increment(idName);
-        Map<String,Object> values=new HashMap<>();
-        values.put("id",id);
-        values.put(FieldConstants.DATATIME,eventTime);
-        values.put(FieldConstants.PROJECT_ID,colpId);
-        values.put(FieldConstants.DRIVER_ID,driverId);
-//        values.put(FieldConstants.SYSTEM_ID,ref.getSystemId());
-//        values.put(FieldConstants.DEVICE_ID,ref.getDeviceId());
-//        values.put(FieldConstants.POINT_ID,ref.getPointId());
-        values.put(FieldConstants.SIMPLE_RAW_DATA,val);
-        values.put(FieldConstants.PROCESSED_DATA,processedData);
-        values.put(FieldConstants.STATUS,1);
-        values.put(FieldConstants.DATATYPE,dataType);
-        try{
-            Double d=Double.parseDouble(processedData);
-            values.put(FieldConstants.SIMPLE_NUMERIC_DATA,d);
-        }catch (Exception e){
-
-        }
-        values.put("status",1);
-        String ts = DateUtil.formatDateTime(new Date());
-        values.put("create_time",ts);
-        values.put("update_time",ts);
-        String vss = JsonUtilUnderline.toJson(values);
-        createStreamLoad(FieldConstants.SIMPLE_DATA_TABLE);
-        kafkaTemplate.send(KafkaNames.DORIS_TOPIC_PRIFIX+FieldConstants.SIMPLE_DATA_TABLE,"rt", vss);
-        return id;
-    }
-
 
     public Long saveObject(Map<String, Object> data, String tbl, List<TblCol> preDefLst, List<TblIndex> indices,Long colpId) {
         DorisDDLUtils.setJdbcType(preDefLst,data);
@@ -249,5 +213,15 @@ public class DorisStoreService extends AbstractStoreService {
     @PostConstruct
     protected void initDDL(){
         this.ddlService=dorisDDLService;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void deleteEntity(String table, String guid, Long id) {
+
     }
 }

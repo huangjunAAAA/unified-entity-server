@@ -1,6 +1,7 @@
 package com.zjht.unified.utils;
 
 import com.google.common.collect.Lists;
+import com.zjht.authcenter.permission.util.StringUtils;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
@@ -13,6 +14,7 @@ import groovy.util.logging.Slf4j;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class StoreUtil {
@@ -27,11 +29,16 @@ public class StoreUtil {
         if (saveFlag) {
             for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
                 TblCol col = new TblCol();
-                col.setNameEn(fieldDef.getTblCol());
+                if(StringUtils.isNotBlank(fieldDef.getTblCol()))
+                    col.setNameEn(fieldDef.getTblCol());
+                else{
+                    String fname = StringUtils.toUnderScoreCase(fieldDef.getName());
+                    col.setNameEn(fname);
+                }
                 col.setNameZh(fieldDef.getDisplayName());
                 col.setType(fieldDef.getType());
                 col.setJdbcType(null);
-                col.setIsPK(0);
+                col.setIsPK(Objects.equals(fieldDef.getTblCol(),"id")?1:0);
                 col.setIsTempstamp(0);
                 cols.add(col);
                 if (kvMap.containsKey(fieldDef.getName())) {
@@ -47,7 +54,7 @@ public class StoreUtil {
                     col.setNameZh(fieldDef.getDisplayName());
                     col.setType(fieldDef.getType());
                     col.setJdbcType(null);
-                    col.setIsPK(0);
+                    col.setIsPK(Objects.equals(fieldDef.getTblCol(),"id")?1:0);
                     col.setIsTempstamp(0);
                     cols.add(col);
                 }

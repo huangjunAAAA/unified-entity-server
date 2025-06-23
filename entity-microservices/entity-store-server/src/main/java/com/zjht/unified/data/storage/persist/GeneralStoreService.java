@@ -3,41 +3,49 @@ package com.zjht.unified.data.storage.persist;
 import com.wukong.core.util.SpringUtil;
 
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
+import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
-public class GeneralStoreService implements IDeviceStore,IPointStore, ApplicationRunner {
+public class GeneralStoreService implements IObjectEntityStore, ApplicationRunner {
 
     @Resource
     private PersistConfig persistConfig;
 
-    private IDeviceStore deviceStore;
+    private IObjectEntityStore objectEntityStore;
 
 
     @Override
-    public List<Long> saveObjectPoint(EntityStoreMessageDO val) {
-        return deviceStore.saveObjectPoint(val);
-    }
-
-    @Override
-    public Long saveSimplePoint(EntityStoreMessageDO val) {
-        return deviceStore.saveSimplePoint(val);
+    public List<Long> saveEntity(EntityStoreMessageDO val) {
+        return objectEntityStore.saveEntity(val);
     }
 
     @Override
     public List<Integer> updateEntity(EntityStoreMessageDO val) {
-        return deviceStore.updateEntity(val);
+        return objectEntityStore.updateEntity(val);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
+        return objectEntityStore.queryEntity(clazzDef, page, size, orderby, asc);
+    }
+
+    @Override
+    public void deleteEntity(String table, String guid, Long id) {
+        objectEntityStore.deleteEntity(table, guid, id);
     }
 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         String beanName=persistConfig.getEngine()+"-store";
-        deviceStore= (IDeviceStore) SpringUtil.getBean(beanName);
+        objectEntityStore= (IObjectEntityStore) SpringUtil.getBean(beanName);
     }
 }
