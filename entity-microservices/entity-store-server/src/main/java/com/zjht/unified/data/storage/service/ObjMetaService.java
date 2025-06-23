@@ -19,7 +19,7 @@ public class ObjMetaService {
         param.setObjName(clazzName);
         param.setVer(ver);
         R<ClazzDefCompositeDO> cls = remoteRT.getObjectClassDef(param);
-
+        return null;
     }
 
 
