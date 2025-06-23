@@ -131,7 +131,7 @@ public class MysqlDDLUtils {
         }
     }
 
-    public static TableCreateDDL createTable(String tbl, Map<String, Object> actualData, List<TblCol> preDefLst, List<TblIndex> indices, Boolean hasSdpRef) {
+    public static TableCreateDDL createTable(String tbl, Map<String, Object> actualData, List<TblCol> preDefLst, List<TblIndex> indices, Boolean hasEntityRef) {
         List<TblCol> validColList = new ArrayList<>();
         if (CollectionUtils.isEmpty(preDefLst)) {
             validColList = createTblColFromData(actualData);
@@ -167,8 +167,8 @@ public class MysqlDDLUtils {
             validColList.add(dtCol);
         }
 
-        // sdp ref columns
-        if(hasSdpRef)
+        // entity ref columns
+        if(hasEntityRef)
             addEntityReferenceColumns(validColList);
 
 
@@ -373,4 +373,5 @@ public class MysqlDDLUtils {
         });
         return defLst;
     }
+
 }

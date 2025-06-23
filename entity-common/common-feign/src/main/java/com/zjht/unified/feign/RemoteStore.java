@@ -15,5 +15,8 @@ import java.util.Map;
 @FeignClient(value = "entity-store-server", configuration = IgnoreValidateFormDataConfiguration.class)
 public interface RemoteStore {
     @PostMapping("/store/query-class")
-    public R<List<Map<String, Object>>> query(@RequestBody BaseQueryDTO<QueryClass> queryDTO);
+    R<List<Map<String, Object>>> query(@RequestBody BaseQueryDTO<QueryClass> queryDTO);
+
+    @PostMapping("/store/query")
+    List<Map<String,Object>> query(@RequestParam String ver, @RequestParam String prjId,  @RequestParam String sql);
 }
