@@ -214,13 +214,24 @@ public class ExecController {
     }
 
     @ApiOperation(value = "在指定运行环境获取对象")
-    @PostMapping("/list-object-value")
+    @PostMapping("/list-object")
     public R<List<Map<String, Object>>> listObject(@RequestBody BaseQueryDTO<QueryObjectDTO>  param){
         TaskContext ctx = rtContextService.getRunningContext(param.getCondition().getVer());
         if(ctx==null){
             return R.fail("task not found:"+param.getCondition().getVer());
         }
         List<Map<String, Object>> result = frontObjectService.listObject(ctx,param);
+        return R.ok(result);
+    }
+
+    @ApiOperation(value = "在指定运行环境获取对象")
+    @PostMapping("/list-all-object")
+    public R<List<Map<String, Object>>> listAllObject(@RequestBody QueryAllObjectDTO  param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getVer());
+        }
+        List<Map<String, Object>> result = frontObjectService.listAllObject(ctx,param);
         return R.ok(result);
     }
 }

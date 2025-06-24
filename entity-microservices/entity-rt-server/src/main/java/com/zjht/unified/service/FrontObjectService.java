@@ -16,6 +16,7 @@ import com.zjht.unified.dto.CreateObjectParam;
 import com.zjht.unified.common.core.domain.dto.GetParam;
 import com.zjht.unified.dto.MethodInvokeParam;
 import com.zjht.unified.common.core.domain.dto.SetParam;
+import com.zjht.unified.dto.QueryAllObjectDTO;
 import com.zjht.unified.dto.QueryObjectDTO;
 import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.service.ctx.EntityDepService;
@@ -169,6 +170,37 @@ public class FrontObjectService {
         ret.put(FieldConstants.PROJECT_VER, obj.getPrjVer());
         ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
         return ret;
+    }
+
+    public List<Map<String, Object>> listAllObject(TaskContext ctx, QueryAllObjectDTO param){
+        BaseQueryDTO<QueryObjectDTO> baseQueryDTO=new BaseQueryDTO<>();
+        QueryObjectDTO queryObjectDTO=new QueryObjectDTO();
+        queryObjectDTO.setClazzGuid(param.getClazzGuid());
+        queryObjectDTO.setPrjId(param.getPrjId());
+        queryObjectDTO.setVer(param.getVer());
+        queryObjectDTO.setClazzName(param.getClazzName());
+        baseQueryDTO.setCondition(queryObjectDTO);
+        baseQueryDTO.setSize(Integer.MAX_VALUE);
+        baseQueryDTO.setPage(1);
+        List<Map<String, Object>> data1 = listObject(ctx, baseQueryDTO);
+        if(param.getIncludeInherited()){
+            ClazzDefCompositeDO baseCls = entityDepService.getClsDefByGuid(ctx, param.getClazzGuid());
+            ClazzDefCompositeDO parentCls=entityDepService.getClsDefByGuid(ctx, baseCls.getParentGuid());
+            while(parentCls!=null){
+                BaseQueryDTO<QueryObjectDTO> parentQueryDTO=new BaseQueryDTO<>();
+                QueryObjectDTO parentCondition = new QueryObjectDTO();
+                parentCondition.setClazzGuid(parentCls.getGuid());
+                parentCondition.setPrjId(param.getPrjId());
+                parentCondition.setVer(param.getVer());
+                parentQueryDTO.setCondition(parentCondition);
+                parentQueryDTO.setSize(Integer.MAX_VALUE);
+                parentQueryDTO.setPage(1);
+                List<Map<String, Object>> data2 = listObject(ctx, parentQueryDTO);
+                data1.addAll(data2);
+                parentCls=entityDepService.getClsDefByGuid(ctx, parentCls.getParentGuid());
+            }
+        }
+        return data1;
     }
 
     public List<Map<String, Object>> listObject(TaskContext ctx,BaseQueryDTO<QueryObjectDTO> param){

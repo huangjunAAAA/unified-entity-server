@@ -4,6 +4,7 @@ import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,9 @@ public class EntityDepService {
     @Resource
     private RtRedisObjectStorageService rtRedisObjectStorageService;
     public ClazzDefCompositeDO getClsDefByGuid(TaskContext ctx, String clsGuid){
+        if (StringUtils.isBlank(clsGuid)){
+            return null;
+        }
         ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
         if(clsdef==null){
             for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
@@ -30,6 +34,9 @@ public class EntityDepService {
     }
 
     public PrjUniqueInfo getPrjInfoByGuid(TaskContext ctx, String clsGuid){
+        if (StringUtils.isBlank(clsGuid)){
+            return null;
+        }
         ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
         if(clsdef==null){
             for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
@@ -45,6 +52,9 @@ public class EntityDepService {
     }
 
     public ClazzDefCompositeDO getClsDefByInstanceId(TaskContext ctx, String guid){
+        if (StringUtils.isBlank(guid)){
+            return null;
+        }
         UnifiedObject uo = rtRedisObjectStorageService.getObject(ctx, guid, ctx.getPrjInfo().getPrjGuid(), ctx.getPrjInfo().getPrjVer());
         if(uo==null){
             for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
@@ -59,6 +69,9 @@ public class EntityDepService {
     }
 
     public ClazzDefCompositeDO getClsByName(TaskContext ctx, String name){
+        if (StringUtils.isBlank(name)){
+            return null;
+        }
         ClazzDefCompositeDO clsdef=rtRedisObjectStorageService.getClsDefByName(ctx, ctx.getPrjInfo().getPrjVer(), name);
         if(clsdef!=null)
             return clsdef;
@@ -72,6 +85,8 @@ public class EntityDepService {
     }
 
     public FieldDefCompositeDO getFieldDefByGuid(TaskContext ctx, String fieldGuid){
+        if(StringUtils.isBlank(fieldGuid))
+            return null;
         Object fieldObj=rtRedisObjectStorageService.getAttrDefByGuid(ctx, ctx.getPrjInfo().getPrjVer(), fieldGuid);
         if(fieldObj!=null){
             if(fieldObj instanceof FieldDefCompositeDO)
@@ -91,6 +106,8 @@ public class EntityDepService {
     }
 
     public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName){
+        if (StringUtils.isBlank(guid)||StringUtils.isBlank(attrName))
+            return null;
         UnifiedObject uo = getObject(ctx, guid);
         if(uo==null)
             return null;
@@ -98,6 +115,8 @@ public class EntityDepService {
     }
 
     public UnifiedObject getObject(TaskContext ctx, String guid){
+        if (StringUtils.isBlank(guid))
+            return null;
         UnifiedObject uo = rtRedisObjectStorageService.getObject(ctx, guid, ctx.getPrjInfo().getPrjGuid(), ctx.getPrjInfo().getPrjVer());
         if(uo==null){
             for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
