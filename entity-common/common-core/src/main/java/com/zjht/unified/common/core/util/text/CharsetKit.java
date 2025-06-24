@@ -1,4 +1,4 @@
-package com.zjht.unified.common.core.text;
+package com.zjht.unified.common.core.util.text;
 
 
 import com.zjht.unified.common.core.util.StringUtils;

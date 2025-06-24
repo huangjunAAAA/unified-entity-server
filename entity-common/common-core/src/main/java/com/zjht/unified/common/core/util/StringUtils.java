@@ -1,7 +1,8 @@
 package com.zjht.unified.common.core.util;
 
-import com.zjht.unified.common.core.text.StrFormatter;
 import com.zjht.unified.common.core.constants.Constants;
+
+import com.zjht.unified.common.core.util.text.StrFormatter;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;

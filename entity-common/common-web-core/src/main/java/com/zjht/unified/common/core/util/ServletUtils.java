@@ -2,7 +2,7 @@ package com.zjht.unified.common.core.util;
 
 
 import com.zjht.unified.common.core.constants.Constants;
-import com.zjht.unified.common.core.text.Convert;
+import com.zjht.unified.common.core.util.text.Convert;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

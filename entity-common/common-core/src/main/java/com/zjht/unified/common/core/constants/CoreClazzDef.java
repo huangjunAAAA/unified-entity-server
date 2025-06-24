@@ -1,5 +1,6 @@
 package com.zjht.unified.common.core.constants;
 
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.simple.*;
@@ -80,6 +81,7 @@ public class CoreClazzDef {
         clazzDefCompositeDO.setInheritRead(1);
         clazzDefCompositeDO.setInheritWrite(1);
         clazzDefCompositeDO.setType("System");
+        clazzDefCompositeDO.setTbl(StringUtils.toUnderScoreCase(cls.getSimpleName()));
 
         Field[] fields = cls.getDeclaredFields();
 
