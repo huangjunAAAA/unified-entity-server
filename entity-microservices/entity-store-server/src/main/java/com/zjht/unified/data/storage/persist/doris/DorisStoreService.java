@@ -215,10 +215,6 @@ public class DorisStoreService extends AbstractStoreService {
         this.ddlService=dorisDDLService;
     }
 
-    @Override
-    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
-        return Collections.emptyList();
-    }
 
     @Override
     public void deleteEntity(String table, String guid, Long id) {

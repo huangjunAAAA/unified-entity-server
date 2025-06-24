@@ -178,11 +178,13 @@ public class AliDruidUtils {
      * @param orderby 排序列
      * @param asc 排序方式（ASC 或 DESC）
      */
-    public static MySqlSelectQueryBlock setOrderByAndLimit(MySqlSelectQueryBlock sQuery,int page, int size,String orderby,String asc){
-        SQLLimit limit = new SQLLimit();
-        limit.setOffset(page * size);
-        limit.setRowCount(size);
-        sQuery.setLimit(limit);
+    public static MySqlSelectQueryBlock setOrderByAndLimit(MySqlSelectQueryBlock sQuery,Integer page, Integer size,String orderby,String asc){
+        if(page!=null&&size!=null) {
+            SQLLimit limit = new SQLLimit();
+            limit.setOffset(page * size);
+            limit.setRowCount(size);
+            sQuery.setLimit(limit);
+        }
 
         if(StringUtils.isNotEmpty(orderby)){
             SQLOrderBy orderBy=new SQLOrderBy();
@@ -211,7 +213,12 @@ public class AliDruidUtils {
     }
 
     public static SQLBinaryOpExpr createBinaryOp(String k,Object v,SQLBinaryOperator op,SQLExpr another){
-        SQLBinaryOpExpr left = createBinaryOp(k, v);
+        SQLBinaryOpExpr left = createBinaryOp(k, v,SQLBinaryOperator.Equality);
+        return combineBinaryOp(left,op,another);
+    }
+
+    public static SQLBinaryOpExpr createBinaryOp(String k,Object v,SQLBinaryOperator kvOp,SQLBinaryOperator op,SQLExpr another){
+        SQLBinaryOpExpr left = createBinaryOp(k, v, kvOp);
         return combineBinaryOp(left,op,another);
     }
     /**
@@ -310,26 +317,62 @@ public class AliDruidUtils {
      * 根据表和条件创建查询。
      *
      * @param tbl 表名
-     * @param fullCondition 条件映射
+     * @param equals 条件映射
      * @return 查询块
      */
-    public static MySqlSelectQueryBlock createQueryFromTable(String tbl, Map<String,Object> fullCondition){
+    public static MySqlSelectQueryBlock createQueryEqualsFromTable(String tbl, Map<String,Object> equals){
         MySqlSelectQueryBlock sQuery=new MySqlSelectQueryBlock();
         if(StringUtils.isNotBlank(tbl))
             sQuery.setFrom(new SQLExprTableSource(tbl));
-        if (fullCondition != null)
-            for (Iterator<Map.Entry<String, Object>> iterator = fullCondition.entrySet().iterator(); iterator.hasNext(); ) {
-                Map.Entry<String, Object> condi = iterator.next();
-                if (sQuery.getWhere() == null) {
-                    SQLBinaryOpExpr b = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue());
-                    sQuery.setWhere(b);
-                } else {
-                    SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.BooleanAnd, sQuery.getWhere());
-                    sQuery.setWhere(r);
-                }
+        if (equals == null || equals.isEmpty())
+            return sQuery;
+        for (Iterator<Map.Entry<String, Object>> iterator = equals.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, Object> condi = iterator.next();
+            if (sQuery.getWhere() == null) {
+                SQLBinaryOpExpr b = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue());
+                sQuery.setWhere(b);
+            } else {
+                SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.BooleanAnd, sQuery.getWhere());
+                sQuery.setWhere(r);
             }
+        }
         return sQuery;
     }
+
+    public static MySqlSelectQueryBlock createQueryLikesFromTable(MySqlSelectQueryBlock sQuery, Map<String,String> likes){
+        if(likes==null||likes.isEmpty())
+            return sQuery;
+        for (Iterator<Map.Entry<String, String>> iterator = likes.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, String> condi = iterator.next();
+            if (sQuery.getWhere() == null) {
+                SQLBinaryOpExpr b = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.Like);
+                sQuery.setWhere(b);
+            } else {
+                SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(condi.getKey(), condi.getValue(), SQLBinaryOperator.Like,SQLBinaryOperator.BooleanAnd, sQuery.getWhere());
+                sQuery.setWhere(r);
+            }
+        }
+        return sQuery;
+    }
+
+    public static MySqlSelectQueryBlock createQueryInFromTable(MySqlSelectQueryBlock sQuery, String symbol,List<Object> values){
+        if(values==null||values.isEmpty())
+            return sQuery;
+        SQLBinaryOpExpr orExpr=new SQLBinaryOpExpr();
+        for (Iterator<Object> iterator = values.iterator(); iterator.hasNext(); ) {
+            Object condi = iterator.next();
+            SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(symbol, condi, SQLBinaryOperator.Equality,SQLBinaryOperator.BooleanOr, orExpr);
+        }
+        SQLExpr where = sQuery.getWhere();
+        if(where==null){
+            sQuery.setWhere(orExpr);
+        }else{
+            SQLBinaryOpExpr combined = AliDruidUtils.combineBinaryOp(orExpr, SQLBinaryOperator.BooleanAnd, where);
+            sQuery.setWhere(combined);
+        }
+        return sQuery;
+    }
+
 
     /**
      * 创建通用值查询。
@@ -340,7 +383,7 @@ public class AliDruidUtils {
      * @return 查询块
      */
     public static MySqlSelectQueryBlock createGeneralValueSQLFromTable(String tbl, List<String> cols, Map<String,Object> fullCondition){
-        MySqlSelectQueryBlock sQuery = createQueryFromTable(tbl, fullCondition);
+        MySqlSelectQueryBlock sQuery = createQueryEqualsFromTable(tbl, fullCondition);
         for (Iterator<String> iterator = cols.iterator(); iterator.hasNext(); ) {
             String c =  iterator.next();
             sQuery.addSelectItem(new SQLIdentifierExpr(c));

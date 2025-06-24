@@ -68,9 +68,4 @@ public class MysqlStoreService extends AbstractStoreService {
     protected void initDDL(){
         this.ddlService=mysqlDDLService;
     }
-
-    @Override
-    public void deleteEntity(String table, String guid, Long id) {
-
-    }
 }

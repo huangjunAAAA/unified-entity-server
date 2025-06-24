@@ -33,9 +33,10 @@ public class GeneralStoreService implements IObjectEntityStore, ApplicationRunne
     }
 
     @Override
-    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
-        return objectEntityStore.queryEntity(clazzDef, page, size, orderby, asc);
+    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc, Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in) {
+        return objectEntityStore.queryEntity(clazzDef, page, size, orderby, asc, equals, like, in);
     }
+
 
     @Override
     public void deleteEntity(String table, String guid, Long id) {

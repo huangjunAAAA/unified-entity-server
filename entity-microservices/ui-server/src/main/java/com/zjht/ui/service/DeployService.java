@@ -87,12 +87,11 @@ public class DeployService {
     }
 
     private static void shutdownWorkingEnv(WorkingEnv workingEnv){
-        if(workingEnv.devProcess!=null && workingEnv.devProcess.getProc().isAlive()){
-            workingEnv.devProcess.getProc().destroy();
-            return;
-        }
         if(workingEnv.getPid()!=null){
             killPid(workingEnv.getPid());
+        }
+        if(workingEnv.devProcess!=null && workingEnv.devProcess.getProc().isAlive()){
+            workingEnv.devProcess.getProc().destroy();
         }
     }
 

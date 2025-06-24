@@ -113,10 +113,35 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
     }
 
     @Override
-    public List<Map<String, Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc) {
+    public List<Map<String,Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
+                                         Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in){
         List<String> cols = clazzDef.getClazzIdFieldDefList().stream().map(f -> StringUtils.toUnderScoreCase(f.getName())).collect(Collectors.toList());
+        Map<String,Object> sEquals = null;
+        if(equals!=null&&equals.size()>0)
+            sEquals=equals.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), Map.Entry::getValue));
+        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(clazzDef.getTbl(), cols, sEquals);
 
-        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(clazzDef.getTbl(), cols, null);
+        if(like!=null&&like.size()>0) {
+            Map<String,String> sLikes = like.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), v -> {
+                String val = v.getValue();
+                if (!val.startsWith("%") && !val.endsWith("%")) {
+                    val = "%" + val + "%";
+                }
+                return val;
+            }));
+            AliDruidUtils.createQueryLikesFromTable(sQuery, sLikes);
+        }
+
+        if(in!=null&&in.size()>0){
+            for (Map.Entry<String, List<Object>> entry : in.entrySet()) {
+                String k = StringUtils.toUnderScoreCase(entry.getKey());
+                List<Object> vals = entry.getValue();
+                if(vals!=null&&vals.size()>0){
+                    AliDruidUtils.createQueryInFromTable(sQuery, k,vals);
+                }
+            }
+        }
+
         AliDruidUtils.setOrderByAndLimit(sQuery,page,size,orderby,asc);
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sQuery.toString());
         return list;
