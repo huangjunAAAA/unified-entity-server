@@ -109,6 +109,8 @@ public class TaskService {
 
     //
     public void setClsDefs(TaskContext ctx, List<ClazzDefCompositeDO> clazzList, String prjGuid, String prjVer) {
+        if(CollectionUtils.isEmpty(clazzList))
+            return;
         clazzList.forEach(cd->{
             rtRedisObjectStorageService.setClsDef(ctx,prjVer,cd.getGuid(),cd);
         });
