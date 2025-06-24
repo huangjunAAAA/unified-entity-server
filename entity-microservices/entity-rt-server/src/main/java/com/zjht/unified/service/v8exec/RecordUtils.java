@@ -4,6 +4,7 @@ import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
+import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.reference.V8ValueArray;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -14,6 +15,7 @@ import com.zjht.unified.service.ctx.TaskContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -64,11 +66,11 @@ public class RecordUtils {
         // Step 4: Convert results to V8ValueArray
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8ValueArray v8ValueArray = v8Runtime.createV8ValueArray();
-        JavetProxyConverter proxyConverter = new JavetProxyConverter();
-
-        // TODO
-        // 新建一个对象来完成值传递操作
-
+        for (Iterator<Map<String, Object>> iterator = results.iterator(); iterator.hasNext(); ) {
+            Map<String, Object> r =  iterator.next();
+            V8Value v = V8BeanUtils.toV8Value(v8Runtime, r);
+            v8ValueArray.push(v);
+        }
         return v8ValueArray;
     }
 

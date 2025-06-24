@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 @Slf4j
@@ -54,7 +55,8 @@ public class PackageLockChecker {
             String module = entry.getKey();
             String expectedVersion = entry.getValue();
             String actualVersion = lockDependencies.get(module);
-
+//            if(module.equals("pinia"))
+//                System.out.println(module+" "+expectedVersion+" "+actualVersion);
             if (actualVersion == null) {
                 mismatches.add(module + ": 在 package-lock.json 中缺失");
             } else if (!isVersionCompatible(expectedVersion, actualVersion)) {
@@ -89,8 +91,8 @@ public class PackageLockChecker {
         if (version2 == null || version2.isEmpty()) {
             return false;
         }
-        if(version1.startsWith("^")||version1.startsWith("~")){
-            version1=version1.substring(1);
+        if (version1.startsWith("^") || version1.startsWith("~")) {
+            version1 = version1.substring(1);
         }
 
         // 分割版本号
@@ -107,15 +109,20 @@ public class PackageLockChecker {
             if (seg1.matches("\\d+") && seg2.matches("\\d+")) {
                 int num1 = Integer.parseInt(seg1);
                 int num2 = Integer.parseInt(seg2);
+                if (num1 < num2)
+                    return true;
                 if (num2 < num1) {
                     return false; // 数字部分小于基准
                 }
-                // 数字部分大于等于时继续比较下一段
+                // 数字部分等于时继续比较下一段
             }
             // 规则：包含字母时按字符串比较
             else if (!seg1.matches("\\d+") && !seg2.matches("\\d+")) {
                 if (seg2.compareTo(seg1) < 0) {
                     return false; // 字符串字典序小于基准
+                }
+                if (seg2.compareTo(seg1) > 0) {
+                    return true; // 字符串字典序大于基准
                 }
             }
             // 规则：数字和字母混合比较不符合
@@ -128,5 +135,18 @@ public class PackageLockChecker {
         return true;
     }
 
+
+    public static void main(String[] args) throws Exception{
+        String p1file="/tmp/package.json";
+        String p2file="/tmp/package-lock.json";
+        String p1content = new String(Files.readAllBytes(new File(p1file).toPath()));
+        String p2content = new String(Files.readAllBytes(new File(p2file).toPath()));
+        List<String> mismatches = checkDependenciesMatch(p1content, p2content);
+        if (mismatches.isEmpty()) {
+            System.out.println("依赖项完全匹配");
+        } else {
+            System.out.println("依赖项不匹配："+mismatches);
+        }
+    }
 
 }

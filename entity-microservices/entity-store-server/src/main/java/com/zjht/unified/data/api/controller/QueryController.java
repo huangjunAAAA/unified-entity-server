@@ -6,6 +6,7 @@ import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.data.storage.persist.GeneralStoreService;
 import com.zjht.unified.common.core.domain.dto.QueryClass;
 import io.swagger.annotations.Api;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,9 @@ import java.util.Map;
 public class QueryController {
 
     @Resource
+    protected JdbcTemplate jdbcTemplate;
+
+    @Resource
     private GeneralStoreService generalStoreService;
 
     @PostMapping("/store/query-class")
@@ -32,8 +36,8 @@ public class QueryController {
     }
 
     @PostMapping("/store/query")
-    List<Map<String, Object>> query(@RequestParam String ver, @RequestParam String prjId, @RequestParam String sql) {
-        //todo
-        return null;
+    public List<Map<String, Object>> query(@RequestParam String ver, @RequestParam String prjId, @RequestParam String sql) {
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+        return list;
     }
 }
