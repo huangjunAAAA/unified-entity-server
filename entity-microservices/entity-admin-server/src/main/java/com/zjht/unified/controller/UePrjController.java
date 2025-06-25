@@ -145,38 +145,33 @@ public class UePrjController extends BaseController{
      * 删除统一实体项目
      */
     @ApiOperation(value = "删除统一实体项目")
-	@PostMapping("/delete/{ids}")
-    public R<Integer> remove(@PathVariable Long[] ids)
+	@PostMapping("/delete/{id}")
+    public R<Long> remove(@PathVariable Long id)
     {
-        List<Long> idList=Arrays.asList(ids);
-        Boolean b = uePrjService.removeByIds(idList);
-        for (Iterator<Long> iterator = idList.iterator(); iterator.hasNext(); ) {
-            Long id =  iterator.next();
-            List<ClazzDef> clsList = clazzDefService.list(Wrappers.<ClazzDef>lambdaQuery().eq(ClazzDef::getPrjId, id));
-            for (Iterator<ClazzDef> iteratored = clsList.iterator(); iteratored.hasNext(); ) {
-                ClazzDef clazzDef = iteratored.next();
-                clazzDefCompositeService.removeById(clazzDef.getId());
-            }
-            List<ClsRelation> rList = clsRelationService.list(Wrappers.<ClsRelation>lambdaQuery().eq(ClsRelation::getPrjId, id));
-            for (Iterator<ClsRelation> iteratored = rList.iterator(); iteratored.hasNext(); ) {
-                ClsRelation clsR =  iteratored.next();
-                clsRelationCompositeService.removeById(clsR.getId());
-            }
-            configGraphService.remove(Wrappers.<ConfigGraph>lambdaQuery().eq(ConfigGraph::getPrjId, id));
-            dbtableAliasService.remove(Wrappers.<DbtableAlias>lambdaQuery().eq(DbtableAlias::getPrjId, id));
-
-            List<FsmDef> fsmList = fsmDefService.list(Wrappers.<FsmDef>lambdaQuery().eq(FsmDef::getPrjId, id));
-            for (Iterator<FsmDef> iteratored = fsmList.iterator(); iteratored.hasNext(); ) {
-                FsmDef fsmDef = iteratored.next();
-                fsmDefCompositeService.removeById(fsmDef.getId());
-            }
-            sentinelDefService.remove(Wrappers.<SentinelDef>lambdaQuery().eq(SentinelDef::getPrjId, id));
-            viewDefService.remove(Wrappers.<ViewDef>lambdaQuery().eq(ViewDef::getPrjId, id));
-            prjDepService.remove(Wrappers.<PrjDep>lambdaQuery().eq(PrjDep::getPrjId, id));
-            prjExportService.remove(Wrappers.<PrjExport>lambdaQuery().eq(PrjExport::getSrcPrjId, id));
+        Boolean b = uePrjService.removeById(id);
+        List<ClazzDef> clsList = clazzDefService.list(Wrappers.<ClazzDef>lambdaQuery().eq(ClazzDef::getPrjId, id));
+        for (Iterator<ClazzDef> iteratored = clsList.iterator(); iteratored.hasNext(); ) {
+            ClazzDef clazzDef = iteratored.next();
+            clazzDefCompositeService.removeById(clazzDef.getId());
         }
-        R r = b ? R.ok() : R.fail();
-        return r;
+        List<ClsRelation> rList = clsRelationService.list(Wrappers.<ClsRelation>lambdaQuery().eq(ClsRelation::getPrjId, id));
+        for (Iterator<ClsRelation> iteratored = rList.iterator(); iteratored.hasNext(); ) {
+            ClsRelation clsR =  iteratored.next();
+            clsRelationCompositeService.removeById(clsR.getId());
+        }
+        configGraphService.remove(Wrappers.<ConfigGraph>lambdaQuery().eq(ConfigGraph::getPrjId, id));
+        dbtableAliasService.remove(Wrappers.<DbtableAlias>lambdaQuery().eq(DbtableAlias::getPrjId, id));
+
+        List<FsmDef> fsmList = fsmDefService.list(Wrappers.<FsmDef>lambdaQuery().eq(FsmDef::getPrjId, id));
+        for (Iterator<FsmDef> iteratored = fsmList.iterator(); iteratored.hasNext(); ) {
+            FsmDef fsmDef = iteratored.next();
+            fsmDefCompositeService.removeById(fsmDef.getId());
+        }
+        sentinelDefService.remove(Wrappers.<SentinelDef>lambdaQuery().eq(SentinelDef::getPrjId, id));
+        viewDefService.remove(Wrappers.<ViewDef>lambdaQuery().eq(ViewDef::getPrjId, id));
+        prjDepService.remove(Wrappers.<PrjDep>lambdaQuery().eq(PrjDep::getPrjId, id));
+        prjExportService.remove(Wrappers.<PrjExport>lambdaQuery().eq(PrjExport::getSrcPrjId, id));
+        return R.ok(id);
     }
 	
 	
