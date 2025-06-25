@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.zjht.ui.entity.UiLayout;
 import com.zjht.ui.entity.UiPage;
+import com.zjht.ui.utils.IpPortExtractor;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.ui.utils.PackageLockChecker;
 import com.zjht.unified.common.core.constants.Constants;
@@ -216,7 +217,11 @@ public class DeployService {
                         debugInfo.append(l).append("\n");
                         if (l.trim().contains("Network")) {
                             try {
-                                runningPort.offer(l.trim(), 1, TimeUnit.SECONDS);
+                                String ipPort = IpPortExtractor.extractIpPort(l.trim());
+                                String[] parts = ipPort.split(":");
+                                String domainAddress = parts[1]+".ue.test.zjht100.com";
+                                String nl = l.trim().replace(ipPort, domainAddress);
+                                runningPort.offer(nl, 1, TimeUnit.SECONDS);
                             } catch (InterruptedException e) {
 
                             }
