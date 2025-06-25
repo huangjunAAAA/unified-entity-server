@@ -81,7 +81,7 @@ public class InitialInstanceControllerExt {
      * 新增初始实例
      */
     @ApiOperation(value = "新增初始实例")
-    @PostMapping
+    @PostMapping("create")
     public R<Object> create(@RequestBody ClassNameDTO<InitialInstance> initialInstance)
     {
         ClazzDefCompositeDTO condition=new ClazzDefCompositeDTO();
@@ -112,6 +112,49 @@ public class InitialInstanceControllerExt {
             data.setGuid(UUID.fastUUID().toString());
         }
         initialInstanceService.save(data);
+        validAttrs.put(FieldConstants.ID,data.getId());
+        validAttrs.put(FieldConstants.GUID,data.getGuid());
+        validAttrs.put(FieldConstants.CLAZZ_GUID,data.getClassGuid());
+        return R.ok(validAttrs);
+    }
+
+    /**
+     * 修改初始实例
+     */
+    @ApiOperation(value = "修改初始实例")
+    @PostMapping("update")
+    public R<Object> update(@RequestBody ClassNameDTO<InitialInstance> initialInstance)
+    {
+        ClazzDefCompositeDTO condition=new ClazzDefCompositeDTO();
+        condition.setGuid(initialInstance.getClassGuid());
+        condition.setName(initialInstance.getClassName());
+        ClazzDefCompositeDTO clazzDefCompositeDTO = clazzDefCompositeService.selectOne(condition);
+        if(clazzDefCompositeDTO==null){
+            R r = R.fail("类不存在");
+            return r;
+        }
+        InitialInstance data = initialInstance.getData();
+        Map<String, Object> attrValue = JsonUtilUnderline.readValue(data.getAttrValue(), new TypeReference<Map<String, Object>>() {});
+
+        Map<String, FieldDefCompositeDTO> fieldMap = clazzDefCompositeDTO.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDTO::getName, Function.identity()));
+
+        InitialInstance oldEntity = initialInstanceService.getById(data.getId());
+        Map<String,Object> validAttrs=JsonUtilUnderline.readValue(oldEntity.getAttrValue(), new TypeReference<Map<String, Object>>() {});
+        for (Iterator<String> iterator = fieldMap.keySet().iterator(); iterator.hasNext(); ) {
+            String key =  iterator.next();
+            Object value = attrValue.get(key);
+            if(value!=null){
+                validAttrs.put(key,value);
+            }
+        }
+        data.setAttrValue(JsonUtilUnderline.toJson(validAttrs));
+        data.setClassGuid(clazzDefCompositeDTO.getGuid());
+        data.setClassId(clazzDefCompositeDTO.getId());
+        data.setPrjId(clazzDefCompositeDTO.getPrjId());
+        if(data.getGuid()==null){
+            data.setGuid(UUID.fastUUID().toString());
+        }
+        initialInstanceService.updateById(data);
         validAttrs.put(FieldConstants.ID,data.getId());
         validAttrs.put(FieldConstants.GUID,data.getGuid());
         validAttrs.put(FieldConstants.CLAZZ_GUID,data.getClassGuid());

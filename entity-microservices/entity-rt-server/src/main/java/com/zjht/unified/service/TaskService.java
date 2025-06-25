@@ -1,21 +1,28 @@
 package com.zjht.unified.service;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.FieldConstants;
+import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
 import com.zjht.unified.domain.composite.PrjSpecDO;
+import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
+import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.RtRedisObjectStorageService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.utils.JsonUtilUnderline;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TaskService {
@@ -55,10 +62,22 @@ public class TaskService {
     /**
      * 设置静态变量
      */
-    public void setStatics(TaskContext ctx, List<StaticDefDO> statics, String prjGuid,String prjVer){
+    public void setStatics(TaskContext ctx, List<StaticDefDO> statics, String prjGuid, String prjVer) {
         if (CollectionUtils.isNotEmpty(statics)) {
+            EntityDepService depService = SpringUtils.getBean(EntityDepService.class);
             statics.forEach(sd -> {
-                rtRedisObjectStorageService.setObjectAttrValue(ctx, RedisKeyName.getStaticKey(Constants.STATICS,ctx.getVer(),prjGuid,prjVer),sd.getFieldName(),sd.getFieldValue(),false);
+                if (("" + sd.getFieldType()).equals(FieldConstants.FIELD_TYPE_REGULAR_CLASS)) {
+                    Map<String, Object> attrs = JsonUtilUnderline.readValue(sd.getFieldValue(), new TypeReference<Map<String, Object>>() {
+                    });
+                    String guid = (String) attrs.get(FieldConstants.GUID);
+                    if (guid != null) {
+                        UnifiedObject uo = depService.getObject(ctx, guid);
+                        if (uo != null)
+                            rtRedisObjectStorageService.setObjectAttrValue(ctx, RedisKeyName.getStaticKey(Constants.STATICS, ctx.getVer(), prjGuid, prjVer), sd.getFieldName(), sd.getFieldValue(), false);
+                    }
+                } else {
+                    rtRedisObjectStorageService.setObjectAttrValue(ctx, RedisKeyName.getStaticKey(Constants.STATICS, ctx.getVer(), prjGuid, prjVer), sd.getFieldName(), sd.getFieldValue(), false);
+                }
             });
         }
     }
@@ -143,11 +162,11 @@ public class TaskService {
         // 设置类定义
         setClsDefs(ctx,spec.getClazzList(), prjGuid,prjVer);
 
-        // 设置静态变量
-        setStatics(ctx, spec.getStaticDefList(), prjGuid,prjVer);
-
         // 将初始化的实例放入redis
         setInstances(ctx, spec.getInstanceList(), prjGuid,prjVer);
+
+        // 设置静态变量
+        setStatics(ctx, spec.getStaticDefList(), prjGuid,prjVer);
 
         // 生成哨兵和状态机的定时任务，通过XXL开始执行
         setSentinels(ctx, spec.getSentinelDefList(),prjGuid,prjVer);
