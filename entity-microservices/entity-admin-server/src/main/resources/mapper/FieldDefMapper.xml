@@ -21,11 +21,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="update_user" property="updateUser"/>
         <result column="original_id" property="originalId"/>
         <result column="cachable" property="cachable"/>
-        <result column="cls_rel_id" property="clsRelId"/>
-        <result column="default_lock" property="defaultLock"/>
         <result column="cls_rel_guid" property="clsRelGuid"/>
         <result column="class_guid" property="classGuid"/>
         <result column="guid" property="guid"/>
+        <result column="cls_rel_id" property="clsRelId"/>
+        <result column="default_lock" property="defaultLock"/>
         <result column="eval" property="eval"/>
         <result column="archive_status" property="archiveStatus"/>
     </resultMap>

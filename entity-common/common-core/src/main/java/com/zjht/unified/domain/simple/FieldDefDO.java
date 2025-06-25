@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "FieldDef 领域对象", description = "")
 public class FieldDefDO {
 
-	private static final long serialVersionUID = -2839796095095414885L;
+	private static final long serialVersionUID = 8505280881016573155L;
 
 
 	/**
@@ -75,16 +75,6 @@ public class FieldDefDO {
 	@ApiModelProperty(value = "字段值是否可缓存，以秒为单位，-1表示永久缓存，0 表示不缓存")
 	private Integer cachable;
 	 /**
-	 * 类关系ID
-	 */
-	@ApiModelProperty(value = "类关系ID")
-	private Long clsRelId;
-	 /**
-	 * 是否锁定默认值
-	 */
-	@ApiModelProperty(value = "是否锁定默认值")
-	private String defaultLock;
-	 /**
 	 * 类关系的guid
 	 */
 	@ApiModelProperty(value = "类关系的guid")
@@ -99,6 +89,16 @@ public class FieldDefDO {
 	 */
 	@ApiModelProperty(value = "GUID")
 	private String guid;
+	 /**
+	 * 类关系ID
+	 */
+	@ApiModelProperty(value = "类关系ID")
+	private Long clsRelId;
+	 /**
+	 * 是否锁定默认值
+	 */
+	@ApiModelProperty(value = "是否锁定默认值")
+	private String defaultLock;
 	 /**
 	 * 值校验表达式
 	 */

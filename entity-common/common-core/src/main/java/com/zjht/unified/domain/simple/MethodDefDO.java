@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "MethodDef 领域对象", description = "")
 public class MethodDefDO {
 
-	private static final long serialVersionUID = 8074349355698552063L;
+	private static final long serialVersionUID = 4719440169440892262L;
 
 
 	/**
@@ -55,11 +55,6 @@ public class MethodDefDO {
 	@ApiModelProperty(value = "原始ID")
 	private Long originalId;
 	 /**
-	 * 方法说明
-	 */
-	@ApiModelProperty(value = "方法说明")
-	private String description;
-	 /**
 	 * 显示名称
 	 */
 	@ApiModelProperty(value = "显示名称")
@@ -74,4 +69,14 @@ public class MethodDefDO {
 	 */
 	@ApiModelProperty(value = "")
 	private String clazzGuid;
+	 /**
+	 * private/public/protected
+	 */
+	@ApiModelProperty(value = "private/public/protected")
+	private String modifier;
+	 /**
+	 * 方法说明
+	 */
+	@ApiModelProperty(value = "方法说明")
+	private String description;
 }
