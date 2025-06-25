@@ -1,9 +1,11 @@
 package com.zjht.unified.service.ctx;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.wukong.core.weblog.utils.JsonUtil;
+import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.common.core.util.SpringUtils;
@@ -12,6 +14,7 @@ import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.InstanceFieldDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.utils.JsonUtilUnderline;
 import com.zjht.unified.utils.StoreUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -149,9 +152,22 @@ public class RtRedisObjectStorageService {
             instanceList.forEach(inst->{
                 setObject(ctx,new UnifiedObject(inst.getGuid(),inst.getClassGuid(),true, prjGuid,prjVer,ctx.getVer()));
                 if(StringUtils.isNotBlank(inst.getAttrValue())){
-                    List<InstanceFieldDO> fdlst = JsonUtil.parseArray(inst.getAttrValue(), InstanceFieldDO.class);
-                    fdlst.forEach(fd->{
-                        setObjectAttrValue(ctx,inst.getGuid(),fd.getField(),fd.getCurrentValue(),false);
+                    Map<String, Object> fdlst = JsonUtilUnderline.readValue(inst.getAttrValue(), new TypeReference<Map<String, Object>>() {
+                    });
+                    fdlst.entrySet().stream().forEach(fd->{
+                        Object value = fd.getValue();
+                        if(value instanceof Map){
+                            String guid = (String) ((Map<?, ?>) value).get(FieldConstants.GUID);
+                            if(guid!=null) {
+                                EntityDepService entityDepService = SpringUtils.getBean(EntityDepService.class);
+                                UnifiedObject target = entityDepService.getObject(ctx, guid);
+                                if(target!=null){
+                                    setObjectAttrValue(ctx,inst.getGuid(),fd.getKey(),target,false);
+                                }
+                            }
+                        }else{
+                            setObjectAttrValue(ctx,inst.getGuid(),fd.getKey(),value,false);
+                        }
                     });
                 }
 

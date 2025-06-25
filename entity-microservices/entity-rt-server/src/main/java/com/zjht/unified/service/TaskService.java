@@ -128,6 +128,15 @@ public class TaskService {
 
     public void initSpecDefinition(TaskContext ctx, PrjSpecDO spec){
 
+        // 先初始化依赖项目
+        if(spec.getDepPkgList()!=null){
+            spec.getDepPkgList().forEach(pkg->{
+                TaskContext subContext=rtContextService.startNewSession(pkg,ctx.getVer());
+                ctx.appendTaskContext(subContext);
+                initSpecDefinition(subContext,pkg);
+            });
+        }
+
         String prjGuid = spec.getUePrj().getGuid();
         String prjVer = spec.getUePrj().getVersion();
 
@@ -148,12 +157,6 @@ public class TaskService {
 
 //        String prjKey=prjGuid+":"+prjVer;
 
-        if(spec.getDepPkgList()!=null){
-            spec.getDepPkgList().forEach(pkg->{
-                TaskContext subContext=rtContextService.startNewSession(pkg,ctx.getVer());
-                ctx.appendTaskContext(subContext);
-                initSpecDefinition(subContext,pkg);
-            });
-        }
+
     }
 }
