@@ -27,10 +27,4 @@ public class IpPortExtractor {
         }
         return null;
     }
-
-    // 测试示例
-    public static void main(String[] args) {
-        String input = "➜ Network: http://192.168.4.89:5174/ddtsett";
-        extractIpPort(input).ifPresent(System.out::println); // 输出: 192.168.4.89:5174
-    }
 }
