@@ -277,7 +277,7 @@ public class ClazzDefCompositeExtController extends BaseController{
 
 
     @ApiOperation(value = "查询(clazzDef)列表，接受like和in条件，包括依赖项目")
-    @GetMapping("/delete-ext")
+    @PostMapping("/delete-ext")
     public R<Long> deleteExt(@RequestBody IdAndGuid idAndGuid){
         if(idAndGuid.getId()!=null){
             clazzDefCompositeService.removeById(idAndGuid.getId());
