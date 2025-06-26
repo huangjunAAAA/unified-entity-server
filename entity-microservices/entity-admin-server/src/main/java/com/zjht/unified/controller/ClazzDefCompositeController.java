@@ -14,6 +14,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.UUID;
 import com.zjht.unified.vo.ClazzDefVo;
 import com.zjht.unified.wrapper.ClazzDefWrapper;
 import com.zjht.unified.entity.ClazzDef;
@@ -106,6 +107,15 @@ public class ClazzDefCompositeController extends BaseController{
         }
         if(StringUtils.isBlank(clazzDef.getNameZh())){
             return R.fail("类中文名不能为空");
+        }
+        if(StringUtils.isBlank(clazzDef.getGuid())){
+            clazzDef.setGuid(UUID.fastUUID().toString());
+        }
+        if(clazzDef.getPrjId()==null){
+            return R.fail("项目ID不能为空");
+        }
+        if(StringUtils.isBlank(clazzDef.getType())){
+            clazzDef.setType(Constants.CLASS_TYPE_USER);
         }
         // 检查name或name_zh是否重复
         List<ClazzDef> tmp = clazzDefService.list(new LambdaQueryWrapper<ClazzDef>()
