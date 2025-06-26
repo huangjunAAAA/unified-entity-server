@@ -3,11 +3,13 @@ package com.zjht.unified.common.core.constants;
 import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
+import com.zjht.unified.domain.runtime.TNode;
 import com.zjht.unified.domain.simple.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CoreClazzDef {
@@ -58,7 +60,7 @@ public class CoreClazzDef {
         if (coreClsMap.isEmpty())
             synchronized (CoreClazzDef.class) {
                 if(coreClsMap.isEmpty()){
-                    coreClsMap.put(CLAZZ_TREE_NODE,convert(ConfigGraphDO.class));
+                    coreClsMap.put(CLAZZ_TREE_NODE,convert(TNode.class));
                     coreClsMap.put(CLAZZ_CLSREL,convert(ClsRelationDO.class));
                     coreClsMap.put(CLAZZ_DATAVIEW,convert(ViewDefDO.class));
                     coreClsMap.put(CLAZZ_DB_TABLE,convert(DbtableAliasDO.class));
@@ -89,7 +91,15 @@ public class CoreClazzDef {
             FieldDefCompositeDO fieldDefCompositeDO = new FieldDefCompositeDO();
             fieldDefCompositeDO.setName(field.getName());
             fieldDefCompositeDO.setType(field.getType().getSimpleName());
-            fieldDefCompositeDO.setNature(1);
+            if(field.getType().isPrimitive()) {
+                fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_PRIMITIVE));
+            }else if (field.getType().equals(TNode.class)){
+                fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_TREENODE));
+            }else if(field.getType().equals(List.class)){
+                fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_CLS_REL));
+            }else{
+                fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_REGULAR_CLASS));
+            }
             fieldDefCompositeDO.setDisplayName(field.getName());
             fieldDefCompositeDO.setCachable(0);
 

@@ -4,6 +4,7 @@ package com.zjht.unified.controller;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.common.core.domain.dto.GetParam;
+import com.zjht.unified.common.core.domain.dto.GuidDTO;
 import com.zjht.unified.common.core.domain.dto.SetParam;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FsmDefCompositeDO;
@@ -12,7 +13,6 @@ import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
 import com.zjht.unified.dto.*;
-import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.service.FrontObjectService;
 import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
@@ -233,5 +233,17 @@ public class ExecController {
         }
         List<Map<String, Object>> result = frontObjectService.listAllObject(ctx,param);
         return R.ok(result);
+    }
+
+    @ApiOperation(value = "在指定运行环境获取树根节点列表")
+    @PostMapping("/list-tree")
+    public R<List<Map<String, Object>>> listTree(@RequestBody BaseQueryDTO<QueryTree>  param){
+        return null;
+    }
+
+    @ApiOperation(value = "在指定运行环境删除树节点")
+    @PostMapping("/delete-tree")
+    public R<Integer> deleteTree(@RequestBody GuidDTO<Object> param){
+        return null;
     }
 }
