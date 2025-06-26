@@ -48,22 +48,22 @@ public class RedisKeyName {
      * @return
      */
     public static String getObjectAttrDefKey(String prjVer, String clsGuid, String ver, String attrName){
-        return ver+":"+prjVer+":"+clsGuid+":"+attrName;
+        return ver+":"+prjVer+":attr_name:"+clsGuid+":"+attrName;
     }
 
     public static String getObjectAttrDefKey(String prjVer, String fieldGuid, String ver){
-        return ver+":"+prjVer+":"+fieldGuid;
+        return ver+":"+prjVer+":attr_guid:"+fieldGuid;
     }
 
     public static String getObjectKey(String guid,String ver,String prjGuid,String prjVer){
-        return prjGuid+":"+prjVer+":"+ver+":"+guid;
+        return ver+":"+prjVer+":object:"+prjGuid+":"+guid;
     }
 
     public static String getClsDefKey(String ver,String prjVer,String clsGuid){
-        return ver+":"+prjVer+":"+clsGuid;
+        return ver+":"+prjVer+":cls:"+clsGuid;
     }
 
     public static String getObjectRtKey(String guid,String ver,String prjGuid,String prjVer){
-        return prjGuid+":"+prjVer+":"+ver+":rt:"+guid;
+        return ver+":"+prjVer+":rt:"+prjGuid+":"+guid;
     }
 }
