@@ -68,7 +68,7 @@ public class ClassUtils {
     public V8Value newInstanceByGuid(String classGuid, Boolean isPersist,V8Value... args) throws Exception {
         log.info("new args = " + Arrays.toString(args));
         ClazzDefCompositeDO classDef = CoreClazzDef.getCoreClassObject(classGuid);;
-        if (classDef != null) {
+        if (classDef == null) {
             classDef = entityDepService.getClsDefByGuid(taskContext, classGuid);
         }
         if (classDef == null) {

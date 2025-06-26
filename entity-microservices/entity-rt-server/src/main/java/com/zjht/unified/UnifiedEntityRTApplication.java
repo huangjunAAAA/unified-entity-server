@@ -44,7 +44,7 @@ public class UnifiedEntityRTApplication {
         }
 
         ConfigurableApplicationContext app = SpringApplication.run(UnifiedEntityRTApplication.class, args);
-        log.info("数据存储模块启动成功");
+        log.info("引擎模块启动成功");
     }
 
 }

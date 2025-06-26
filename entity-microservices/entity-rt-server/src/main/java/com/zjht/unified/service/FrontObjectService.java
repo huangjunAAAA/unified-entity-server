@@ -108,7 +108,7 @@ public class FrontObjectService {
         }
         if(StringUtils.isNotBlank(param.getClsGuid())){
             classDef = CoreClazzDef.getCoreClassObject(param.getClsGuid());;
-            if (classDef != null) {
+            if (classDef == null) {
                 classDef = entityDepService.getClsDefByGuid(taskContext, param.getClsGuid());
             }
         }else{
