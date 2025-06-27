@@ -24,7 +24,11 @@ public class StoreUtil {
 
         ArrayList<TblCol> cols = Lists.newArrayList();
         ArrayList<TblIndex> indices = Lists.newArrayList();
-        messageDO.setTblName( classDef.getTbl());
+        if (StringUtils.isBlank(classDef.getTbl())) {
+            messageDO.setTblName( StringUtils.toUnderScoreCase(classDef.getName()));
+        } else {
+            messageDO.setTblName( classDef.getTbl());
+        }
         Map<String, Object> newKvMap = new HashMap<>();
         if (saveFlag) {
             for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
@@ -48,9 +52,15 @@ public class StoreUtil {
         } else {
             for (FieldDefCompositeDO fieldDef : classDef.getClazzIdFieldDefList()) {
                 if (kvMap.containsKey(fieldDef.getName())) {
-                    newKvMap.put(fieldDef.getTblCol(), kvMap.get(fieldDef.getName()));
                     TblCol col = new TblCol();
-                    col.setNameEn(fieldDef.getTblCol());
+                    String colName ;
+                    if(StringUtils.isBlank(fieldDef.getTblCol())) {
+                        colName = StringUtils.toUnderScoreCase(fieldDef.getName());
+                    } else {
+                        colName = fieldDef.getTblCol();
+                    }
+                    col.setNameEn(colName);
+                    newKvMap.put(colName, kvMap.get(fieldDef.getName()));
                     col.setNameZh(fieldDef.getDisplayName());
                     col.setType(fieldDef.getType());
                     col.setJdbcType(null);
