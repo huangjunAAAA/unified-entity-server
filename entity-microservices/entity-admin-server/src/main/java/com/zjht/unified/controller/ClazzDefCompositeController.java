@@ -2,7 +2,7 @@ package com.zjht.unified.controller ;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wukong.core.weblog.utils.DateUtil;
@@ -14,6 +14,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.common.core.util.UUID;
 import com.zjht.unified.vo.ClazzDefVo;
 import com.zjht.unified.wrapper.ClazzDefWrapper;
@@ -105,9 +106,13 @@ public class ClazzDefCompositeController extends BaseController{
         if(StringUtils.isBlank(clazzDef.getName())){
             return R.fail("类名不能为空");
         }
+        if(!StringUtils.isValidVar(clazzDef.getName())){
+            return R.fail("类名格式错误");
+        }
         if(StringUtils.isBlank(clazzDef.getNameZh())){
             return R.fail("类中文名不能为空");
         }
+
         if(StringUtils.isBlank(clazzDef.getGuid())){
             clazzDef.setGuid(UUID.fastUUID().toString());
         }
