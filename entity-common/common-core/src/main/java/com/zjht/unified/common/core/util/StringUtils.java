@@ -490,6 +490,58 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         return varName != null && varName.matches("^[a-zA-Z_][a-zA-Z0-9_]*$");
     }
 
+    /**
+     * 判断两个目录路径是否存在冲突
+     * 冲突条件：一个目录是另一个目录的子目录，或者两者完全相同
+     * 
+     * @param dir1 第一个目录路径
+     * @param dir2 第二个目录路径
+     * @return true：存在冲突 false：不存在冲突
+     */
+    public static boolean isDirConflict(String dir1, String dir2)
+    {
+        if (isEmpty(dir1) || isEmpty(dir2))
+        {
+            return false;
+        }
+        
+        // 规范化路径，去除末尾斜杠并转换为绝对路径
+        String normalizedDir1 = normalizePath(dir1);
+        String normalizedDir2 = normalizePath(dir2);
+        
+        // 判断是否为同一目录
+        if (normalizedDir1.equals(normalizedDir2))
+        {
+            return true;
+        }
+        
+        // 判断是否为父子目录关系
+        return normalizedDir1.startsWith(normalizedDir2 + "/") || normalizedDir2.startsWith(normalizedDir1 + "/");
+    }
+
+    /**
+     * 规范化路径，去除末尾斜杠并确保路径格式一致
+     * 
+     * @param path 原始路径
+     * @return 规范化后的路径
+     */
+    private static String normalizePath(String path)
+    {
+        if (path == null)
+        {
+            return "";
+        }
+        
+        // 去除末尾斜杠
+        while (path.endsWith("/") || path.endsWith("\\"))
+        {
+            path = path.substring(0, path.length() - 1);
+        }
+        
+        // 确保使用正斜杠作为分隔符
+        return path.replace("\\", "/");
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T cast(Object obj)
     {

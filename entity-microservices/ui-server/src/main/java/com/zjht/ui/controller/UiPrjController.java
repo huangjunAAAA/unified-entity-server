@@ -22,6 +22,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.common.core.domain.dto.ConditionLikeAndIn;
+import com.zjht.unified.common.core.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -110,6 +112,20 @@ public class UiPrjController extends BaseController {
     @PostMapping("/create")
     public R<Long> create(@RequestBody CreateUiPrjDTO uiPrj)
     {
+        if(StringUtils.isBlank(uiPrj.getWorkDir())){
+            return R.fail("请填写项目目录");
+        }
+        if(!uiPrj.getWorkDir().startsWith("/")&&!uiPrj.getWorkDir().startsWith("\\")){
+            return R.fail("项目目录必须以/或\\开头");
+        }
+        List<UiPrj> uiPrjLst = uiPrjService.list();
+        List<String> dirList = uiPrjLst.stream().map(t -> uiPrj.getWorkDir()).collect(Collectors.toList());
+        for (Iterator<String> iterator = dirList.iterator(); iterator.hasNext(); ) {
+            String exist =  iterator.next();
+            if(StringUtils.isDirConflict(exist, uiPrj.getWorkDir())){
+                return R.fail("项目目录冲突"+exist+" : "+uiPrj.getWorkDir());
+            }
+        }
         uiPrj.setCreateTime(DateUtil.now());
         boolean b = uiPrjService.save(uiPrj);
         if(!b){
