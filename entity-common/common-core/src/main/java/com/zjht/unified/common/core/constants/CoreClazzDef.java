@@ -5,6 +5,7 @@ import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.runtime.TNode;
 import com.zjht.unified.domain.simple.*;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -90,17 +91,25 @@ public class CoreClazzDef {
         for (Field field : fields) {
             FieldDefCompositeDO fieldDefCompositeDO = new FieldDefCompositeDO();
             fieldDefCompositeDO.setName(field.getName());
-            fieldDefCompositeDO.setType(field.getType().getSimpleName());
+
             if(field.getType().isPrimitive()) {
                 fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_PRIMITIVE));
+                fieldDefCompositeDO.setType(field.getType().getSimpleName());
             }else if (field.getType().equals(TNode.class)){
                 fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_TREENODE));
+                fieldDefCompositeDO.setType(String.class.getSimpleName());
             }else if(field.getType().equals(List.class)){
-                fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_CLS_REL));
+                continue;
             }else{
                 fieldDefCompositeDO.setNature(Integer.parseInt(FieldConstants.FIELD_TYPE_REGULAR_CLASS));
+                fieldDefCompositeDO.setType(String.class.getSimpleName());
             }
-            fieldDefCompositeDO.setDisplayName(field.getName());
+            ApiModelProperty dname = field.getAnnotation(ApiModelProperty.class);
+            if(dname!=null&&StringUtils.isNotEmpty(dname.value())){
+                fieldDefCompositeDO.setDisplayName(dname.value());
+            }else {
+                fieldDefCompositeDO.setDisplayName(field.getName());
+            }
             fieldDefCompositeDO.setCachable(0);
 
             clazzDefCompositeDO.getClazzIdFieldDefList().add(fieldDefCompositeDO);
