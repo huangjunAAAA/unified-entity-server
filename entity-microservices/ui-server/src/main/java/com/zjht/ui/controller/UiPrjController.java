@@ -119,7 +119,7 @@ public class UiPrjController extends BaseController {
             return R.fail("项目目录必须以/或\\开头");
         }
         List<UiPrj> uiPrjLst = uiPrjService.list();
-        List<String> dirList = uiPrjLst.stream().map(t -> uiPrj.getWorkDir()).collect(Collectors.toList());
+        List<String> dirList = uiPrjLst.stream().map(t -> t.getWorkDir()).collect(Collectors.toList());
         for (Iterator<String> iterator = dirList.iterator(); iterator.hasNext(); ) {
             String exist =  iterator.next();
             if(StringUtils.isDirConflict(exist, uiPrj.getWorkDir())){
