@@ -12,6 +12,7 @@ import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
 import com.zjht.unified.domain.composite.MethodDefCompositeDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
+import com.zjht.unified.domain.simple.TNodeDO;
 import com.zjht.unified.dto.CreateObjectParam;
 import com.zjht.unified.common.core.domain.dto.GetParam;
 import com.zjht.unified.dto.MethodInvokeParam;
@@ -31,10 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -232,6 +230,97 @@ public class FrontObjectService {
         }else{
             return new ArrayList<>();
         }
+    }
+
+
+    public Integer deleteTree(TaskContext ctx, String guid){
+        GetParam param=new GetParam();
+        param.setObjGuid(guid);
+        param.setVer(param.getVer());
+        Map<String, Object> eNode = getObject(param);
+        if(eNode==null){
+            return 0;
+        }
+        Set<String> treeGuids=new HashSet<>();
+        treeGuids.add(guid);
+        Object parentGuid = eNode.get("parent");
+        if(Objects.equals("0",parentGuid)){
+            // 根节点
+            QueryClass treeQuery = new QueryClass();
+            BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
+            query.setCondition(treeQuery);
+            Map<String, Object> equals=new HashMap<>();
+            equals.put("root", guid);
+            equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
+            equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
+            R<List<Map<String, Object>>> result = remoteStore.query(query);
+            if(result.getData()!=null){
+                result.getData().stream().forEach(resData->{
+                    Object tmpGuid = resData.get(FieldConstants.GUID);
+                    if(tmpGuid!=null)
+                        treeGuids.add(tmpGuid.toString());
+                });
+            }
+            for (Iterator<String> iterator = treeGuids.iterator(); iterator.hasNext(); ) {
+                String tGuid =  iterator.next();
+                entityDepService.deleteObject(ctx, tGuid);
+            }
+            return treeGuids.size();
+        }else{
+            int count=0;
+            while(!treeGuids.isEmpty()){
+                String tGuid=treeGuids.iterator().next();
+                treeGuids.remove(tGuid);
+                entityDepService.deleteObject(ctx, tGuid);
+                count++;
+                QueryClass treeQuery = new QueryClass();
+                BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
+                query.setCondition(treeQuery);
+                Map<String, Object> equals=new HashMap<>();
+                equals.put("parent", guid);
+                equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
+                equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
+                R<List<Map<String, Object>>> result = remoteStore.query(query);
+                if(result.getData()!=null){
+                    result.getData().stream().forEach(resData->{
+                        Object tmpGuid = resData.get(FieldConstants.GUID);
+                        if(tmpGuid!=null)
+                            treeGuids.add(tmpGuid.toString());
+                    });
+                }
+            }
+            return count;
+        }
+    }
+
+    public List<TNodeDO> listTree(TaskContext ctx,String type,String subType){
+        QueryClass treeQuery = new QueryClass();
+        BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
+        query.setCondition(treeQuery);
+        Map<String, Object> equals=new HashMap<>();
+        equals.put("type", type);
+        equals.put("subType", subType);
+        equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
+        equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
+        treeQuery.setEquals(equals);
+        R<List<Map<String, Object>>> result = remoteStore.query(query);
+        List<TNodeDO> ret=new ArrayList<>();
+        if(result.getData()!=null){
+            result.getData().stream().forEach(resData->{
+                TNodeDO node=new TNodeDO();
+                node.setGuid(resData.get(FieldConstants.GUID).toString());
+                node.setNodeData(resData.get("nodeData").toString());
+                node.setId(Long.parseLong(resData.get(FieldConstants.ID)+""));
+                node.setType(resData.get("type").toString());
+                node.setSubtype(resData.get("subtype").toString());
+                node.setPrjId(ctx.getPrjInfo().getPrjId());
+                node.setRoot(resData.get("root").toString());
+                node.setParent(resData.get("parent").toString());
+                node.setNodeType(resData.get("nodeType").toString());
+                ret.add(node);
+            });
+        }
+        return ret;
     }
 
 }

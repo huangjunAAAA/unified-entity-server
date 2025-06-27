@@ -2,9 +2,10 @@ package com.zjht.unified.domain.simple;
 
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 
-
+@Data
 public class TNodeDO {
 
     private static final long serialVersionUID = 29382572398923L;

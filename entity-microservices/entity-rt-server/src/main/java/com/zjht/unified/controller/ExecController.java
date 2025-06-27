@@ -12,6 +12,7 @@ import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
 import com.zjht.unified.domain.simple.SentinelDefDO;
 import com.zjht.unified.domain.simple.StaticDefDO;
+import com.zjht.unified.domain.simple.TNodeDO;
 import com.zjht.unified.dto.*;
 import com.zjht.unified.service.FrontObjectService;
 import com.zjht.unified.service.IScriptEngine;
@@ -237,13 +238,23 @@ public class ExecController {
 
     @ApiOperation(value = "在指定运行环境获取树根节点列表")
     @PostMapping("/list-tree")
-    public R<List<Map<String, Object>>> listTree(@RequestBody BaseQueryDTO<QueryTree>  param){
-        return null;
+    public R<List<TNodeDO>> listTree(@RequestBody BaseQueryDTO<QueryTree>  param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getCondition().getVer());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getCondition().getVer());
+        }
+        List<TNodeDO> result = frontObjectService.listTree(ctx,param.getCondition().getType(),param.getCondition().getSubtype());
+        return R.ok(result);
     }
 
     @ApiOperation(value = "在指定运行环境删除树节点")
     @PostMapping("/delete-tree")
-    public R<Integer> deleteTree(@RequestBody GuidDTO<Object> param){
-        return null;
+    public R<Integer> deleteTree(@RequestBody GuidDTO<String> param){
+        TaskContext ctx = rtContextService.getRunningContext(param.getData());
+        if(ctx==null){
+            return R.fail("task not found:"+param.getData());
+        }
+        Integer ret = frontObjectService.deleteTree(ctx,param.getGuid());
+        return R.ok(ret);
     }
 }

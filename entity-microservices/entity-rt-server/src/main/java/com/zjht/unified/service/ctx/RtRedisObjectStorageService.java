@@ -200,14 +200,14 @@ public class RtRedisObjectStorageService {
             });
         }
 
+        if(unifiedObject.getPersistTag()){
+            // TODO 删除对象持久化记录
+        }
+
         // 删除对象记录
         String objectKey = RedisKeyName.getObjectRtKey(ctx.getVer(), guid, prjGuid,prjVer);
-        boolean deleted = redisTemplate.delete(objectKey);
-        if (deleted) {
-            return true;
-        } else {
-            return false;
-        }
+        return redisTemplate.delete(objectKey);
+
     }
 
 }

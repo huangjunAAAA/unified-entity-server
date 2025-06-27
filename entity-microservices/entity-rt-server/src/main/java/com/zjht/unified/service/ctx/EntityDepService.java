@@ -130,4 +130,13 @@ public class EntityDepService {
         return null;
     }
 
+    public Boolean deleteObject(TaskContext ctx, String guid){
+        if (StringUtils.isBlank(guid))
+            return false;
+        UnifiedObject uo = getObject(ctx, guid);
+        if(uo==null)
+            return false;
+        return rtRedisObjectStorageService.deleteObject(ctx, guid, uo.getPrjGuid(), uo.getPrjVer());
+    }
+
 }
