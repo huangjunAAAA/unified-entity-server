@@ -19,4 +19,10 @@ public interface RemoteStore {
 
     @PostMapping("/store/query")
     List<Map<String,Object>> query(@RequestParam String ver, @RequestParam String prjId,  @RequestParam String sql);
+
+    @PostMapping("/store/execute")
+    R<Object> execute( @RequestParam String sql);
+
+    @PostMapping("/store/queryWithArgs")
+    List<Map<String, Object>> queryWithArgs(@RequestParam String sql, @RequestBody List<Object> args);
 }

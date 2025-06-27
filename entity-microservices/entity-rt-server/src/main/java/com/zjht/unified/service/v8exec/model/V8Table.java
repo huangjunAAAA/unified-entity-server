@@ -1,6 +1,7 @@
 package com.zjht.unified.service.v8exec.model;
 
 import com.caoccao.javet.annotations.V8Function;
+import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.service.DbMetaService;
 import com.zjht.unified.service.v8exec.SchemaUtils;
 
@@ -26,7 +27,8 @@ public class V8Table{
     public void alterColumnType(String colName, String newType) {
         String sql = String.format("ALTER TABLE `%s`.`%s` MODIFY COLUMN `%s` %s",
                 dbname, name, colName, newType);
-        DbMetaService.executeSql(sql);
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        dbMetaService.executeSql(sql);
     }
 
     @V8Function(name = "alterColumnTypeByIdx")
@@ -42,7 +44,8 @@ public class V8Table{
         String type = colOpt.get().type;
         String sql = String.format("ALTER TABLE `%s`.`%s` CHANGE COLUMN `%s` `%s` %s",
                 dbname, name, oldName, newName, type);
-        DbMetaService.executeSql(sql);
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        dbMetaService.executeSql(sql);
     }
 
     @V8Function(name = "alterColumnNameByIdx")
@@ -55,7 +58,8 @@ public class V8Table{
     public void dropIdx(String idxName) {
         String sql = String.format("ALTER TABLE `%s`.`%s` DROP INDEX `%s`",
                 dbname, name, idxName);
-        DbMetaService.executeSql(sql);
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        dbMetaService.executeSql(sql);
     }
 
     @V8Function(name = "createIdx")
@@ -63,7 +67,9 @@ public class V8Table{
         String cols = String.join("`, `", columnNames);
         String sql = String.format("CREATE %s INDEX `%s` ON `%s`.`%s` (`%s`)",
                 type.toUpperCase(), idxName, dbname, name, cols);
-        DbMetaService.executeSql(sql);
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+
+        dbMetaService.executeSql(sql);
     }
 
     @V8Function(name = "filter")
@@ -75,7 +81,8 @@ public class V8Table{
                 " LIMIT ?, ?";
         params.add(offset);
         params.add(limit);
-        return DbMetaService.query(sql, params.toArray());
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        return dbMetaService.query(sql, params.toArray());
     }
 
     @V8Function(name = "filterLen")
@@ -84,7 +91,8 @@ public class V8Table{
         String sql = "SELECT COUNT(*) AS cnt FROM `" +
                 dbname + "`.`" + name + "` " +
                 buildWhereSql(condition, params);
-        List<Map<String, Object>> result = DbMetaService.query(sql, params.toArray());
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        List<Map<String, Object>> result = dbMetaService.query(sql, params.toArray());
         if (result.isEmpty()) return 0;
         return ((Number) result.get(0).get("cnt")).intValue();
     }
@@ -92,7 +100,8 @@ public class V8Table{
     @V8Function(name = "length")
     public int length() {
         String sql = String.format("SELECT COUNT(*) AS cnt FROM `%s`.`%s`", dbname, name);
-        List<Map<String, Object>> result = DbMetaService.query( sql);
+        DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
+        List<Map<String, Object>> result = dbMetaService.query( sql);
         if (result.isEmpty()) return 0;
         return ((Number) result.get(0).get("cnt")).intValue();
     }

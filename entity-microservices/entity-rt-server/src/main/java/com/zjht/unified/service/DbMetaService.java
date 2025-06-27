@@ -80,8 +80,7 @@ public class DbMetaService {
         return meta;
     }
 
-    public static void executeSql(String sql) {
-        RemoteStore remoteStore = SpringUtils.getBean(RemoteStore.class);
+    public void executeSql(String sql) {
         R<Object> result = remoteStore.execute( sql);
         if (result.getCode() == Constants.SUCCESS) {
             log.info("SQL执行成功: {}", sql);
@@ -91,8 +90,7 @@ public class DbMetaService {
         }
     }
 
-    public static List<Map<String, Object>> query( String sql, Object... args) {
-        RemoteStore remoteStore = SpringUtils.getBean(RemoteStore.class);
+    public List<Map<String, Object>> query( String sql, Object... args) {
         if (args == null || args.length == 0) {
             return remoteStore.query("", "", sql);
         } else {
