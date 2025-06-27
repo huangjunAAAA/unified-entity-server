@@ -76,7 +76,12 @@ public class FrontObjectService {
                 }
         }
         params.put("me", me);
-        return scriptEngine.exec(mf.getBody(), params, tcxt, param.getPrjGuid(), param.getPrjVer());
+        Object val = scriptEngine.exec(mf.getBody(), params, tcxt, param.getPrjGuid(), param.getPrjVer());
+        if (val != null && val instanceof UnifiedObject) {
+            Map<String, Object> realVal = getObject(tcxt, (UnifiedObject) val);
+            return realVal;
+        }
+        return val;
     }
 
     public Map<String, Object> getObject(GetParam param) {
