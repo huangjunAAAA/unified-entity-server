@@ -90,6 +90,7 @@ public class StoreUtil {
         messageDO.setPrjId(taskContext.getPrjInfo().getPrjId());
         messageDO.setVer(taskContext.getVer());
         messageDO.setData(JsonUtilExt.toJson(Lists.newArrayList(newKvMap)));
+        messageDO.setVer(taskContext.getVer());
         return messageDO;
     }
 }

@@ -12,6 +12,7 @@ import com.zjht.unified.common.core.util.AliDruidUtils;
 import com.zjht.unified.common.core.util.MysqlDDLUtils;
 import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
+import com.zjht.unified.data.storage.service.DynamicDataSourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -30,6 +31,9 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
 
     protected TableDDLService ddlService;
 
+    @Resource
+    protected DynamicDataSourceService dynamicDataSourceService;
+
     @Override
     public List<Integer> updateEntity(EntityStoreMessageDO sMsg) {
         List<TblCol> colDef = sMsg.getCols();
@@ -40,7 +44,7 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
 
             for (Iterator<Map<String, Object>> iterator = data.iterator(); iterator.hasNext(); ) {
                 Map<String, Object> vals =  iterator.next();
-                int id=updateObject(vals,sMsg.getTblName(),colDef);
+                int id=updateObject(vals,sMsg.getTblName(),colDef,sMsg.getVer());
                 ids.add(id);
             }
         }
@@ -58,20 +62,26 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
 
             for (Iterator<Map<String, Object>> iterator = data.iterator(); iterator.hasNext(); ) {
                 Map<String, Object> vals =  iterator.next();
-                Long id=saveObject(vals,sMsg.getTblName(),colDef,indices,sMsg.getPrjId());
+                Long id=saveObject(vals,sMsg.getTblName(),colDef,indices,sMsg.getPrjId(),sMsg.getVer());
                 ids.add(id);
             }
         }
         return ids;
     }
-    public void createObjectTable(Map<String,Object> data,String tbl, List<TblCol> def,List<TblIndex> indices){
-        if(!checkTableExist(tbl)){
+
+
+    public abstract void delExcludeObjectScope(List<Map<String,Object>> vals,String tbl,List<TblCol> colDef,String ver);
+
+
+    public void createObjectTable(Map<String,Object> data,String tbl, List<TblCol> def,List<TblIndex> indices,String ver){
+        if(!checkTableExist(tbl,ver)){
             synchronized (tableExistence){
-                if(!checkTableExist(tbl)){
+                if(!checkTableExist(tbl,ver)){
                     TableCreateDDL createTable = ddlService.createTable(tbl, data, def, indices);
                     for (Iterator<String> iterator = createTable.getDdl().iterator(); iterator.hasNext(); ) {
                         String sql =  iterator.next();
                         log.info("creating table:"+tbl+", with sql:\n"+sql);
+                        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
                         jdbcTemplate.execute(sql);
                     }
                     tableExistence.put(tbl,true);
@@ -81,13 +91,13 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
         MysqlDDLUtils.addEntityReferenceColumns(def);
     }
 
-    public abstract Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices,Long colpId);
+    public abstract Long saveObject(Map<String, Object> vals, String tbl, List<TblCol> colDef, List<TblIndex> indices,Long colpId,String ver);
 
-    public abstract int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef);
+    public abstract int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver);
 
     private final Map<String,Boolean> tableExistence=new HashMap<>();
 
-    public boolean checkTableExist(String name){
+    public boolean checkTableExist(String name,String ver){
         Boolean exist = tableExistence.get(name);
         if(exist!=null)
             return exist;
@@ -96,6 +106,7 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
             if(exist!=null)
                 return exist;
             try {
+                JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
                 SqlRowSet rs = jdbcTemplate.queryForRowSet("show create table " + name);
                 exist = rs.next();
             } catch (Exception e){
@@ -160,7 +171,7 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
                 TblCol col = iter2.next();
                 valLst.put(col.getNameEn(),null);
             }
-            updateObject(valLst,sMsg.getTblName(),sMsg.getCols());
+            updateObject(valLst,sMsg.getTblName(),sMsg.getCols(),sMsg.getVer());
         }
     }
 }

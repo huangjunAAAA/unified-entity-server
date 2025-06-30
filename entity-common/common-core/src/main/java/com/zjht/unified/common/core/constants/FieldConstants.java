@@ -5,6 +5,7 @@ public class FieldConstants {
     public static final String DEVICE_ID="device_id";
     public static final String SYSTEM_ID="sys_id";
     public static final String PROJECT_ID="prj_id";
+    public static final String PROJECT_ID_CAMEL="prjId";
     public static final String GUID="guid";
     public static final String ID="id";
     public static final String CLAZZ_GUID="clazz_guid";

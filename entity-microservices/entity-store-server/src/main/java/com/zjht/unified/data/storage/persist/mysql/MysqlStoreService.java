@@ -13,6 +13,7 @@ import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.data.storage.persist.AbstractStoreService;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -28,39 +29,48 @@ public class MysqlStoreService extends AbstractStoreService {
     private MysqlDDLService mysqlDDLService;
 
 
-    public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId){
-        createObjectTable(data,tbl,def,indices);
+
+    public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId,String ver){
+        createObjectTable(data,tbl,def,indices,ver);
         MysqlDDLUtils.setJdbcType(def,data);
 //        data.put(FieldConstants.SYSTEM_ID,ref.getSystemId());
 //        data.put(FieldConstants.DEVICE_ID,ref.getDeviceId());
 //        data.put(FieldConstants.POINT_ID,ref.getPointId());
-        data.put(FieldConstants.PROJECT_ID,colpId);
+        if (!data.containsKey(FieldConstants.PROJECT_ID) && !data.containsKey(FieldConstants.PROJECT_ID_CAMEL)) {
+            data.put(FieldConstants.PROJECT_ID,colpId);
+        }
 //        data.put(FieldConstants.DRIVER_ID,driverId);
         String insertSQL = mysqlDDLService.insert(tbl, data, def)+";";
+        log.info("insertSQL===========================:{}",insertSQL);
         String lastId="SELECT LAST_INSERT_ID();";
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
         jdbcTemplate.update(insertSQL);
         Long lastInsertId = jdbcTemplate.queryForObject(lastId, Long.class);
         return lastInsertId;
     }
 
     @Override
-    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
+    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver
+    ) {
         MysqlDDLUtils.setJdbcType(colDef,vals);
         MysqlDDLUtils.addUpdateConditionColumns(colDef);
         String updateSql = mysqlDDLService.update(tbl, vals, colDef);
         log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
         int update = jdbcTemplate.update(updateSql);
         return update;
     }
 
-
-    public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef) {
+    @Override
+    public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef,String ver) {
         Optional<TblCol> pk = colDef.stream().filter(c -> c.getIsPK() == 1).findFirst();
         if(!pk.isPresent())
             return;
         String pkName=StrUtil.toUnderlineCase(pk.get().getNameEn());
         List<Object> pkVals = vals.stream().map(t -> t.get(pkName)).collect(Collectors.toList());
         String delSql = MysqlDDLUtils.deleteIn(tbl, pkName, pkVals, true);
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
+
         jdbcTemplate.execute(delSql);
     }
 

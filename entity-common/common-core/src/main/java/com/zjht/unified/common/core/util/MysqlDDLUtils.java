@@ -241,7 +241,7 @@ public class MysqlDDLUtils {
     public static void addEntityReferenceColumns(List<TblCol> validColList){
         Set<String> cSet = validColList.stream().map(c -> c.getNameEn()).collect(Collectors.toSet());
 
-        if(!cSet.contains(FieldConstants.PROJECT_ID)) {
+        if(!cSet.contains(FieldConstants.PROJECT_ID) && !cSet.contains(FieldConstants.PROJECT_ID_CAMEL)) {
             TblCol planCol = new TblCol();
             planCol.setNameEn(FieldConstants.PROJECT_ID);
             planCol.setType("Long");
@@ -291,10 +291,12 @@ public class MysqlDDLUtils {
 
     public static String insert(String tbl, Map<String, Object> actualData, List<TblCol> preDefLst) {
         Map<String, TblCol> colMap = preDefLst.stream().collect(Collectors.toMap(d -> d.getNameEn(), Function.identity()));
+        log.info("colmap =============== :{}",colMap);
         MySqlInsertStatement insert = new MySqlInsertStatement();
         insert.setTableName(new SQLIdentifierExpr(StrUtil.toUnderlineCase(tbl)));
         SQLInsertStatement.ValuesClause vc = new SQLInsertStatement.ValuesClause();
         insert.addValueCause(vc);
+        log.info("actualData=============== :{}",actualData);
         actualData.entrySet().stream().forEach(e -> {
             insert.addColumn(new SQLIdentifierExpr(StrUtil.toUnderlineCase(e.getKey())));
             TblCol colDef = colMap.get(e.getKey());

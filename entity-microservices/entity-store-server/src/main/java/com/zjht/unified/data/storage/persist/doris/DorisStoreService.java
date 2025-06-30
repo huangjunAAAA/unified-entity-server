@@ -21,6 +21,7 @@ import org.apache.kafka.clients.admin.ListTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.KafkaFuture;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -50,11 +51,13 @@ public class DorisStoreService extends AbstractStoreService {
 
 
     @Override
-    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef) {
+    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver) {
         MysqlDDLUtils.setJdbcType(colDef,vals);
         MysqlDDLUtils.addUpdateConditionColumns(colDef);
         String updateSql = dorisDDLService.update(tbl, vals, colDef);
         log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
+
         int update = jdbcTemplate.update(updateSql);
         return update;
     }
@@ -64,23 +67,26 @@ public class DorisStoreService extends AbstractStoreService {
     private static final Map<String, String> timeFmt=new HashMap<>();
 
     @Override
-    public void createObjectTable(Map<String, Object> data, String tbl, List<TblCol> def, List<TblIndex> indices) {
-        super.createObjectTable(data, tbl, def, indices);
-        createStreamLoad(tbl);
+    public void createObjectTable(Map<String, Object> data, String tbl, List<TblCol> def, List<TblIndex> indices,String ver) {
+        super.createObjectTable(data, tbl, def, indices,ver);
+        createStreamLoad(tbl,ver);
     }
 
-    public void createStreamLoad(String tbl){
-        if(!checkStreamRoutine(tbl)){
+
+    public void createStreamLoad(String tbl,String ver){
+        if(!checkStreamRoutine(tbl,ver)){
             synchronized (streamRoutineExistence){
                 String sql = dorisDDLService.createStreamRoutine(tbl);
                 log.info("creating table:"+tbl+", with sql:\n"+sql);
+                JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
+
                 jdbcTemplate.execute(sql);
                 streamRoutineExistence.put(tbl,true);
             }
         }
     }
 
-    public boolean checkStreamRoutine(String name){
+    public boolean checkStreamRoutine(String name,String ver){
         Boolean exist = streamRoutineExistence.get(name);
         if(exist!=null)
             return exist;
@@ -89,6 +95,7 @@ public class DorisStoreService extends AbstractStoreService {
             if(exist!=null)
                 return exist;
             try {
+                JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
                 SqlRowSet rs = jdbcTemplate.queryForRowSet("SHOW ROUTINE LOAD FOR load_" + name+"Job");
                 exist = rs.next();
             } catch (Exception e){
@@ -101,9 +108,9 @@ public class DorisStoreService extends AbstractStoreService {
         }
     }
 
-    public Long saveObject(Map<String, Object> data, String tbl, List<TblCol> preDefLst, List<TblIndex> indices,Long colpId) {
+    public Long saveObject(Map<String, Object> data, String tbl, List<TblCol> preDefLst, List<TblIndex> indices,Long colpId,String ver) {
         DorisDDLUtils.setJdbcType(preDefLst,data);
-        createObjectTable(data,tbl,preDefLst,indices);
+        createObjectTable(data,tbl,preDefLst,indices,ver);
         createKafkaTopic(KafkaNames.DORIS_TOPIC_PRIFIX+tbl);
         Map<String, TblCol> colMap = preDefLst.stream().collect(Collectors.toMap(d -> d.getNameEn(), Function.identity()));
         data.entrySet().stream().forEach(e -> {
@@ -149,7 +156,8 @@ public class DorisStoreService extends AbstractStoreService {
         return id;
     }
 
-    public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef) {
+    @Override
+    public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef,String ver) {
         Optional<TblCol> pk = colDef.stream().filter(c -> c.getIsPK() == 1).findFirst();
         if(!pk.isPresent())
             return;
@@ -173,6 +181,7 @@ public class DorisStoreService extends AbstractStoreService {
 //            String partitionList = " PARTITION ("+StrUtil.join(",", monthSet)+") WHERE";
 //            delSql=delSql.replace("WHERE",partitionList);
 //        }
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
 
         jdbcTemplate.execute(delSql);
     }
