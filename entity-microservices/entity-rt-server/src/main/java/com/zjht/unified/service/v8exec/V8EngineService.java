@@ -141,6 +141,7 @@ public class V8EngineService implements IScriptEngine {
         register(v8Runtime, factory, () -> new LockUtils(ctx, prjGuid, prjVer));
         register(v8Runtime, factory, () -> new MemUtils(ctx, prjGuid, prjVer));
         register(v8Runtime, factory, () -> new RecordUtils(ctx, prjGuid, prjVer));
+        register(v8Runtime, factory, () -> new SchemaUtils(ctx, prjGuid, prjVer));
     }
 
     /**

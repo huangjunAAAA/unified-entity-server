@@ -1,6 +1,6 @@
 spring:
   application:
-    name: entity-store-server
+    name: entity-store-server-local
   profiles:
     active: dev
   main:
@@ -19,6 +19,7 @@ spring:
         shared-configs:
           - dc.${spring.cloud.nacos.config.file-extension}
           - dc-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - entity-store-server-dev.yaml
 
 
 

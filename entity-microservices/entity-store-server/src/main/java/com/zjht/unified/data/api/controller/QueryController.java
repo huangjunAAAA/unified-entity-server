@@ -40,4 +40,21 @@ public class QueryController {
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
         return list;
     }
+
+    @PostMapping("/store/execute")
+    public R<Object> executeSql( @RequestParam String sql) {
+        try {
+            jdbcTemplate.execute(sql);
+            return R.ok();
+        } catch (Exception e) {
+            return R.fail("SQL执行失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/store/queryWithArgs")
+    public List<Map<String, Object>> queryWithArgs(@RequestParam String sql, @RequestBody List<Object> args) {
+        return jdbcTemplate.queryForList(sql, args.toArray());
+    }
+
+
 }

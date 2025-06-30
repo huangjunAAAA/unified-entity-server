@@ -1,6 +1,6 @@
 spring:
   application:
-    name: entity-admin-server
+    name: entity-admin-server-local
   profiles:
     active: dev
   main:
@@ -19,7 +19,7 @@ spring:
         shared-configs:
           - de.${spring.cloud.nacos.config.file-extension}
           - de-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-
+          - entity-admin-server-dev.yaml
 
 
 
