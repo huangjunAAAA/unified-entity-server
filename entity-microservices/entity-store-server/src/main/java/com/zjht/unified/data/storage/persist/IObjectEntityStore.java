@@ -18,4 +18,8 @@ public interface IObjectEntityStore {
                                          Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in);
 
     void deleteEntity(String table, String guid, Long id);
+
+    Map<String,Object>getEntityByGuid(String guid);
+
+    void removeEntityFieldByGuid(EntityStoreMessageDO val);
  }

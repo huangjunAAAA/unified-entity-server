@@ -45,13 +45,7 @@ public class ClassUtils {
     @V8Function(name = "createEntity")
     public V8Value newInstance(String className, Boolean isPersist,V8Value... args) throws Exception {
         log.info("new args = " + Arrays.toString(args));
-        ClazzDefCompositeDO classDef = null;
-        String cguid = CoreClazzDef.getCoreClassGuid(className);
-        if (cguid != null) {
-            classDef = CoreClazzDef.getCoreClassObject(cguid);
-        } else {
-            classDef = entityDepService.getClsByName(taskContext, className);
-        }
+        ClazzDefCompositeDO classDef = entityDepService.getClsByName(taskContext, className);;
         if (classDef == null) {
             log.error("ClassName not found in newInstance:  {}", className);
             return null;
@@ -67,10 +61,7 @@ public class ClassUtils {
     @V8Function(name = "createEntityByGuid")
     public V8Value newInstanceByGuid(String classGuid, Boolean isPersist,V8Value... args) throws Exception {
         log.info("new args = " + Arrays.toString(args));
-        ClazzDefCompositeDO classDef = CoreClazzDef.getCoreClassObject(classGuid);;
-        if (classDef == null) {
-            classDef = entityDepService.getClsDefByGuid(taskContext, classGuid);
-        }
+        ClazzDefCompositeDO classDef = entityDepService.getClsDefByGuid(taskContext, classGuid);
         if (classDef == null) {
             log.error("ClassName not found in newInstance:  {}", classGuid);
             return null;
@@ -128,13 +119,7 @@ public class ClassUtils {
 
     @V8Function(name = "getClassByName")
     public V8Value getClassObjectByName(V8ValueObject clsName) {
-        ClazzDefCompositeDO clsObj =null;
-        String cguid = CoreClazzDef.getCoreClassGuid(clsName.toString());
-        if (cguid != null) {
-            clsObj=CoreClazzDef.getCoreClassObject(cguid);
-        }else{
-            clsObj=entityDepService.getClsByName(taskContext,clsName.toString());
-        }
+        ClazzDefCompositeDO clsObj =entityDepService.getClsByName(taskContext,clsName.toString());
         if (clsObj != null) {
             return convertClassObject(clsObj, clsName.getV8Runtime());
         }
@@ -143,10 +128,7 @@ public class ClassUtils {
 
     @V8Function(name = "getClassByGuid")
     public V8Value getClassObject(String guid) {
-        ClazzDefCompositeDO clsObj = CoreClazzDef.getCoreClassObject(guid);
-        if (clsObj == null) {
-            clsObj = entityDepService.getClsDefByGuid(taskContext,guid);
-        }
+        ClazzDefCompositeDO clsObj = entityDepService.getClsDefByGuid(taskContext,guid);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         if (clsObj == null) {
             return v8Runtime.createV8ValueNull();

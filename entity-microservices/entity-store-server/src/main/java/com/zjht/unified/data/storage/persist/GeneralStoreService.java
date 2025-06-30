@@ -43,10 +43,22 @@ public class GeneralStoreService implements IObjectEntityStore, ApplicationRunne
         objectEntityStore.deleteEntity(table, guid, id);
     }
 
+    @Override
+    public Map<String, Object> getEntityByGuid(String guid) {
+        return objectEntityStore.getEntityByGuid(guid);
+    }
+
+    @Override
+    public void removeEntityFieldByGuid(EntityStoreMessageDO val) {
+        objectEntityStore.removeEntityFieldByGuid(val);
+    }
+
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         String beanName=persistConfig.getEngine()+"-store";
         objectEntityStore= (IObjectEntityStore) SpringUtil.getBean(beanName);
     }
+
+
 }

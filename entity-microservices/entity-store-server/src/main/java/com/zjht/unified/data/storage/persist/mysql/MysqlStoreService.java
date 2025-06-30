@@ -53,7 +53,7 @@ public class MysqlStoreService extends AbstractStoreService {
         return update;
     }
 
-    @Override
+
     public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef) {
         Optional<TblCol> pk = colDef.stream().filter(c -> c.getIsPK() == 1).findFirst();
         if(!pk.isPresent())
@@ -67,5 +67,11 @@ public class MysqlStoreService extends AbstractStoreService {
     @PostConstruct
     protected void initDDL(){
         this.ddlService=mysqlDDLService;
+    }
+
+
+    @Override
+    public Map<String, Object> getEntityByGuid(String guid) {
+        return Collections.emptyMap();
     }
 }

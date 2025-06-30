@@ -5,6 +5,7 @@ import com.wukong.bigdata.common.model.KafkaMessageRecord;
 import com.wukong.core.weblog.utils.JsonUtil;
 
 
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.data.dispatch.DispatchMqService;
@@ -42,12 +43,16 @@ public class KafkaConsumerListener implements ConsumerSeekAware {
             return;
 
         EntityStoreMessageDO sMsg = JsonUtil.parse(kMsg.getData().toString(), EntityStoreMessageDO.class);
-        if (kMsg.getTable().equals("save")) {
+        if (kMsg.getTable().equals(Constants.CMD_STORE_ENTITY)) {
             List<Long> longs = storeService.saveEntity(sMsg);
             log.info(" table : {} save object  return ids {} " , sMsg.getTblName(),longs);
-        } else if (kMsg.getTable().equals("update")) {
+        } else if (kMsg.getTable().equals(Constants.CMD_UPDATE_ENTITY)) {
             List<Integer> integers = storeService.updateEntity(sMsg);
             log.info("table : {} update object  return  {} " ,sMsg.getTblName(), integers);
+        } else if (kMsg.getTable().equals(Constants.CMD_DELETE_ENTITY)) {
+            storeService.deleteEntity(sMsg.getTblName(),(String)sMsg.getData(),null);
+        } else if (kMsg.getTable().equals(Constants.CMD_ENTITY_DELETE_FIELD)) {
+            storeService.removeEntityFieldByGuid(sMsg);
         }
 
 

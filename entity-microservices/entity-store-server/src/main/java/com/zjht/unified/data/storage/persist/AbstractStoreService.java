@@ -3,6 +3,7 @@ package com.zjht.unified.data.storage.persist;
 
 
 import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.ddl.TableCreateDDL;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
@@ -63,11 +64,6 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
         }
         return ids;
     }
-
-
-    public abstract void delExcludeObjectScope(List<Map<String,Object>> vals,String tbl,List<TblCol> colDef);
-
-
     public void createObjectTable(Map<String,Object> data,String tbl, List<TblCol> def,List<TblIndex> indices){
         if(!checkTableExist(tbl)){
             synchronized (tableExistence){
@@ -153,5 +149,18 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
             jdbcTemplate.update("delete from "+table+" where id=?",id);
         else if(guid!=null)
             jdbcTemplate.update("delete from "+table+" where guid=?",guid);
+    }
+
+    @Override
+    public void removeEntityFieldByGuid(EntityStoreMessageDO sMsg) {
+        List<Map<String,Object>> data= EntityStoreMessageDO.getDataAsObjectList(sMsg);
+        for (Iterator<Map<String, Object>> iterator = data.iterator(); iterator.hasNext(); ) {
+            Map<String, Object> valLst = iterator.next();
+            for (Iterator<TblCol> iter2 = sMsg.getCols().iterator(); iter2.hasNext(); ) {
+                TblCol col = iter2.next();
+                valLst.put(col.getNameEn(),null);
+            }
+            updateObject(valLst,sMsg.getTblName(),sMsg.getCols());
+        }
     }
 }

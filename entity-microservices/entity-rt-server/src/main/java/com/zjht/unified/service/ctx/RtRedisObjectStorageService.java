@@ -4,7 +4,7 @@ package com.zjht.unified.service.ctx;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
 import com.wukong.bigdata.storage.gather.client.GatherClient;
-import com.wukong.core.weblog.utils.JsonUtil;
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
@@ -12,7 +12,6 @@ import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.simple.InitialInstanceDO;
-import com.zjht.unified.domain.simple.InstanceFieldDO;
 import com.zjht.unified.domain.runtime.UnifiedObject;
 import com.zjht.unified.utils.JsonUtilUnderline;
 import com.zjht.unified.utils.StoreUtil;
@@ -23,10 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 @Service
@@ -66,15 +62,15 @@ public class RtRedisObjectStorageService {
             }else{
                 kvMap.put(attrName,val);
             }
-            kvMap.put("guid", guid);
+            kvMap.put(FieldConstants.GUID, guid);
             EntityDepService entityDepService=SpringUtils.getBean(EntityDepService.class);
             UnifiedObject object = entityDepService.getObject(ctx, guid);
             RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
             ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, object.getPrjVer(),  object.getClazzGUID());
-            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(classDef, ctx, kvMap, false);
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(classDef, ctx, kvMap);
             log.info("send update message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_FIELD_STORE,storeMessageDO);
 
-            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA,"update",storeMessageDO,System.currentTimeMillis());
+            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA, Constants.CMD_UPDATE_ENTITY,storeMessageDO,System.currentTimeMillis());
         }
     }
 
@@ -82,6 +78,16 @@ public class RtRedisObjectStorageService {
         log.info("delete attr:"+guid+"."+attrName);
         String key = RedisKeyName.getObjectKey(guid, ctx.getVer(),prjGuid,prjVer);
         redisTemplate.opsForHash().delete(key,attrName);
+        UnifiedObject uo = getObject(ctx, guid, prjGuid, prjVer);
+        if(uo!=null&&uo.getPersistTag()){
+            RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
+            ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, uo.getPrjVer(),  uo.getClazzGUID());
+            List<String> nullFields = new ArrayList<>();
+            nullFields.add(attrName);
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getNullMessageDO(classDef, ctx, nullFields,guid);
+            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA, Constants.CMD_ENTITY_DELETE_FIELD,storeMessageDO,System.currentTimeMillis());
+
+        }
     }
 
     public Object getObjectAttrValue(TaskContext ctx, String guid, String attrName,String prjGuid,String prjVer){
@@ -172,12 +178,12 @@ public class RtRedisObjectStorageService {
                 }
 
                 Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, inst.getGuid(),prjGuid,prjVer);
-                objectAttrValueMap.put("clazz_guid",inst.getClassGuid());
+                objectAttrValueMap.put(FieldConstants.CLAZZ_GUID,inst.getClassGuid());
                 RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
                 ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, prjVer,  inst.getClassGuid());
-                EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, ctx,objectAttrValueMap,true);
+                EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, ctx,objectAttrValueMap);
                 log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
-                gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,"save",messageDO,System.currentTimeMillis());
+                gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,Constants.CMD_STORE_ENTITY,messageDO,System.currentTimeMillis());
             });
         }
 
@@ -201,7 +207,10 @@ public class RtRedisObjectStorageService {
         }
 
         if(unifiedObject.getPersistTag()){
-            // TODO 删除对象持久化记录
+            RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
+            ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, prjVer, unifiedObject.getClazzGUID());
+            EntityStoreMessageDO messageDO = StoreUtil.getDelMessageDO(ctx, classDef, guid);
+            gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,Constants.CMD_DELETE_ENTITY,messageDO,System.currentTimeMillis());
         }
 
         // 删除对象记录

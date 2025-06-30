@@ -1,5 +1,6 @@
 package com.zjht.unified.service.ctx;
 
+import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.config.RedisKeyName;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.domain.composite.FieldDefCompositeDO;
@@ -20,7 +21,10 @@ public class EntityDepService {
         if (StringUtils.isBlank(clsGuid)){
             return null;
         }
-        ClazzDefCompositeDO clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
+        ClazzDefCompositeDO clsdef =CoreClazzDef.getCoreClassObject(clsGuid);
+        if(clsdef!=null)
+            return clsdef;
+        clsdef = rtRedisObjectStorageService.getClsDef(ctx, ctx.getPrjInfo().getPrjVer(), clsGuid);
         if(clsdef==null){
             for (Iterator<TaskContext> iterator = ctx.getDeps().values().iterator(); iterator.hasNext(); ) {
                 TaskContext dep = iterator.next();
@@ -71,6 +75,10 @@ public class EntityDepService {
     public ClazzDefCompositeDO getClsByName(TaskContext ctx, String name){
         if (StringUtils.isBlank(name)){
             return null;
+        }
+        String sysGuid = CoreClazzDef.getCoreClassGuid(name);
+        if(sysGuid!=null){
+            return CoreClazzDef.getCoreClassObject(sysGuid);
         }
         ClazzDefCompositeDO clsdef=rtRedisObjectStorageService.getClsDefByName(ctx, ctx.getPrjInfo().getPrjVer(), name);
         if(clsdef!=null)

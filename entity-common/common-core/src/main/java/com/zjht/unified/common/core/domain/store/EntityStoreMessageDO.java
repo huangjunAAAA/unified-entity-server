@@ -20,6 +20,8 @@ public class EntityStoreMessageDO {
 
     private Long prjId;
 
+    private String ver;
+
     public static List<Map<String,Object>> getDataAsObjectList(EntityStoreMessageDO sMsg){
         return JsonUtilExt.parseMapList(getStringCastData(sMsg));
     }

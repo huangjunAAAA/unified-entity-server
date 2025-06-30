@@ -2,6 +2,7 @@ package com.zjht.unified.service;
 
 import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.R;
@@ -110,17 +111,9 @@ public class FrontObjectService {
             prjVer=taskContext.getVer();
         }
         if(StringUtils.isNotBlank(param.getClsGuid())){
-            classDef = CoreClazzDef.getCoreClassObject(param.getClsGuid());;
-            if (classDef == null) {
-                classDef = entityDepService.getClsDefByGuid(taskContext, param.getClsGuid());
-            }
+            classDef = entityDepService.getClsDefByGuid(taskContext, param.getClsGuid());
         }else{
-            String cguid = CoreClazzDef.getCoreClassGuid(param.getClsName());
-            if (cguid != null) {
-                classDef = CoreClazzDef.getCoreClassObject(cguid);
-            } else {
-                classDef = entityDepService.getClsByName(taskContext, param.getClsName());
-            }
+            classDef = entityDepService.getClsByName(taskContext, param.getClsName());
         }
 
         if(classDef==null)
@@ -155,25 +148,39 @@ public class FrontObjectService {
 
     private Map<String, Object> getObject(TaskContext taskContext, UnifiedObject obj) {
         Map<String, Object> ret = new HashMap<>();
-        ClazzDefCompositeDO cls = entityDepService.getClsDefByGuid(taskContext, obj.getClazzGUID());
-        for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
-            Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
-            if (val != null) {
-                if (val instanceof UnifiedObject) {
-                    Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
-                    ret.put(field.getName(), realVal);
-                } else {
-                    ret.put(field.getName(), val);
+        if(obj.getClazzGUID().equals(CoreClazzDef.CLAZZ_TREE_NODE)){
+            List<Map<String, Object>> nodes = getTreeNodeGuid(taskContext, obj.getGuid());
+            ret.put("extra_deserialize","TNode");
+            ret.put("extra_deserialize_data",nodes);
+
+            ClazzDefCompositeDO cls = CoreClazzDef.getCoreClassObject(CoreClazzDef.CLAZZ_TREE_NODE);
+            ret.put(FieldConstants.CLAZZ_GUID, CoreClazzDef.CLAZZ_TREE_NODE);
+            ret.put(FieldConstants.PROJECT_GUID, taskContext.getPrjInfo().getPrjGuid());
+            ret.put(FieldConstants.PROJECT_VER, taskContext.getPrjInfo().getPrjVer());
+            ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
+        }else {
+            ClazzDefCompositeDO cls = entityDepService.getClsDefByGuid(taskContext, obj.getClazzGUID());
+            for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
+                Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
+                if (val != null) {
+                    if (val instanceof UnifiedObject) {
+                        Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
+                        ret.put(field.getName(), realVal);
+                    } else {
+                        ret.put(field.getName(), val);
+                    }
                 }
             }
+            ret.put(FieldConstants.GUID, obj.getGuid());
+            ret.put(FieldConstants.CLAZZ_GUID, obj.getClazzGUID());
+            ret.put(FieldConstants.PROJECT_GUID, obj.getPrjGuid());
+            ret.put(FieldConstants.PROJECT_VER, obj.getPrjVer());
+            ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
         }
-        ret.put(FieldConstants.GUID, obj.getGuid());
-        ret.put(FieldConstants.CLAZZ_GUID, obj.getClazzGUID());
-        ret.put(FieldConstants.PROJECT_GUID, obj.getPrjGuid());
-        ret.put(FieldConstants.PROJECT_VER, obj.getPrjVer());
-        ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
         return ret;
     }
+
+
 
     public List<Map<String, Object>> listAllObject(TaskContext ctx, QueryAllObjectDTO param){
         BaseQueryDTO<QueryObjectDTO> baseQueryDTO=new BaseQueryDTO<>();
@@ -203,14 +210,21 @@ public class FrontObjectService {
                 parentCls=entityDepService.getClsDefByGuid(ctx, parentCls.getParentGuid());
             }
         }
+
+        if(!data1.isEmpty()) {
+            ClazzDefCompositeDO cls = entityDepService.getClsDefByGuid(ctx, param.getClazzGuid());
+            data1.forEach(data -> {
+                preInstallObject(ctx, data, cls);
+            });
+        }
         return data1;
     }
 
     public List<Map<String, Object>> listObject(TaskContext ctx,BaseQueryDTO<QueryObjectDTO> param){
         ClazzDefCompositeDO def = null;
-        if(param.getCondition().getClazzGuid()!=null)
+        if(param.getCondition().getClazzGuid()!=null){
             def=entityDepService.getClsDefByGuid(ctx, param.getCondition().getClazzGuid());
-        else if(param.getCondition().getClazzName()!=null)
+        } else if(param.getCondition().getClazzName()!=null)
             def=entityDepService.getClsByName(ctx, param.getCondition().getClazzName());
         if(def==null)
             return new ArrayList<>();
@@ -220,29 +234,93 @@ public class FrontObjectService {
         R<List<Map<String, Object>>> result = remoteStore.query(query);
         if(result.getData()!=null){
             ClazzDefCompositeDO cls=def;
-            result.getData().stream().forEach(resData->{
+            List<Map<String, Object>> mapData = result.getData();
+            mapData.stream().forEach(resData->{
                 resData.put(FieldConstants.CLAZZ_GUID, cls.getGuid());
-                resData.put(FieldConstants.PROJECT_GUID, cls.getPrjGuid());
-                resData.put(FieldConstants.PROJECT_VER, cls.getPrjVer());
+                if(cls.getType().equals(Constants.CLASS_TYPE_SYSTEM)){
+                    resData.put(FieldConstants.PROJECT_GUID, ctx.getPrjInfo().getPrjGuid());
+                    resData.put(FieldConstants.PROJECT_VER, ctx.getPrjInfo().getPrjVer());
+                }else {
+                    resData.put(FieldConstants.PROJECT_GUID, cls.getPrjGuid());
+                    resData.put(FieldConstants.PROJECT_VER, cls.getPrjVer());
+                }
                 resData.put(FieldConstants.CLASS, ClsDf.from(cls, ctx));
+                preInstallObject(ctx, resData,cls);
             });
-            return result.getData();
+            return mapData;
         }else{
             return new ArrayList<>();
         }
     }
 
+    public void preInstallObject(TaskContext ctx, Map<String, Object> mapData, ClazzDefCompositeDO cls) {
+        for (Iterator<FieldDefCompositeDO> iterator = cls.getClazzIdFieldDefList().iterator(); iterator.hasNext(); ) {
+            FieldDefCompositeDO f = iterator.next();
+            if (Objects.equals(f.getNature(), Integer.parseInt(FieldConstants.FIELD_TYPE_TREENODE))
+                    || Objects.equals(f.getNature(), Integer.parseInt(FieldConstants.FIELD_TYPE_ANY))
+                    || Objects.equals(f.getNature(), Integer.parseInt(FieldConstants.FIELD_TYPE_REGULAR_CLASS))) {
+                Object fdata = mapData.get(f.getName());
+                if (fdata == null)
+                    continue;
+                UnifiedObject uo = entityDepService.getObject(ctx, (String) fdata);
+                if (uo != null) {
+                    Map<String, Object> tdata = getObject(ctx, uo);
+                    mapData.put(f.getName(), tdata);
+                }
+            }
+        }
+    }
+
+    public Map<String,Object> treeNodeToMap(TaskContext ctx, TNodeDO node){
+        Map<String,Object> ret=new HashMap<>();
+        ret.put("id", node.getId());
+        ret.put("guid", node.getGuid());
+        ret.put("parent", node.getParent());
+        ret.put("nodeData", node.getNodeData());
+        ret.put("type", node.getType());
+        ret.put("prjId", node.getPrjId());
+        ret.put("subtype", node.getSubtype());
+        ret.put("root", node.getRoot());
+        ret.put("nodeType", node.getNodeType());
+        return ret;
+    }
+
+    public static TNodeDO mapToTreeNode(TaskContext ctx, Map<String, Object> mapData){
+        TNodeDO node=new TNodeDO();
+        node.setGuid(mapData.get(FieldConstants.GUID).toString());
+        node.setNodeData(mapData.get("nodeData").toString());
+        node.setId(Long.parseLong(mapData.get(FieldConstants.ID)+""));
+        node.setType(mapData.get("type").toString());
+        node.setSubtype(mapData.get("subtype").toString());
+        node.setPrjId(ctx.getPrjInfo().getPrjId());
+        node.setRoot(mapData.get("root").toString());
+        node.setParent(mapData.get("parent").toString());
+        node.setNodeType(mapData.get("nodeType").toString());
+        return node;
+    }
+
 
     public Integer deleteTree(TaskContext ctx, String guid){
+        List<Map<String, Object>> treeGuids = getTreeNodeGuid(ctx, guid);
+        for (Iterator<Map<String, Object>> iterator = treeGuids.iterator(); iterator.hasNext(); ) {
+            Map<String, Object> tnode =  iterator.next();
+            Object tGuid = tnode.get(FieldConstants.GUID);
+            if(tGuid!=null)
+                entityDepService.deleteObject(ctx, tGuid.toString());
+        }
+        return treeGuids.size();
+    }
+
+    private List<Map<String,Object>> getTreeNodeGuid(TaskContext ctx,String guid){
         GetParam param=new GetParam();
         param.setObjGuid(guid);
         param.setVer(param.getVer());
         Map<String, Object> eNode = getObject(param);
         if(eNode==null){
-            return 0;
+            return new ArrayList<>();
         }
-        Set<String> treeGuids=new HashSet<>();
-        treeGuids.add(guid);
+        List<Map<String,Object>> ret=new ArrayList<>();
+        ret.add(eNode);
         Object parentGuid = eNode.get("parent");
         if(Objects.equals("0",parentGuid)){
             // 根节点
@@ -255,42 +333,28 @@ public class FrontObjectService {
             equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
             R<List<Map<String, Object>>> result = remoteStore.query(query);
             if(result.getData()!=null){
-                result.getData().stream().forEach(resData->{
-                    Object tmpGuid = resData.get(FieldConstants.GUID);
-                    if(tmpGuid!=null)
-                        treeGuids.add(tmpGuid.toString());
-                });
+                ret.addAll(result.getData());
             }
-            for (Iterator<String> iterator = treeGuids.iterator(); iterator.hasNext(); ) {
-                String tGuid =  iterator.next();
-                entityDepService.deleteObject(ctx, tGuid);
-            }
-            return treeGuids.size();
+
         }else{
-            int count=0;
-            while(!treeGuids.isEmpty()){
-                String tGuid=treeGuids.iterator().next();
-                treeGuids.remove(tGuid);
-                entityDepService.deleteObject(ctx, tGuid);
-                count++;
+            List<String> tmpGuidList=new ArrayList<>();
+            tmpGuidList.add(guid);
+            while(!tmpGuidList.isEmpty()){
+                String tGuid=tmpGuidList.remove(0);
                 QueryClass treeQuery = new QueryClass();
                 BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
                 query.setCondition(treeQuery);
                 Map<String, Object> equals=new HashMap<>();
-                equals.put("parent", guid);
+                equals.put("parent", tGuid);
                 equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
                 equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
                 R<List<Map<String, Object>>> result = remoteStore.query(query);
                 if(result.getData()!=null){
-                    result.getData().stream().forEach(resData->{
-                        Object tmpGuid = resData.get(FieldConstants.GUID);
-                        if(tmpGuid!=null)
-                            treeGuids.add(tmpGuid.toString());
-                    });
+                    ret.addAll(result.getData());
                 }
             }
-            return count;
         }
+        return ret;
     }
 
     public List<TNodeDO> listTree(TaskContext ctx,String type,String subType){
@@ -307,16 +371,7 @@ public class FrontObjectService {
         List<TNodeDO> ret=new ArrayList<>();
         if(result.getData()!=null){
             result.getData().stream().forEach(resData->{
-                TNodeDO node=new TNodeDO();
-                node.setGuid(resData.get(FieldConstants.GUID).toString());
-                node.setNodeData(resData.get("nodeData").toString());
-                node.setId(Long.parseLong(resData.get(FieldConstants.ID)+""));
-                node.setType(resData.get("type").toString());
-                node.setSubtype(resData.get("subtype").toString());
-                node.setPrjId(ctx.getPrjInfo().getPrjId());
-                node.setRoot(resData.get("root").toString());
-                node.setParent(resData.get("parent").toString());
-                node.setNodeType(resData.get("nodeType").toString());
+                TNodeDO node=mapToTreeNode(ctx, resData);
                 ret.add(node);
             });
         }

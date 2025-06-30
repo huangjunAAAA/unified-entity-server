@@ -13,6 +13,7 @@ import com.zjht.unified.common.core.domain.ddl.TblCol;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AliDruidUtils {
 
@@ -358,16 +359,17 @@ public class AliDruidUtils {
     public static MySqlSelectQueryBlock createQueryInFromTable(MySqlSelectQueryBlock sQuery, String symbol,List<Object> values){
         if(values==null||values.isEmpty())
             return sQuery;
-        SQLBinaryOpExpr orExpr=new SQLBinaryOpExpr();
-        for (Iterator<Object> iterator = values.iterator(); iterator.hasNext(); ) {
-            Object condi = iterator.next();
-            SQLBinaryOpExpr r = AliDruidUtils.createBinaryOp(symbol, condi, SQLBinaryOperator.Equality,SQLBinaryOperator.BooleanOr, orExpr);
-        }
+
+        SQLInListExpr inClause=new SQLInListExpr();
+        inClause.setExpr(new SQLIdentifierExpr(symbol));
+        List<SQLExpr> tLst = values.stream().map(t -> AliDruidUtils.toSQLExpr(t)).collect(Collectors.toList());
+        inClause.setTargetList(tLst);
+
         SQLExpr where = sQuery.getWhere();
         if(where==null){
-            sQuery.setWhere(orExpr);
+            sQuery.setWhere(inClause);
         }else{
-            SQLBinaryOpExpr combined = AliDruidUtils.combineBinaryOp(orExpr, SQLBinaryOperator.BooleanAnd, where);
+            SQLBinaryOpExpr combined = AliDruidUtils.combineBinaryOp(inClause, SQLBinaryOperator.BooleanAnd, where);
             sQuery.setWhere(combined);
         }
         return sQuery;

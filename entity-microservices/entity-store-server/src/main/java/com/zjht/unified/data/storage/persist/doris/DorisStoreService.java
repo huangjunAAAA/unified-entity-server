@@ -149,7 +149,6 @@ public class DorisStoreService extends AbstractStoreService {
         return id;
     }
 
-    @Override
     public void delExcludeObjectScope(List<Map<String, Object>> vals, String tbl, List<TblCol> colDef) {
         Optional<TblCol> pk = colDef.stream().filter(c -> c.getIsPK() == 1).findFirst();
         if(!pk.isPresent())
@@ -215,9 +214,8 @@ public class DorisStoreService extends AbstractStoreService {
         this.ddlService=dorisDDLService;
     }
 
-
     @Override
-    public void deleteEntity(String table, String guid, Long id) {
-
+    public Map<String, Object> getEntityByGuid(String guid) {
+        return Collections.emptyMap();
     }
 }
