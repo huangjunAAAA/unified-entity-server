@@ -5,7 +5,6 @@ import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interop.V8Runtime;
 import com.caoccao.javet.values.V8Value;
 import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
-import com.zjht.unified.service.ctx.EntityDepService;
 import com.zjht.unified.service.ctx.TaskContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @Slf4j
 public class MemUtils {
-    private TaskContext taskContext;
 
     private String prjGuid;
 
@@ -28,6 +26,7 @@ public class MemUtils {
         this.prjVer = prjVer;
     }
 
+    private TaskContext taskContext;
 
     @V8Function(name="set")
     public void set(String name,Object obj){

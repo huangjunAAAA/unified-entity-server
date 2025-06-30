@@ -174,23 +174,11 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             return getV8Runtime().createV8ValueUndefined();
         if (key.equals(FieldConstants.OBJECT_SAVE)){
             return getV8Runtime().createV8ValueFunction(
-//                    new JavetCallbackContext(
-//                            IJavetProxyHandler.FUNCTION_NAME_TO_V8_VALUE,
-//                            V8ValueSymbolType.BuiltIn,
-//                            JavetCallbackType.DirectCallNoThisAndResult,
-//                            (IJavetDirectCallable.NoThisAndNoResult<?>) this::save));
-
                     new JavetCallbackContext(
                             IJavetProxyHandler.FUNCTION_NAME_TO_V8_VALUE,
                             V8ValueSymbolType.BuiltIn,
-                            JavetCallbackType.DirectCallNoThisAndNoResult,
-                            new IJavetDirectCallable.NoThisAndNoResult() {
-                                @Override
-                                public void call(V8Value... v8Values) throws JavetException, Exception {
-                                    save(v8Values);
-                                }
-                            }
-                    ));
+                            JavetCallbackType.DirectCallNoThisAndResult,
+                            (IJavetDirectCallable.NoThisAndNoResult<?>) this::save));
         }
         if (FieldConstants.GUID.equalsIgnoreCase(key))
             return convertToV8Value(guid,getV8Runtime(),taskContext);
@@ -260,7 +248,6 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
     }
 
     public void save(V8Value... v8Values) {
-        log.info("save method called");
         synchronized (modified) {
             if (!modified.isEmpty()) {
                 for (Iterator<Map.Entry<String, Object>> iterator = modified.entrySet().iterator(); iterator.hasNext(); ) {
@@ -302,7 +289,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         AttrWrapper attrWrapper = fieldObjectMap.get(key);
         if (Objects.nonNull(attrWrapper)) {
             int archiveStatus = attrWrapper.getArchiveStatus();
-            log.info("archiveStatus = {}" , archiveStatus);
+            System.out.println("archiveStatus = " + archiveStatus);
             if (archiveStatus==1) {
                 return getV8Runtime().createV8ValueBoolean(false);
             }

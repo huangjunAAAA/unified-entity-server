@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ui-server-local
+    name: ui-server
   profiles:
     active: dev
   main:
@@ -19,7 +19,7 @@ spring:
         shared-configs:
           - ui.${spring.cloud.nacos.config.file-extension}
           - ui-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-          - ui-server-dev.${spring.cloud.nacos.config.file-extension}
+#          - ui-server-dev.${spring.cloud.nacos.config.file-extension}
 
 
 

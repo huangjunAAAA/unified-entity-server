@@ -7,8 +7,8 @@ public class KafkaNames {
     public static final String RT_DERIVEDDATA_TO_STORE="rt_deriveddata_to_store";
 
 
-    public static final String UNIFIED_ENTITY_TO_STORE="test_unified_entity_to_store";
-    public static final String UNIFIED_ENTITY_FIELD_STORE="test_unified_entity_field_store";
+    public static final String UNIFIED_ENTITY_TO_STORE="unified_entity_to_store";
+    public static final String UNIFIED_ENTITY_FIELD_STORE="unified_entity_field_store";
 
 
 

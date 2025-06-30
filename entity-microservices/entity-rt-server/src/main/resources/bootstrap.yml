@@ -1,6 +1,6 @@
 spring:
   application:
-    name: entity-rt-server-local
+    name: entity-rt-server
   profiles:
     active: dev
   main:
@@ -19,7 +19,6 @@ spring:
         shared-configs:
           - dc.${spring.cloud.nacos.config.file-extension}
           - dc-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-          - entity-rt-server-dev.yaml
 
 
 
