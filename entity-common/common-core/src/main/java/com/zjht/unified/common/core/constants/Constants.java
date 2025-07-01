@@ -441,4 +441,7 @@ public class Constants {
     public static final String CMD_UPDATE_ENTITY="update";
     public static final String CMD_ENTITY_DELETE_FIELD="delete_field";
     public static final String CMD_DELETE_ENTITY="delete";
+
+    public static final String STORE_DBNAME_PREFIX = "uui_store_";
+
 }
