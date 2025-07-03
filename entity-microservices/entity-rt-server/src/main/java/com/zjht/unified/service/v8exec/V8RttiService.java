@@ -49,10 +49,23 @@ public class V8RttiService {
         String guid = UUID.randomUUID().toString();
         ProxyObject proxyObject = new ProxyObject(taskContext,guid,classDef.getGuid(),prjGuid,prjVer);
 
+        List<ClazzDefCompositeDO> clazzDefList=new ArrayList<>();
+        // 加载父类默认值
+        if(classDef.getParentGuid()!=null) {
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, classDef.getParentGuid());
+            clazzDefList.addAll(parents);
+        }
+
+        clazzDefList.add(classDef);
+
         //加载默认值
-        List<FieldDefCompositeDO> clazzIdFieldDefList = classDef.getClazzIdFieldDefList();
-        for (FieldDefCompositeDO fieldDefCompositeDO : clazzIdFieldDefList) {
-            redisObjectStorageService.setObjectAttrValue(taskContext, guid, fieldDefCompositeDO.getName(), fieldDefCompositeDO.getInitValue(), false);
+        for (Iterator<ClazzDefCompositeDO> iterator = clazzDefList.iterator(); iterator.hasNext(); ) {
+            ClazzDefCompositeDO cls =  iterator.next();
+            List<FieldDefCompositeDO> clazzIdFieldDefList = cls.getClazzIdFieldDefList();
+            for (FieldDefCompositeDO fieldDefCompositeDO : clazzIdFieldDefList) {
+                if(fieldDefCompositeDO.getInitValue()!=null)
+                    redisObjectStorageService.setObjectAttrValue(taskContext, guid, fieldDefCompositeDO.getName(), fieldDefCompositeDO.getInitValue(), false);
+            }
         }
 
         if (isPersist) {
