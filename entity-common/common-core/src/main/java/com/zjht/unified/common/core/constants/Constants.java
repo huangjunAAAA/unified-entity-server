@@ -443,5 +443,7 @@ public class Constants {
     public static final String CMD_DELETE_ENTITY="delete";
 
     public static final String STORE_DBNAME_PREFIX = "uui_store_";
+    public static final String STORE_ENGINE_MYSQL = "mysql";
+    public static final String STORE_ENGINE_DORIS = "doris";
 
 }
