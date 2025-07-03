@@ -7,6 +7,7 @@ import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.reference.V8ValueFunction;
 import com.caoccao.javet.values.reference.V8ValueObject;
 import com.caoccao.javet.exceptions.JavetException;
+import com.wukong.core.util.CollectionUtil;
 import com.wukong.core.weblog.utils.StringUtil;
 import com.zjht.unified.common.core.constants.CoreClazzDef;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -53,6 +54,13 @@ public class ClassUtils {
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, isPersist);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+        if(classDef.getParentGuid()!=null) {
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, classDef.getParentGuid());
+            for (Iterator<ClazzDefCompositeDO> iterator = parents.iterator(); iterator.hasNext(); ) {
+                ClazzDefCompositeDO parentCls = iterator.next();
+                bindMethodsToV8Object(target, parentCls.getClazzIdMethodDefList(), proxyObject.getV8Runtime());
+            }
+        }
         bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), v8Runtime);
         parseConstructMethod(args, classDef, target);
         return target;
@@ -69,6 +77,13 @@ public class ClassUtils {
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, isPersist);
         V8Runtime v8Runtime = V8EngineService.getRuntime(taskContext, prjGuid, prjVer);
         V8Value target = new JavetProxyConverter().toV8Value(v8Runtime, proxyObject);
+        if(classDef.getParentGuid()!=null) {
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, classDef.getParentGuid());
+            for (Iterator<ClazzDefCompositeDO> iterator = parents.iterator(); iterator.hasNext(); ) {
+                ClazzDefCompositeDO parentCls = iterator.next();
+                bindMethodsToV8Object(target, parentCls.getClazzIdMethodDefList(), proxyObject.getV8Runtime());
+            }
+        }
         bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), v8Runtime);
         parseConstructMethod(args, classDef, target);
         return target;
@@ -156,6 +171,8 @@ public class ClassUtils {
      * @throws JavetException Javet 异常
      */
     public static void bindMethodsToV8Object(V8Value v8Object, List<MethodDefCompositeDO> methodDefList, V8Runtime v8Runtime) throws JavetException {
+        if(CollectionUtil.isEmpty(methodDefList))
+            return;
         if (v8Object instanceof V8ValueObject) {
             V8ValueObject value = (V8ValueObject) v8Object;
             for (MethodDefCompositeDO methodDef : methodDefList) {
@@ -176,7 +193,7 @@ public class ClassUtils {
                         paramList.append(params.get(i).getName());
                     }
                 }
-                System.out.println("methodName: " + methodName);
+                log.info("methodName: " + methodName);
                 if (StringUtil.isNotBlank(methodName) && StringUtil.isNotBlank(methodBody)) {
                     // 生成JS方法定义
                     String jsFunction = String.format("(function() { return function %s(%s) { %s }; })()", methodName, paramList.toString(), methodBody);

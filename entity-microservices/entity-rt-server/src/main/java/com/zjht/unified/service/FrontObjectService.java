@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -119,10 +120,16 @@ public class FrontObjectService {
         if(classDef==null)
             return null;
 
-
         ProxyObject proxyObject = v8RttiService.createNewObject(classDef, taskContext, param.isPersist());
         try {
             V8Value target = new JavetProxyConverter().toV8Value(proxyObject.getV8Runtime(), proxyObject);
+            if(classDef.getParentGuid()!=null) {
+                List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, classDef.getParentGuid());
+                for (Iterator<ClazzDefCompositeDO> iterator = parents.iterator(); iterator.hasNext(); ) {
+                    ClazzDefCompositeDO parentCls = iterator.next();
+                    ClassUtils.bindMethodsToV8Object(target, parentCls.getClazzIdMethodDefList(), proxyObject.getV8Runtime());
+                }
+            }
             ClassUtils.bindMethodsToV8Object(target, classDef.getClazzIdMethodDefList(), proxyObject.getV8Runtime());
             ClassUtils.parseConstructMethod(proxyObject.getV8Runtime(), param.getArgs(), classDef, proxyObject);
         } catch (Exception e) {
@@ -159,15 +166,17 @@ public class FrontObjectService {
             ret.put(FieldConstants.PROJECT_VER, taskContext.getPrjInfo().getPrjVer());
             ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
         }else {
-            ClazzDefCompositeDO cls = entityDepService.getClsDefByGuid(taskContext, obj.getClazzGUID());
-            for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
-                Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
-                if (val != null) {
-                    if (val instanceof UnifiedObject) {
-                        Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
-                        ret.put(field.getName(), realVal);
-                    } else {
-                        ret.put(field.getName(), val);
+            List<ClazzDefCompositeDO> clsList = entityDepService.getClassDefWithParents(taskContext, obj.getClazzGUID());
+            for (ClazzDefCompositeDO cls : clsList) {
+                for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
+                    Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
+                    if (val != null) {
+                        if (val instanceof UnifiedObject) {
+                            Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
+                            ret.put(field.getName(), realVal);
+                        } else {
+                            ret.put(field.getName(), val);
+                        }
                     }
                 }
             }
@@ -175,7 +184,13 @@ public class FrontObjectService {
             ret.put(FieldConstants.CLAZZ_GUID, obj.getClazzGUID());
             ret.put(FieldConstants.PROJECT_GUID, obj.getPrjGuid());
             ret.put(FieldConstants.PROJECT_VER, obj.getPrjVer());
-            ret.put(FieldConstants.CLASS, ClsDf.from(cls, taskContext));
+            ClsDf currentCls = ClsDf.from(clsList.remove(0), taskContext);
+            ret.put(FieldConstants.CLASS, currentCls);
+            if(!clsList.isEmpty()) {
+                List<ClsDf> parentCls = clsList.stream().map(cls -> ClsDf.from(cls, taskContext)).collect(Collectors.toList());
+                ret.put(FieldConstants.PARENT_CLASS_LIST, parentCls);
+            }
+
         }
         return ret;
     }

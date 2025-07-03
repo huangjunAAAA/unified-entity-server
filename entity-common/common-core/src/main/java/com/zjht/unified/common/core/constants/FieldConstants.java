@@ -24,6 +24,7 @@ public class FieldConstants {
     public static final String PROJECT_GUID="prjGuid";
     public static final String PROJECT_VER="prjVer";
     public static final String CLASS="cls";
+    public static final String PARENT_CLASS_LIST="_parent_cls";
     public static final String OBJECT_SAVE="save";
 
     // 0 任意类型 1 基础类型 2 普通类 3 结构 4 脚本 5 树节点 6 类关系
