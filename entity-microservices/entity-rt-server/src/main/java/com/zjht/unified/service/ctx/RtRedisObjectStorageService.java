@@ -65,9 +65,8 @@ public class RtRedisObjectStorageService {
             kvMap.put(FieldConstants.GUID, guid);
             EntityDepService entityDepService=SpringUtils.getBean(EntityDepService.class);
             UnifiedObject object = entityDepService.getObject(ctx, guid);
-            RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
-            ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, object.getPrjVer(),  object.getClazzGUID());
-            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(classDef, ctx, kvMap);
+            List<ClazzDefCompositeDO> classDefList = entityDepService.getClassDefWithParents(ctx, object.getClazzGUID());
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getStoreMessageDO(classDefList, ctx, kvMap);
             log.info("send update message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_FIELD_STORE,storeMessageDO);
 
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA, Constants.CMD_UPDATE_ENTITY,storeMessageDO,System.currentTimeMillis());
@@ -84,7 +83,8 @@ public class RtRedisObjectStorageService {
             ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, uo.getPrjVer(),  uo.getClazzGUID());
             List<String> nullFields = new ArrayList<>();
             nullFields.add(attrName);
-            EntityStoreMessageDO storeMessageDO = StoreUtil.getNullMessageDO(classDef, ctx, nullFields,guid);
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(ctx, classDef.getParentGuid());
+            EntityStoreMessageDO storeMessageDO = StoreUtil.getNullMessageDO(classDef,parents,ctx, nullFields,guid);
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_FIELD_STORE,false,KafkaNames.ENTITY_DATA, Constants.CMD_ENTITY_DELETE_FIELD,storeMessageDO,System.currentTimeMillis());
 
         }
@@ -179,9 +179,8 @@ public class RtRedisObjectStorageService {
 
                 Map<String, Object> objectAttrValueMap = getObjectAttrValueMap(ctx, inst.getGuid(),prjGuid,prjVer);
                 objectAttrValueMap.put(FieldConstants.CLAZZ_GUID,inst.getClassGuid());
-                RtRedisObjectStorageService rtRedisObjectStorageService= SpringUtils.getBean(RtRedisObjectStorageService.class);
-                ClazzDefCompositeDO classDef = rtRedisObjectStorageService.getClsDef(ctx, prjVer,  inst.getClassGuid());
-                EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, ctx,objectAttrValueMap);
+                List<ClazzDefCompositeDO> classDefList = entityDepService.getClassDefWithParents(ctx, inst.getClassGuid());
+                EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDefList, ctx,objectAttrValueMap);
                 log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
                 gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,Constants.CMD_STORE_ENTITY,messageDO,System.currentTimeMillis());
             });

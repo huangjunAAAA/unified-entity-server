@@ -2,6 +2,7 @@ package com.zjht.unified.service.v8exec;
 
 import com.wukong.bigdata.storage.gather.client.GatherClient;
 import com.zjht.unified.common.core.constants.Constants;
+import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.constants.KafkaNames;
 import com.zjht.unified.common.core.domain.store.EntityStoreMessageDO;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -56,8 +57,9 @@ public class V8RttiService {
 
         if (isPersist) {
             Map<String, Object> objectAttrValueMap = redisObjectStorageService.getObjectAttrValueMap(taskContext, guid,  prjGuid,prjVer);
-            objectAttrValueMap.put("clazz_guid",classDef.getGuid());
-            EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, taskContext,objectAttrValueMap);
+            objectAttrValueMap.put(FieldConstants.CLAZZ_GUID,classDef.getGuid());
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, classDef.getParentGuid());
+            EntityStoreMessageDO messageDO = StoreUtil.getStoreMessageDO(classDef, parents, taskContext,objectAttrValueMap);
             log.info("send message to topic :{} message:{}",KafkaNames.UNIFIED_ENTITY_TO_STORE,messageDO);
             gather.addRecordAsString(KafkaNames.UNIFIED_ENTITY_TO_STORE,false,KafkaNames.ENTITY_DATA,Constants.CMD_STORE_ENTITY,messageDO,System.currentTimeMillis());
         }

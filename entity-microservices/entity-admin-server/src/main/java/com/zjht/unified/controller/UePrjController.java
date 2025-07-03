@@ -1,5 +1,6 @@
 package com.zjht.unified.controller ;
 
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -78,10 +79,15 @@ public class UePrjController extends BaseController{
      */
     @ApiOperation(value = "获取统一实体项目详细信息")
     @GetMapping(value = "/{id}")
-    public R<UePrjVo> getInfo(@PathVariable("id") Long id)
+    public R<UePrjVo> getInfo(@PathVariable("id") String id)
     {
-        UePrj uePrj = uePrjService.getById(id);
-        return R.ok(UePrjWrapper.build().entityVO(uePrj));
+        if(NumberUtil.isNumber(id)) {
+            UePrj uePrj = uePrjService.getById(Long.parseLong(id));
+            return R.ok(UePrjWrapper.build().entityVO(uePrj));
+        }else{
+            UePrj uePrj=uePrjService.getOne(Wrappers.<UePrj>lambdaQuery().eq(UePrj::getGuid, id));
+            return R.ok(UePrjWrapper.build().entityVO(uePrj));
+        }
     }
 
 
@@ -146,8 +152,18 @@ public class UePrjController extends BaseController{
      */
     @ApiOperation(value = "删除统一实体项目")
 	@PostMapping("/delete/{id}")
-    public R<Long> remove(@PathVariable Long id)
+    public R<Long> remove(@PathVariable String uid)
     {
+        Long id=null;
+        if(NumberUtil.isNumber(uid)){
+            id=Long.parseLong(uid);
+        }else{
+            UePrj toBeDeleted = uePrjService.getOne(Wrappers.<UePrj>lambdaQuery().eq(UePrj::getGuid, uid));
+            if(toBeDeleted==null){
+                return R.fail("项目不存在");
+            }
+            id=toBeDeleted.getId();
+        }
         Boolean b = uePrjService.removeById(id);
         List<ClazzDef> clsList = clazzDefService.list(Wrappers.<ClazzDef>lambdaQuery().eq(ClazzDef::getPrjId, id));
         for (Iterator<ClazzDef> iteratored = clsList.iterator(); iteratored.hasNext(); ) {

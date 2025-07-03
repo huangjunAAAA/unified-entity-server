@@ -1,5 +1,7 @@
 package com.zjht.unified.controller ;
 
+import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,7 +14,9 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.dto.SentinelDefCompositeDTO;
 import com.zjht.unified.vo.SentinelDefVo;
+import com.zjht.unified.wrapper.SentinelDefCompositeWrapper;
 import com.zjht.unified.wrapper.SentinelDefWrapper;
 import com.zjht.unified.entity.SentinelDef;
 import com.zjht.unified.service.ISentinelDefService;
@@ -73,10 +77,17 @@ public class SentinelDefController extends BaseController{
      */
     @ApiOperation(value = "获取哨兵定义详细信息")
     @GetMapping(value = "/{id}")
-    public R<SentinelDefVo> getInfo(@PathVariable("id") Long id)
+    public R<SentinelDefVo> getInfo(@PathVariable("id") String id)
     {
-        SentinelDef sentinelDef = sentinelDefService.getById(id);
-        return R.ok(SentinelDefWrapper.build().entityVO(sentinelDef));
+        if(NumberUtil.isNumber(id)) {
+            SentinelDef sentinelDef = sentinelDefService.getById(Long.parseLong(id));
+            return R.ok(SentinelDefWrapper.build().entityVO(sentinelDef));
+        }else{
+
+            SentinelDef sentinelDef = sentinelDefService.getOne(Wrappers.<SentinelDef>lambdaQuery().eq(SentinelDef::getGuid,id));
+            return R.ok(SentinelDefWrapper.build().entityVO(sentinelDef));
+        }
+
     }
 
 
@@ -110,12 +121,16 @@ public class SentinelDefController extends BaseController{
      * 删除哨兵定义
      */
     @ApiOperation(value = "删除哨兵定义")
-	@PostMapping("/delete/{ids}")
-    public R<Integer> remove(@PathVariable Long[] ids)
+	@PostMapping("/delete/{id}")
+    public R<String> remove(@PathVariable String id)
     {
-        Boolean b = sentinelDefService.removeByIds(Arrays.asList(ids));
-        R r = b ? R.ok() : R.fail();
-        return r;
+
+        if(NumberUtil.isNumber(id)) {
+            sentinelDefService.removeById(Long.parseLong(id));
+        }else{
+            sentinelDefService.remove(new LambdaQueryWrapper<SentinelDef>().eq(SentinelDef::getGuid,id));
+        }
+        return R.ok(id);
     }
 	
 	

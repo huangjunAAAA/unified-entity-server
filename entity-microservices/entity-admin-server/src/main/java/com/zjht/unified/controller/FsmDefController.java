@@ -1,5 +1,7 @@
-package com.zjht.unified.controller ;
+package com.zjht.unified.controller;
 
+import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -73,10 +75,15 @@ public class FsmDefController extends BaseController{
      */
     @ApiOperation(value = "获取状态机实例详细信息")
     @GetMapping(value = "/{id}")
-    public R<FsmDefVo> getInfo(@PathVariable("id") Long id)
+    public R<FsmDefVo> getInfo(@PathVariable("id") String id)
     {
-        FsmDef fsmDef = fsmDefService.getById(id);
-        return R.ok(FsmDefWrapper.build().entityVO(fsmDef));
+        if(NumberUtil.isNumber(id)) {
+            FsmDef fsmDef = fsmDefService.getById(Long.parseLong(id));
+            return R.ok(FsmDefWrapper.build().entityVO(fsmDef));
+        } else {
+            FsmDef fsmDef = fsmDefService.getOne(Wrappers.<FsmDef>lambdaQuery().eq(FsmDef::getGuid, id));
+            return R.ok(FsmDefWrapper.build().entityVO(fsmDef));
+        }
     }
 
 
@@ -107,15 +114,18 @@ public class FsmDefController extends BaseController{
     }
 
     /**
-     * 删除状态机实例
+     * 删除状态机实例 (改为单值删除)
      */
     @ApiOperation(value = "删除状态机实例")
-	@PostMapping("/delete/{ids}")
-    public R<Integer> remove(@PathVariable Long[] ids)
+    @PostMapping("/delete/{id}")
+    public R<String> remove(@PathVariable String id)
     {
-        Boolean b = fsmDefService.removeByIds(Arrays.asList(ids));
-        R r = b ? R.ok() : R.fail();
-        return r;
+        if(NumberUtil.isNumber(id)) {
+            fsmDefService.removeById(Long.parseLong(id));
+        } else {
+            fsmDefService.remove(new LambdaQueryWrapper<FsmDef>().eq(FsmDef::getGuid, id));
+        }
+        return R.ok(id);
     }
 	
 	

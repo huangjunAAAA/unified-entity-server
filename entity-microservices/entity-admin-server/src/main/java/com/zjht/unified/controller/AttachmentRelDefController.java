@@ -1,5 +1,6 @@
 package com.zjht.unified.controller ;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,6 +13,8 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.domain.dto.ConditionLikeAndIn;
+import com.zjht.unified.dto.AttachmentRelDefListDTO;
 import com.zjht.unified.vo.AttachmentRelDefVo;
 import com.zjht.unified.wrapper.AttachmentRelDefWrapper;
 import com.zjht.unified.entity.AttachmentRelDef;
@@ -128,5 +131,114 @@ public class AttachmentRelDefController extends BaseController{
 		List<AttachmentRelDef> data = attachmentRelDefService.listByIds(ids);
         return data;
 	}
+
+    /**
+     * 查询挂载关系列表，接受like和in条件
+     */
+    @ApiOperation(value = "查询挂载关系列表，接受like和in条件")
+    @PostMapping("/list-like-in")
+    public TableDataInfo<AttachmentRelDefVo> listExt2(@RequestBody BaseQueryDTO<ConditionLikeAndIn<AttachmentRelDef, AttachmentRelDefListDTO>> baseQueryDTO) {
+        // 获取参数
+        ConditionLikeAndIn<AttachmentRelDef, AttachmentRelDefListDTO> condition = baseQueryDTO.getCondition();
+        AttachmentRelDef equalsCondition = condition.getEquals();
+        AttachmentRelDef likeCondition = condition.getLike();
+        AttachmentRelDefListDTO inCondition = condition.getInCondition();
+
+        // 初始化分页信息
+        Page<AttachmentRelDef> page = new Page<>(baseQueryDTO.getPage(), baseQueryDTO.getSize());
+
+        // 构建查询条件
+        LambdaQueryWrapper<AttachmentRelDef> queryWrapper = Wrappers.<AttachmentRelDef>lambdaQuery();
+
+        // 处理 equals 条件：精确匹配
+        if (equalsCondition != null) {
+            if (equalsCondition.getId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getId, equalsCondition.getId());
+            }
+            if (equalsCondition.getPrjId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getPrjId, equalsCondition.getPrjId());
+            }
+            if (equalsCondition.getAttachmentId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachmentId, equalsCondition.getAttachmentId());
+            }
+            if (equalsCondition.getAttachmentType() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachmentType, equalsCondition.getAttachmentType());
+            }
+            if (equalsCondition.getAttachmentGraphId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachmentGraphId, equalsCondition.getAttachmentGraphId());
+            }
+            if (equalsCondition.getAttachAtId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachAtId, equalsCondition.getAttachAtId());
+            }
+            if (equalsCondition.getAttachAtType() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachAtType, equalsCondition.getAttachAtType());
+            }
+            if (equalsCondition.getAttachAtGraphId() != null) {
+                queryWrapper.eq(AttachmentRelDef::getAttachAtGraphId, equalsCondition.getAttachAtGraphId());
+            }
+        }
+
+        // 处理 like 条件：模糊匹配
+        if (likeCondition != null) {
+            if (likeCondition.getAttachmentId() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachmentId, likeCondition.getAttachmentId());
+            }
+            if (likeCondition.getAttachmentType() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachmentType, likeCondition.getAttachmentType());
+            }
+            if (likeCondition.getAttachmentGraphId() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachmentGraphId, likeCondition.getAttachmentGraphId());
+            }
+            if (likeCondition.getAttachAtId() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachAtId, likeCondition.getAttachAtId());
+            }
+            if (likeCondition.getAttachAtType() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachAtType, likeCondition.getAttachAtType());
+            }
+            if (likeCondition.getAttachAtGraphId() != null) {
+                queryWrapper.like(AttachmentRelDef::getAttachAtGraphId, likeCondition.getAttachAtGraphId());
+            }
+        }
+
+        // 处理 inCondition 条件：IN 查询
+        if (inCondition != null) {
+            if (inCondition.getId() != null && !inCondition.getId().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getId, inCondition.getId());
+            }
+            if (inCondition.getAttachmentId() != null && !inCondition.getAttachmentId().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachmentId, inCondition.getAttachmentId());
+            }
+            if (inCondition.getAttachmentType() != null && !inCondition.getAttachmentType().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachmentType, inCondition.getAttachmentType());
+            }
+            if (inCondition.getAttachmentGraphId() != null && !inCondition.getAttachmentGraphId().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachmentGraphId, inCondition.getAttachmentGraphId());
+            }
+            if (inCondition.getAttachAtId() != null && !inCondition.getAttachAtId().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachAtId, inCondition.getAttachAtId());
+            }
+            if (inCondition.getAttachAtType() != null && !inCondition.getAttachAtType().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachAtType, inCondition.getAttachAtType());
+            }
+            if (inCondition.getAttachAtGraphId() != null && !inCondition.getAttachAtGraphId().isEmpty()) {
+                queryWrapper.in(AttachmentRelDef::getAttachAtGraphId, inCondition.getAttachAtGraphId());
+            }
+        }
+
+        // 执行查询
+        IPage<AttachmentRelDef> attachmentRelDefIPage = attachmentRelDefService.page(page, queryWrapper);
+
+        // 转换为 VO
+        IPage<AttachmentRelDefVo> rows = AttachmentRelDefWrapper.build().pageVO(attachmentRelDefIPage);
+
+        // 封装返回结果
+        TableDataInfo<AttachmentRelDefVo> dataInfo = new TableDataInfo<>();
+        dataInfo.setCode(Constants.SUCCESS);
+        dataInfo.setData(rows.getRecords());
+        dataInfo.setMsg("查询成功");
+        dataInfo.setTotal(attachmentRelDefIPage.getTotal());
+
+        return dataInfo;
+    }
 	
 }

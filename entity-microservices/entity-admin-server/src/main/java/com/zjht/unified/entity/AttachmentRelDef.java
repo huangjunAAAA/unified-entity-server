@@ -74,7 +74,7 @@ public class AttachmentRelDef extends BaseCopyEntity {
 	@ApiModelProperty(value = "")
 	@Column(name = "attachment_graph_id")
 	@TableField(value = "attachment_graph_id")  
-	private Long attachmentGraphId;
+	private String attachmentGraphId;
 
 	 /**
 	 * 
@@ -98,7 +98,7 @@ public class AttachmentRelDef extends BaseCopyEntity {
 	@ApiModelProperty(value = "")
 	@Column(name = "attach_at_graph_id")
 	@TableField(value = "attach_at_graph_id")  
-	private Long attachAtGraphId;
+	private String attachAtGraphId;
 
 	 /**
 	 * 原始ID
