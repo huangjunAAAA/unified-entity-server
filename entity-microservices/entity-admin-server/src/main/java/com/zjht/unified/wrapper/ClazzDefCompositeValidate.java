@@ -8,8 +8,6 @@ import com.zjht.unified.service.IClazzDefService;
 
 public class ClazzDefCompositeValidate{
     public static void preValidate(ClazzDefCompositeDTO clazzDef){
-		if(clazzDef.getGuid()==null)
-			clazzDef.setGuid(UUID.fastUUID().toString());
 		if(clazzDef.getParentId()!=null){
 			IClazzDefService clazzDefService =SpringUtil.getBean(IClazzDefService.class);
 			ClazzDef parent = clazzDefService.getById(clazzDef.getParentId());
