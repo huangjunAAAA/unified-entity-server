@@ -98,7 +98,7 @@ public class ClazzDefDO {
 	 * 是否可继承
 	 */
 	@ApiModelProperty(value = "是否可继承")
-	private Integer inheritable;
+	private String modifier;
 	 /**
 	 * 继承的类是否可读基类
 	 */
