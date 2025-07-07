@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "ClazzDef 领域对象", description = "")
 public class ClazzDefDO {
 
-	private static final long serialVersionUID = 9209239040561657013L;
+	private static final long serialVersionUID = -7972372090174881825L;
 
 
 	/**
@@ -85,11 +85,6 @@ public class ClazzDefDO {
 	@ApiModelProperty(value = "原始ID")
 	private Long originalId;
 	 /**
-	 * 修饰符
-	 */
-	@ApiModelProperty(value = "修饰符")
-	private String modifier;
-	 /**
 	 * pv的同义属性
 	 */
 	@ApiModelProperty(value = "pv的同义属性")
@@ -98,7 +93,7 @@ public class ClazzDefDO {
 	 * 是否可继承
 	 */
 	@ApiModelProperty(value = "是否可继承")
-	private Integer inheritable;
+	private String modifier;
 	 /**
 	 * 继承的类是否可读基类
 	 */
@@ -114,9 +109,12 @@ public class ClazzDefDO {
 	 */
 	@ApiModelProperty(value = "属性值历史表名")
 	private String tblHistory;
-	/**
-	 * 所属项目GUID
+	 /**
+	 * 是否可继承
 	 */
+	@ApiModelProperty(value = "是否可继承")
+	private Integer inheritable;
+
 	@ApiModelProperty
 	private String prjGuid;
 

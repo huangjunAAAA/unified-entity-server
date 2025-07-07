@@ -519,6 +519,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         return normalizedDir1.startsWith(normalizedDir2 + "/") || normalizedDir2.startsWith(normalizedDir1 + "/");
     }
 
+    public static String setLikeString(String column)
+    {
+        if(column != null && !column.contains("%"))
+            return "%" + column + "%";
+        return column;
+    }
+
     /**
      * 规范化路径，去除末尾斜杠并确保路径格式一致
      * 

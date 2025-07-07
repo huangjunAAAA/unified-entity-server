@@ -12,10 +12,12 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.common.core.domain.dto.ConditionLikeAndIn;
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.dto.ClassDefListDTO;
 import com.zjht.unified.dto.ClazzDefCompositeDTO;
 
-import com.zjht.unified.dto.IdAndGuid;
+
+import com.zjht.unified.dto.IdNameGuidDTO;
 import com.zjht.unified.entity.ClazzDef;
 import com.zjht.unified.entity.PrjDep;
 import com.zjht.unified.entity.PrjExport;
@@ -183,28 +185,22 @@ public class ClazzDefCompositeExtController extends BaseController{
         // 处理 like 条件：模糊匹配
         if (likeCondition != null) {
             if (likeCondition.getName() != null) {
-                queryWrapper.like(ClazzDef::getName, likeCondition.getName());
+                queryWrapper.like(ClazzDef::getName, StringUtils.setLikeString(likeCondition.getName()));
             }
             if (likeCondition.getNameZh() != null) {
-                queryWrapper.like(ClazzDef::getNameZh, likeCondition.getNameZh());
-            }
-            if (likeCondition.getTbl() != null) {
-                queryWrapper.like(ClazzDef::getTbl, likeCondition.getTbl());
+                queryWrapper.like(ClazzDef::getNameZh, StringUtils.setLikeString(likeCondition.getNameZh()));
             }
             if (likeCondition.getVersion() != null) {
-                queryWrapper.like(ClazzDef::getVersion, likeCondition.getVersion());
+                queryWrapper.like(ClazzDef::getVersion, StringUtils.setLikeString(likeCondition.getVersion()));
             }
             if (likeCondition.getModifier() != null) {
-                queryWrapper.like(ClazzDef::getModifier, likeCondition.getModifier());
-            }
-            if (likeCondition.getInheritable() != null) {
-                queryWrapper.like(ClazzDef::getInheritable, likeCondition.getInheritable());
+                queryWrapper.like(ClazzDef::getModifier, StringUtils.setLikeString(likeCondition.getModifier()));
             }
             if (likeCondition.getPvAttr() != null) {
-                queryWrapper.like(ClazzDef::getPvAttr, likeCondition.getPvAttr());
+                queryWrapper.like(ClazzDef::getPvAttr, StringUtils.setLikeString(likeCondition.getPvAttr()));
             }
             if (likeCondition.getTblHistory() != null) {
-                queryWrapper.like(ClazzDef::getTblHistory, likeCondition.getTblHistory());
+                queryWrapper.like(ClazzDef::getTblHistory, StringUtils.setLikeString(likeCondition.getTblHistory()));
             }
         }
 
@@ -276,9 +272,9 @@ public class ClazzDefCompositeExtController extends BaseController{
     }
 
 
-    @ApiOperation(value = "查询(clazzDef)列表，接受like和in条件，包括依赖项目")
+    @ApiOperation(value = "删除类")
     @PostMapping("/delete-ext")
-    public R<Long> deleteExt(@RequestBody IdAndGuid idAndGuid){
+    public R<Long> deleteExt(@RequestBody IdNameGuidDTO idAndGuid){
         if(idAndGuid.getId()!=null){
             clazzDefCompositeService.removeById(idAndGuid.getId());
             return R.ok(idAndGuid.getId());

@@ -3,7 +3,7 @@ package com.zjht.unified.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zjht.unified.common.core.domain.R;
-import com.zjht.unified.dto.IdAndNameDTO;
+import com.zjht.unified.dto.IdNameGuidDTO;
 import com.zjht.unified.entity.FieldDef;
 import com.zjht.unified.entity.MethodDef;
 import com.zjht.unified.entity.MethodParam;
@@ -34,14 +34,21 @@ public class FieldAndMethodDelController {
      */
     @ApiOperation(value = "删除类字段")
     @PostMapping("/delete/field")
-    public R<Long> removeFieldByName(@RequestBody IdAndNameDTO field)
-    {
-        FieldDef f = fieldDefService.getOne(new LambdaQueryWrapper<FieldDef>()
-                .eq(FieldDef::getName, field.getName())
-                .eq(FieldDef::getClazzId, field.getId()));
-        if(f!=null){
+    public R<String> removeFieldByName(@RequestBody IdNameGuidDTO field) {
+        FieldDef f = null;
+        if (field.getGuid() != null) {
+            f = fieldDefService.getOne(new LambdaQueryWrapper<FieldDef>()
+                    .eq(FieldDef::getGuid, field.getGuid()));
+
+        } else {
+            f = fieldDefService.getOne(new LambdaQueryWrapper<FieldDef>()
+                    .eq(FieldDef::getName, field.getName())
+                    .eq(FieldDef::getClazzId, field.getId()));
+
+        }
+        if (f != null) {
             fieldDefService.removeById(f.getId());
-            return R.ok(f.getId());
+            return R.ok(f.getGuid());
         }
         return R.fail();
     }
@@ -51,14 +58,20 @@ public class FieldAndMethodDelController {
      */
     @ApiOperation(value = "删除类方法")
     @PostMapping("/delete/method")
-    public R<Long> removeMethodByName(@RequestBody  IdAndNameDTO method)
+    public R<String> removeMethodByName(@RequestBody IdNameGuidDTO method)
     {
-        MethodDef m = methodDefService.getOne(new LambdaQueryWrapper<MethodDef>()
-                .eq(MethodDef::getName, method.getName())
-                .eq(MethodDef::getClazzId, method.getId()));
+        MethodDef m = null;
+        if (method.getGuid() != null) {
+            m = methodDefService.getOne(new LambdaQueryWrapper<MethodDef>()
+                    .eq(MethodDef::getGuid, method.getGuid()));
+        } else {
+            m = methodDefService.getOne(new LambdaQueryWrapper<MethodDef>()
+                    .eq(MethodDef::getName, method.getName())
+                    .eq(MethodDef::getClazzId, method.getId()));
+        }
         if(m!=null){
             methodDefService.removeById(m.getId());
-            return R.ok(m.getId());
+            return R.ok(m.getGuid());
         }
         return R.fail();
     }
@@ -68,14 +81,20 @@ public class FieldAndMethodDelController {
      */
     @ApiOperation(value = "删除方法的参数")
     @PostMapping("/delete/param")
-    public R<Long> removeParamByName(@RequestBody  IdAndNameDTO paramName)
+    public R<String> removeParamByName(@RequestBody IdNameGuidDTO paramName)
     {
-        MethodParam p = methodParamService.getOne(new LambdaQueryWrapper<MethodParam>()
-                .eq(MethodParam::getName, paramName.getName())
-                .eq(MethodParam::getMethodId, paramName.getId()));
-        if(p!=null){
+        MethodParam p = null;
+        if (paramName.getGuid() != null) {
+            p = methodParamService.getOne(new LambdaQueryWrapper<MethodParam>()
+                    .eq(MethodParam::getGuid, paramName.getGuid()));
+        } else {
+            p = methodParamService.getOne(new LambdaQueryWrapper<MethodParam>()
+                    .eq(MethodParam::getName, paramName.getName())
+                    .eq(MethodParam::getMethodId, paramName.getId()));
+        }
+        if (p != null) {
             methodParamService.removeById(p.getId());
-            return R.ok(p.getId());
+            return R.ok(p.getGuid());
         }
         return R.fail();
     }

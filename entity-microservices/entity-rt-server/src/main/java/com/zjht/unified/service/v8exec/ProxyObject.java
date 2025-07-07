@@ -216,7 +216,7 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
                     //todo init eval and archivestatus
                     FieldDefCompositeDO fieldDefCompositeDO = fieldDefMap.get(key);
                     attrWrapper = new AttrWrapper(null, null, fieldDefCompositeDO.getArchiveStatus(),
-                            fieldDefCompositeDO.getEval(), taskContext,guid, key,prjGuid,prjVer,objectAttrValue);
+                            taskContext,guid, key,prjGuid,prjVer,objectAttrValue);
                     fieldObjectMap.put(key, attrWrapper);
                 }
                 return new JavetProxyConverter().toV8Value(getV8Runtime(), attrWrapper);
@@ -295,16 +295,6 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
             }
             Object lastValue = attrWrapper.getCurrentValue();
             attrWrapper.setLastValue(lastValue);
-            V8EngineService engineService = SpringUtils.getBean(V8EngineService.class);
-            if (StringUtil.isNotBlank(attrWrapper.getEval())) {
-                log.info("attrWrapper.getEval() = {} ", attrWrapper.getEval());
-                String script = "'" + lastValue + "'" + attrWrapper.getEval();
-                log.info("eval script = " + script);
-                Boolean evalResult = (Boolean) engineService.exec(script, null, taskContext, prjGuid, prjVer);
-                if (Objects.nonNull(evalResult) && evalResult) {
-                    attrWrapper.setLastEV(lastValue);
-                }
-            }
             attrWrapper.setCurrentValue(actualValue);
             modified.put(key, attrWrapper);
         }else {

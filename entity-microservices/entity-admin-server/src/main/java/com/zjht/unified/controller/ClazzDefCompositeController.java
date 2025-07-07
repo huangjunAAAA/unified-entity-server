@@ -119,6 +119,38 @@ public class ClazzDefCompositeController extends BaseController{
         if(clazzDef.getPrjId()==null){
             return R.fail("项目ID不能为空");
         }
+
+        if(clazzDef.getClazzIdFieldDefList()!=null){
+            clazzDef.getClazzIdFieldDefList().forEach(t->{
+                if(StringUtils.isBlank(t.getName())){
+                    throw new RuntimeException("字段名不能为空");
+                }
+                if(!StringUtils.isValidVar(t.getName())){
+                    throw new RuntimeException("字段名格式错误");
+                }
+            });
+        }
+
+        if(clazzDef.getClazzIdMethodDefList()!=null){
+            clazzDef.getClazzIdMethodDefList().forEach(t->{
+                if(StringUtils.isBlank(t.getName())){
+                    throw new RuntimeException("方法名不能为空");
+                }
+                if(!StringUtils.isValidVar(t.getName())){
+                    throw new RuntimeException("方法名格式错误");
+                }
+                if(t.getMethodIdMethodParamList()!=null){
+                    t.getMethodIdMethodParamList().forEach(t2->{
+                        if(StringUtils.isBlank(t2.getName())){
+                            throw new RuntimeException("参数名不能为空");
+                        }
+                        if(!StringUtils.isValidVar(t2.getName())){
+                            throw new RuntimeException("参数名格式错误");
+                        }
+                    });
+                }
+            });
+        }
         if(StringUtils.isBlank(clazzDef.getType())){
             clazzDef.setType(Constants.CLASS_TYPE_USER);
         }

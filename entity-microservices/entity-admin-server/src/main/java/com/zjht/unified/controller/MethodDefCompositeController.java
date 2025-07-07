@@ -12,6 +12,8 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.StringUtils;
+import com.zjht.unified.dto.MethodParamCompositeDTO;
 import com.zjht.unified.vo.MethodDefVo;
 import com.zjht.unified.wrapper.MethodDefWrapper;
 import com.zjht.unified.entity.MethodDef;
@@ -99,6 +101,36 @@ public class MethodDefCompositeController extends BaseController{
     @PostMapping
     public R<Long> add(@RequestBody MethodDefCompositeDTO methodDef)
     {
+        if(StringUtils.isBlank(methodDef.getName())){
+            return R.fail("方法名不能为空");
+        }
+        if(StringUtils.isValidVar(methodDef.getName())){
+            return R.fail("方法名格式错误");
+        }
+        if(StringUtils.isBlank(methodDef.getBody())){
+            return R.fail("方法体不能为空");
+        }
+        if(StringUtils.isBlank(methodDef.getModifier())){
+            return R.fail("private/public/protected,不能为空");
+        }
+        if(null==methodDef.getType()){
+            return R.fail("1 构造方法，2 普通方法,不能为空");
+        }
+        if(null!=methodDef.getMethodIdMethodParamList()){
+            for(MethodParamCompositeDTO param:methodDef.getMethodIdMethodParamList()){
+                if(StringUtils.isBlank(param.getName())){
+                    return R.fail("参数名称不能为空");
+                }
+                if(StringUtils.isValidVar(param.getName())){
+                    return R.fail("参数名称格式错误");
+                }
+                if(StringUtils.isBlank(param.getType())){
+                    return R.fail("参数类型不能为空");
+                }
+            }
+        }
+
+
         methodDef.setId(null);
         methodDef.setCreateTime(DateUtil.now());
         Long id = methodDefCompositeService.submit(methodDef);

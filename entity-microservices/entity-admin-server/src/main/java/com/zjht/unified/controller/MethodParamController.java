@@ -12,6 +12,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.vo.MethodParamVo;
 import com.zjht.unified.wrapper.MethodParamWrapper;
 import com.zjht.unified.entity.MethodParam;
@@ -87,6 +88,16 @@ public class MethodParamController extends BaseController{
     @PostMapping
     public R<Long> add(@RequestBody MethodParam methodParam)
     {
+        if(StringUtils.isBlank(methodParam.getName())){
+            return R.fail("参数名称不能为空");
+        }
+        if(StringUtils.isValidVar(methodParam.getName())){
+            return R.fail("参数名称格式错误");
+        }
+        if(StringUtils.isBlank(methodParam.getType())){
+            return R.fail("参数类型不能为空");
+        }
+
         methodParam.setCreateTime(DateUtil.now());
         Boolean b = methodParamService.save(methodParam);
         R r = b ? R.ok(methodParam.getId()) : R.fail();

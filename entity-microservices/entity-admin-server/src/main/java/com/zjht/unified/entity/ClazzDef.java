@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "ClazzDef对象", description = "")
 public class ClazzDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 693959582817415353L;
+	private static final long serialVersionUID = 7385879494342368947L;
 
 
 
@@ -141,14 +141,6 @@ public class ClazzDef extends BaseCopyEntity {
 	private Long originalId;
 
 	 /**
-	 * 修饰符
-	 */
-	@ApiModelProperty(value = "修饰符")
-	@Column(name = "modifier")
-	@TableField(value = "modifier")
-	private String modifier;
-
-	 /**
 	 * pv的同义属性
 	 */
 	@ApiModelProperty(value = "pv的同义属性")
@@ -160,9 +152,9 @@ public class ClazzDef extends BaseCopyEntity {
 	 * 是否可继承
 	 */
 	@ApiModelProperty(value = "是否可继承")
-	@Column(name = "inheritable")
-	@TableField(value = "inheritable")
-	private String inheritable;
+	@Column(name = "modifier")
+	@TableField(value = "modifier")  
+	private String modifier;
 
 	 /**
 	 * 继承的类是否可读基类
@@ -187,4 +179,12 @@ public class ClazzDef extends BaseCopyEntity {
 	@Column(name = "tbl_history")
 	@TableField(value = "tbl_history")  
 	private String tblHistory;
+
+	 /**
+	 * 是否可继承
+	 */
+	@ApiModelProperty(value = "是否可继承")
+	@Column(name = "inheritable")
+	@TableField(value = "inheritable")  
+	private Integer inheritable;
 }

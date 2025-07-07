@@ -24,7 +24,6 @@ public class AttrWrapper implements IJavetDirectProxyHandler<Exception> {
     private Object lastValue;
     private Object lastEV;
     private int archiveStatus;
-    private String eval;
 
     private TaskContext taskContext;
 

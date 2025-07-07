@@ -12,6 +12,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.TableDataInfo;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.wukong.core.mp.base.BaseEntity;
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.vo.FieldDefVo;
 import com.zjht.unified.wrapper.FieldDefWrapper;
 import com.zjht.unified.entity.FieldDef;
@@ -87,6 +88,18 @@ public class FieldDefController extends BaseController{
     @PostMapping
     public R<Long> add(@RequestBody FieldDef fieldDef)
     {
+        if(StringUtils.isBlank(fieldDef.getName())){
+            return R.fail("字段名称不能为空");
+        }
+        if(StringUtils.isValidVar(fieldDef.getName())){
+            return R.fail("字段名称格式错误");
+        }
+        if(StringUtils.isBlank(fieldDef.getType())){
+            return R.fail("字段类型不能为空");
+        }
+        if(null==fieldDef.getNature()){
+            return R.fail("字段属性不能为空");
+        }
         fieldDef.setCreateTime(DateUtil.now());
         Boolean b = fieldDefService.save(fieldDef);
         R r = b ? R.ok(fieldDef.getId()) : R.fail();

@@ -30,7 +30,7 @@ import com.zjht.unified.common.core.entity.BaseCopyEntity;
 @ApiModel(value = "FieldDef对象", description = "")
 public class FieldDef extends BaseCopyEntity {
 
-	private static final long serialVersionUID = 1573081040640428111L;
+	private static final long serialVersionUID = 8380674828872878220L;
 
 
 
@@ -149,6 +149,14 @@ public class FieldDef extends BaseCopyEntity {
 	private String guid;
 
 	 /**
+	 * 修饰符
+	 */
+	@ApiModelProperty(value = "修饰符")
+	@Column(name = "modifier")
+	@TableField(value = "modifier")  
+	private String modifier;
+
+	 /**
 	 * 类关系ID
 	 */
 	@ApiModelProperty(value = "类关系ID")
@@ -163,14 +171,6 @@ public class FieldDef extends BaseCopyEntity {
 	@Column(name = "default_lock")
 	@TableField(value = "default_lock")  
 	private String defaultLock;
-
-	 /**
-	 * 值校验表达式
-	 */
-	@ApiModelProperty(value = "值校验表达式")
-	@Column(name = "eval")
-	@TableField(value = "eval")  
-	private String eval;
 
 	 /**
 	 * 归档状态 0未归档 1已归档
