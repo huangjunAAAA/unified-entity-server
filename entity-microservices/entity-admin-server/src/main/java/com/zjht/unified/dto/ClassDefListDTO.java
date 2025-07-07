@@ -84,7 +84,7 @@ public class ClassDefListDTO {
     /**
      * 是否可继承
      */
-    private List<String> modifier;
+    private List<Integer> inheritable;
 
     /**
      * 继承的类是否可读基类

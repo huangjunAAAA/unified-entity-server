@@ -25,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result column="original_id" property="originalId"/>
         <result column="modifer" property="modifer"/>
         <result column="pv_attr" property="pvAttr"/>
-        <result column="modifier" property="modifier"/>
+        <result column="inheritable" property="inheritable"/>
         <result column="inherit_read" property="inheritRead"/>
         <result column="inherit_write" property="inheritWrite"/>
         <result column="tbl_history" property="tblHistory"/>

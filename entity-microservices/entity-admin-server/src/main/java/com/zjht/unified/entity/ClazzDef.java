@@ -160,9 +160,9 @@ public class ClazzDef extends BaseCopyEntity {
 	 * 是否可继承
 	 */
 	@ApiModelProperty(value = "是否可继承")
-	@Column(name = "modifier")
-	@TableField(value = "modifier")  
-	private String modifier;
+	@Column(name = "inheritable")
+	@TableField(value = "inheritable")
+	private Integer inheritable;
 
 	 /**
 	 * 继承的类是否可读基类
