@@ -72,9 +72,9 @@ public class ClassDefListDTO {
     private List<Long> originalId;
 
     /**
-     * 修饰符
+     * 是否可继承
      */
-    private List<String> modifer;
+    private List<Integer> inheritable;
 
     /**
      * pv的同义属性

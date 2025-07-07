@@ -166,8 +166,8 @@ public class ClazzDefCompositeExtController extends BaseController{
             if (equalsCondition.getOriginalId() != null) {
                 queryWrapper.eq(ClazzDef::getOriginalId, equalsCondition.getOriginalId());
             }
-            if (equalsCondition.getModifer() != null) {
-                queryWrapper.eq(ClazzDef::getModifer, equalsCondition.getModifer());
+            if (equalsCondition.getInheritable() != null) {
+                queryWrapper.eq(ClazzDef::getInheritable, equalsCondition.getInheritable());
             }
             if (equalsCondition.getPvAttr() != null) {
                 queryWrapper.eq(ClazzDef::getPvAttr, equalsCondition.getPvAttr());
@@ -194,14 +194,14 @@ public class ClazzDefCompositeExtController extends BaseController{
             if (likeCondition.getVersion() != null) {
                 queryWrapper.like(ClazzDef::getVersion, likeCondition.getVersion());
             }
-            if (likeCondition.getModifer() != null) {
-                queryWrapper.like(ClazzDef::getModifer, likeCondition.getModifer());
+            if (likeCondition.getModifier() != null) {
+                queryWrapper.like(ClazzDef::getModifier, likeCondition.getModifier());
+            }
+            if (likeCondition.getInheritable() != null) {
+                queryWrapper.like(ClazzDef::getInheritable, likeCondition.getInheritable());
             }
             if (likeCondition.getPvAttr() != null) {
                 queryWrapper.like(ClazzDef::getPvAttr, likeCondition.getPvAttr());
-            }
-            if (likeCondition.getModifier() != null) {
-                queryWrapper.like(ClazzDef::getModifier, likeCondition.getModifier());
             }
             if (likeCondition.getTblHistory() != null) {
                 queryWrapper.like(ClazzDef::getTblHistory, likeCondition.getTblHistory());
@@ -243,8 +243,8 @@ public class ClazzDefCompositeExtController extends BaseController{
             if (inCondition.getOriginalId() != null && !inCondition.getOriginalId().isEmpty()) {
                 queryWrapper.in(ClazzDef::getOriginalId, inCondition.getOriginalId());
             }
-            if (inCondition.getModifer() != null && !inCondition.getModifer().isEmpty()) {
-                queryWrapper.in(ClazzDef::getModifer, inCondition.getModifer());
+            if (inCondition.getInheritable() != null && !inCondition.getInheritable().isEmpty()) {
+                queryWrapper.in(ClazzDef::getInheritable, inCondition.getInheritable());
             }
             if (inCondition.getPvAttr() != null && !inCondition.getPvAttr().isEmpty()) {
                 queryWrapper.in(ClazzDef::getPvAttr, inCondition.getPvAttr());

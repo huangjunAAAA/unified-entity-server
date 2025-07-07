@@ -88,7 +88,7 @@ public class ClazzDefDO {
 	 * 修饰符
 	 */
 	@ApiModelProperty(value = "修饰符")
-	private String modifer;
+	private String modifier;
 	 /**
 	 * pv的同义属性
 	 */
@@ -98,7 +98,7 @@ public class ClazzDefDO {
 	 * 是否可继承
 	 */
 	@ApiModelProperty(value = "是否可继承")
-	private String modifier;
+	private Integer inheritable;
 	 /**
 	 * 继承的类是否可读基类
 	 */

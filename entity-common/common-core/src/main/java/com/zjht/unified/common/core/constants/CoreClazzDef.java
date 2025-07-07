@@ -80,9 +80,10 @@ public class CoreClazzDef {
         clazzDefCompositeDO.setNameZh(cls.getSimpleName());
         clazzDefCompositeDO.setType("CORE");
         clazzDefCompositeDO.setVersion("1.0");
-        clazzDefCompositeDO.setModifer("public");
+        clazzDefCompositeDO.setModifier("public");
         clazzDefCompositeDO.setInheritRead(1);
         clazzDefCompositeDO.setInheritWrite(1);
+        clazzDefCompositeDO.setInheritable(1);
         clazzDefCompositeDO.setType("System");
         clazzDefCompositeDO.setTbl(StringUtils.toUnderScoreCase(cls.getSimpleName()));
 
