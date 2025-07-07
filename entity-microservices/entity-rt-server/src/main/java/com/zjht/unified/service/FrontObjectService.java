@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,7 @@ public class FrontObjectService {
         params.put("me", me);
         Object val = scriptEngine.exec(mf.getBody(), params, tcxt, param.getPrjGuid(), param.getPrjVer());
         if (val != null && val instanceof UnifiedObject) {
-            Map<String, Object> realVal = getObject(tcxt, (UnifiedObject) val);
+            Map<String, Object> realVal = getObject(tcxt, (UnifiedObject) val, true);
             return realVal;
         }
         return val;
@@ -87,7 +88,7 @@ public class FrontObjectService {
     public Map<String, Object> getObject(GetParam param) {
         TaskContext taskContext = rtContextService.getRunningContext(param.getVer());
         UnifiedObject obj=entityDepService.getObject(taskContext,param.getObjGuid());
-        Map<String, Object> pureObj = getObject(taskContext, obj);
+        Map<String, Object> pureObj = getObject(taskContext, obj, true);
         return pureObj;
     }
 
@@ -136,7 +137,7 @@ public class FrontObjectService {
             log.error(e.getMessage(), e);
         }
         UnifiedObject unified = new UnifiedObject(proxyObject.getGuid(), classDef.getGuid(), param.isPersist(), classDef.getPrjGuid(), classDef.getPrjVer(), taskContext.getVer());
-        return getObject(taskContext, unified);
+        return getObject(taskContext, unified, true);
     }
 
     public Object getObjectValue(GetParam param) {
@@ -147,13 +148,13 @@ public class FrontObjectService {
         String field = clazzDef.getPvAttr();
         Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field, obj.getPrjGuid(), obj.getPrjVer());
         if (val != null && val instanceof UnifiedObject) {
-            Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
+            Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val, true);
             return realVal;
         }
         return val;
     }
 
-    private Map<String, Object> getObject(TaskContext taskContext, UnifiedObject obj) {
+    private Map<String, Object> getObject(TaskContext taskContext, UnifiedObject obj, boolean includePrivate) {
         Map<String, Object> ret = new HashMap<>();
         if(obj.getClazzGUID().equals(CoreClazzDef.CLAZZ_TREE_NODE)){
             List<Map<String, Object>> nodes = getTreeNodeGuid(taskContext, obj.getGuid());
@@ -168,11 +169,16 @@ public class FrontObjectService {
         }else {
             List<ClazzDefCompositeDO> clsList = entityDepService.getClassDefWithParents(taskContext, obj.getClazzGUID());
             for (ClazzDefCompositeDO cls : clsList) {
+                if(Objects.equals(cls.getInheritable(),Integer.parseInt(Constants.NO))){
+                    continue;
+                }
                 for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
+                    if(Objects.equals(field.getModifier().toLowerCase(), "private") && !includePrivate)
+                        continue;
                     Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
                     if (val != null) {
                         if (val instanceof UnifiedObject) {
-                            Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val);
+                            Map<String, Object> realVal = getObject(taskContext, (UnifiedObject) val, false);
                             ret.put(field.getName(), realVal);
                         } else {
                             ret.put(field.getName(), val);
@@ -279,7 +285,7 @@ public class FrontObjectService {
                     continue;
                 UnifiedObject uo = entityDepService.getObject(ctx, (String) fdata);
                 if (uo != null) {
-                    Map<String, Object> tdata = getObject(ctx, uo);
+                    Map<String, Object> tdata = getObject(ctx, uo, true);
                     mapData.put(f.getName(), tdata);
                 }
             }

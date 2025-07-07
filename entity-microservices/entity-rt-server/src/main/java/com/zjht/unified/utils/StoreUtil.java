@@ -1,6 +1,8 @@
 package com.zjht.unified.utils;
 
 import com.google.common.collect.Lists;
+import com.wukong.core.util.BeanCloneUtils;
+import com.wukong.core.util.BeanCopyUtils;
 import com.wukong.core.util.CollectionUtil;
 import com.zjht.authcenter.permission.util.StringUtils;
 import com.zjht.unified.common.core.constants.FieldConstants;
@@ -42,6 +44,14 @@ public class StoreUtil {
             col.setIsPK(Objects.equals(fieldDef.getTblCol(),FieldConstants.ID)?1:0);
             col.setIsTempstamp(0);
             cols.add(col);
+
+            if(col.getIsPK()==0) {
+                TblCol colEv = new TblCol();
+                BeanCopyUtils.copyProperties(col, colEv);
+                colEv.setNameEn(col.getNameEn() + "_ev");
+                colEv.setNameZh(col.getNameZh() + " 有效值");
+                cols.add(colEv);
+            }
         }
         messageDO.setCols(cols);
         messageDO.setIndices(Lists.newArrayList());

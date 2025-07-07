@@ -97,6 +97,9 @@ public class MethodParamController extends BaseController{
         if(StringUtils.isBlank(methodParam.getType())){
             return R.fail("参数类型不能为空");
         }
+        if(null==methodParam.getSort()){
+            return R.fail("序号不能为空");
+        }
 
         methodParam.setCreateTime(DateUtil.now());
         Boolean b = methodParamService.save(methodParam);

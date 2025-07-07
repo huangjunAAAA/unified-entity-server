@@ -17,6 +17,7 @@ import com.caoccao.javet.values.reference.V8ValueSymbol;
 import com.caoccao.javet.values.reference.builtin.V8ValueBuiltInSymbol;
 import com.wukong.core.weblog.utils.StringUtil;
 import com.zjht.unified.common.core.constants.AttrConstants;
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
@@ -54,6 +55,16 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         ClazzDefCompositeDO clazzDef = entityDepService.getClsDefByGuid(taskContext,clazzGUID);
         methodSet = clazzDef.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
         fieldDefMap = clazzDef.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+        if(clazzDef.getParentGuid()!=null){
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, clazzDef.getParentGuid());
+            for (Iterator<ClazzDefCompositeDO> iterator = parents.iterator(); iterator.hasNext(); ) {
+                ClazzDefCompositeDO p =  iterator.next();
+                Set<String> extraMethods = p.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
+                methodSet.addAll(extraMethods);
+                Map<String, FieldDefCompositeDO> extraFields = p.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+                fieldDefMap.putAll(extraFields);
+            }
+        }
     }
 
     public ProxyObject(TaskContext taskContext, String guid, String clazzGUID) {
@@ -68,6 +79,16 @@ public class ProxyObject implements IJavetDirectProxyHandler<Exception>   {
         ClazzDefCompositeDO clazzDef = rtRedisObjectStorageService.getClsDef(taskContext, this.prjVer,clazzGUID);
         methodSet = clazzDef.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
         fieldDefMap = clazzDef.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+        if(clazzDef.getParentGuid()!=null){
+            List<ClazzDefCompositeDO> parents = entityDepService.getClassDefWithParents(taskContext, clazzDef.getParentGuid());
+            for (Iterator<ClazzDefCompositeDO> iterator = parents.iterator(); iterator.hasNext(); ) {
+                ClazzDefCompositeDO p =  iterator.next();
+                Set<String> extraMethods = p.getClazzIdMethodDefList().stream().map(MethodDefDO::getName).collect(Collectors.toSet());
+                methodSet.addAll(extraMethods);
+                Map<String, FieldDefCompositeDO> extraFields = p.getClazzIdFieldDefList().stream().collect(Collectors.toMap(FieldDefCompositeDO::getName, Function.identity()));
+                fieldDefMap.putAll(extraFields);
+            }
+        }
     }
 
 
