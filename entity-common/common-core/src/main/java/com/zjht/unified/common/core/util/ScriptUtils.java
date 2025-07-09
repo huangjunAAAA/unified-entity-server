@@ -1,6 +1,7 @@
 package com.zjht.unified.common.core.util;
 
 import cn.hutool.core.lang.Pair;
+import cn.hutool.json.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,8 +71,8 @@ public class ScriptUtils {
             return result;
 
         // 解析template部分
-        int templateStart = findTagStart(content, "<template");
-        int templateEnd = findTagEnd(content, "</template>", templateStart);
+        int templateStart = findExactTemplateStart(content);
+        int templateEnd = findTemplateEnd(content, templateStart);
         if (templateStart != -1 && templateEnd != -1) {
             result.put("template", content.substring(findTagContentStart(content, templateStart), templateEnd).trim());
             result.put("templateTag", content.substring(templateStart, findTagContentStart(content, templateStart)).trim());
@@ -129,6 +130,67 @@ public class ScriptUtils {
             index += tagStart.length(); // 继续查找下一个标签
         }
     }
+
+    private static int findExactTemplateStart(String content) {
+        int index = 0;
+        while (true) {
+            int found = content.indexOf("<template>", index);
+            if (found == -1) return -1;
+            boolean inQuotes = false;
+            for (int i = 0; i < found; i++) {
+                if (content.charAt(i) == '"') {
+                    inQuotes = !inQuotes;
+                }
+            }
+
+            if (!inQuotes) return found;
+
+            index = found + 1;
+        }
+    }
+
+    private static int findTemplateEnd(String content, int startIndex) {
+        int index = startIndex;
+        int count = 0;
+
+        while (index < content.length()) {
+            int openIdx = content.indexOf("<template", index);
+            int closeIdx = content.indexOf("</template>", index);
+
+            if (openIdx == -1 && closeIdx == -1) {
+                return -1;
+            }
+
+            if (openIdx != -1 && (openIdx < closeIdx || closeIdx == -1)) {
+                // 确保 <template> 不是在引号里
+                if (!isInQuotes(content, openIdx)) {
+                    count++;
+                }
+                index = openIdx + "<template".length();
+            } else {
+                if (!isInQuotes(content, closeIdx)) {
+                    count--;
+                    if (count == 0) {
+                        return closeIdx;
+                    }
+                }
+                index = closeIdx + "</template>".length();
+            }
+        }
+
+        return -1;
+    }
+
+    private static boolean isInQuotes(String content, int index) {
+        boolean inQuotes = false;
+        for (int i = 0; i < index; i++) {
+            if (content.charAt(i) == '"') {
+                inQuotes = !inQuotes;
+            }
+        }
+        return inQuotes;
+    }
+
 
     /**
      * 查找标签的结束位置，确保标签不在引号内
