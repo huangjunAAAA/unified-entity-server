@@ -112,9 +112,6 @@ public class ClazzDefController extends BaseController{
     @PostMapping("/edit")
     public R<Integer> edit(@RequestBody ClazzDef clazzDef)
     {
-        if (StringUtil.isBlank(clazzDef.getGuid())) {
-            clazzDef.setGuid(IdUtils.fastUUID());
-        }
         if(clazzDef.getParentId()!=null) {
             ClazzDef parent = clazzDefService.getById(clazzDef.getParentId());
             if (parent != null) {
