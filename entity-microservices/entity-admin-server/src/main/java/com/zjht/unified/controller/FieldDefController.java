@@ -91,7 +91,7 @@ public class FieldDefController extends BaseController{
         if(StringUtils.isBlank(fieldDef.getName())){
             return R.fail("字段名称不能为空");
         }
-        if(StringUtils.isValidVar(fieldDef.getName())){
+        if(!StringUtils.isValidVar(fieldDef.getName())){
             return R.fail("字段名称格式错误");
         }
         if(StringUtils.isBlank(fieldDef.getType())){

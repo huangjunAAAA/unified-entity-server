@@ -104,7 +104,7 @@ public class MethodDefCompositeController extends BaseController{
         if(StringUtils.isBlank(methodDef.getName())){
             return R.fail("方法名不能为空");
         }
-        if(StringUtils.isValidVar(methodDef.getName())){
+        if(!StringUtils.isValidVar(methodDef.getName())){
             return R.fail("方法名格式错误");
         }
         if(StringUtils.isBlank(methodDef.getBody())){
@@ -121,7 +121,7 @@ public class MethodDefCompositeController extends BaseController{
                 if(StringUtils.isBlank(param.getName())){
                     return R.fail("参数名称不能为空");
                 }
-                if(StringUtils.isValidVar(param.getName())){
+                if(!StringUtils.isValidVar(param.getName())){
                     return R.fail("参数名称格式错误");
                 }
                 if(StringUtils.isBlank(param.getType())){

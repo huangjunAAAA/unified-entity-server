@@ -91,7 +91,7 @@ public class MethodParamController extends BaseController{
         if(StringUtils.isBlank(methodParam.getName())){
             return R.fail("参数名称不能为空");
         }
-        if(StringUtils.isValidVar(methodParam.getName())){
+        if(!StringUtils.isValidVar(methodParam.getName())){
             return R.fail("参数名称格式错误");
         }
         if(StringUtils.isBlank(methodParam.getType())){
