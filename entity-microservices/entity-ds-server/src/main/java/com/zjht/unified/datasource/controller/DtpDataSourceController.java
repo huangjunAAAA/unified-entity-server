@@ -51,7 +51,7 @@ public class DtpDataSourceController extends BaseController {
     {
 		TableDataInfo<DtpDataSourceVo> dataInfo = new TableDataInfo();
         Page<DtpDataSource> page = new Page<>(pageDomain.getPageNum(),pageDomain.getPageSize());
-        IPage<DtpDataSource> list = dtpDataSourceService.page(page, Wrappers.<DtpDataSource>lambdaQuery(dtpDataSource).orderByDesc(BaseEntity::getCreateTime));
+        IPage<DtpDataSource> list = dtpDataSourceService.page(page, Wrappers.<DtpDataSource>lambdaQuery(dtpDataSource).orderByDesc(DtpDataSource::getCreateTime));
         IPage<DtpDataSourceVo> rows = DtpDataSourceWrapper.build().pageVO(list);
         dataInfo.setCode(Constants.SUCCESS);
         dataInfo.setData(rows.getRecords());
