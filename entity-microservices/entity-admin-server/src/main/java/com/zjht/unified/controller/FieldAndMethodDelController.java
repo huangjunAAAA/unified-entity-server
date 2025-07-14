@@ -73,7 +73,7 @@ public class FieldAndMethodDelController {
             methodDefService.removeById(m.getId());
             return R.ok(m.getGuid());
         }
-        return R.fail();
+        return R.fail("找不到方法；"+method.getName());
     }
 
     /**
