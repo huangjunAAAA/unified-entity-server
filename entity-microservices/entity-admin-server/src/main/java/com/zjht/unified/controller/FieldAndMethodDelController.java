@@ -50,7 +50,7 @@ public class FieldAndMethodDelController {
             fieldDefService.removeById(f.getId());
             return R.ok(f.getGuid());
         }
-        return R.fail();
+        return R.fail("找不到字段:"+field.getName());
     }
 
     /**

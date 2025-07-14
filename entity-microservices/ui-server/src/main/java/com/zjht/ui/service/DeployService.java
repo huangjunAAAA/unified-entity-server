@@ -455,7 +455,7 @@ public class DeployService {
                 }
             });
             StringBuilder rf = new StringBuilder();
-            rf.append("import { createRouter, createWebHistory } from 'vue-router'\n");
+            rf.append("import { createRouter, createWebHashHistory } from 'vue-router'\n");
             rf.append("const router=createRouter(\n").append(NoQuotesJsonUtils.toJson(sr)).append(")\n");
             rf.append("export default router");
             if (sf == null) {
@@ -679,7 +679,7 @@ public class DeployService {
     @Data
     private static class StaticRoutor{
         @JsonSerialize(using = NoQuotesJsonUtils.NoQuotesSerializer.class)
-        private String history="createWebHistory(import.meta.env.BASE_URL)";
+        private String history="createWebHashHistory()";
 
         private List<RoutingInfoInternal> routes=new ArrayList<>();
     }
