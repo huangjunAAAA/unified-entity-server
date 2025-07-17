@@ -41,7 +41,7 @@ public class TsBlockParser {
         LinkedHashMap<String, TsBlock> tsBlocks = new LinkedHashMap<>();
         for (ISwc4jAst block : ast.getBody()) {
             TsBlock tsBlock = new TsBlock();
-            List<String> vars = getHeadSymbol(block, script);
+            List<String> vars = getHeadSymbol(block);
             tsBlock.setDeclVars(vars);
             tsBlock.setBody(getSym(block.getSpan(), script));
             detectDepsForStmt(block, tsBlock.getDeps(),script);
@@ -57,7 +57,7 @@ public class TsBlockParser {
         return tsBlocks;
     }
 
-    public static List<String> getHeadSymbol(ISwc4jAst stmt,String script){
+    public static List<String> getHeadSymbol(ISwc4jAst stmt){
         List<String> heads=new ArrayList<>();
         if(stmt instanceof Swc4jAstVarDecl) {
             Swc4jAstVarDecl varDecl = (Swc4jAstVarDecl) stmt;
