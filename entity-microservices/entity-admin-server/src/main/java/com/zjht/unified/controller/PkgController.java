@@ -64,7 +64,7 @@ public class PkgController {
         uePrj.setUiPrjId(uiId);
 
 
-        R<UiPrjDO> r = uiAdmin.getPrjInfo(uiId);
+        R<UiPrjDO> r = uiAdmin.getPrjInfoById(uiId);
         if(r.getData()!=null){
             UiPrjDO uiPrj = r.getData();
             uiPrj.setExternalId(ueId+"");

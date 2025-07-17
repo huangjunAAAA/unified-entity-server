@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "ui-server", configuration = IgnoreValidateFormDataConfiguration.class)
 public interface RemoteUIAdmin {
     @GetMapping("/uiPrj/{prjId}")
-    R<UiPrjDO> getPrjInfo(@PathVariable Long prjId);
+    R<UiPrjDO> getPrjInfoById(@PathVariable Long prjId);
 
 
     @PostMapping("/uiPrj/edit")
