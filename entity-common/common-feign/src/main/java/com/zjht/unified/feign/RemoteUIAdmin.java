@@ -5,14 +5,11 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.domain.composite.PrjSpecDO;
 import com.zjht.unified.domain.simple.UiPrjDO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(value = "ui-server", configuration = IgnoreValidateFormDataConfiguration.class)
 public interface RemoteUIAdmin {
-    @PostMapping("/uiPrj/{prjId}")
+    @GetMapping("/uiPrj/{prjId}")
     R<UiPrjDO> getPrjInfo(@PathVariable Long prjId);
 
 
