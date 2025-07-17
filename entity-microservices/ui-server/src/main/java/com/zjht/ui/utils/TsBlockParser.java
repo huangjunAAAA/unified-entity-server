@@ -1,4 +1,4 @@
-package com.zjht.unified.jsengine.v8.utils;
+package com.zjht.ui.utils;
 
 import com.caoccao.javet.swc4j.Swc4j;
 import com.caoccao.javet.swc4j.ast.clazz.Swc4jAstClassProp;
@@ -19,12 +19,46 @@ import com.caoccao.javet.swc4j.enums.Swc4jParseMode;
 import com.caoccao.javet.swc4j.options.Swc4jParseOptions;
 import com.caoccao.javet.swc4j.outputs.Swc4jParseOutput;
 import com.caoccao.javet.swc4j.span.Swc4jSpan;
+
+import com.zjht.ui.dto.TsBlock;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.net.URL;
 import java.util.*;
 
+@Slf4j
 public class TsBlockParser {
+
+    public static String assortScript(String script){
+        try{
+            StringBuilder assorted=new StringBuilder();
+            Map<String, TsBlock> blocks = parseTScript(script);
+            HashSet<TsBlock> writed=new HashSet<>();
+            for (TsBlock block : blocks.values()) {
+                writeBlockRecursive(block, assorted, writed, blocks);
+            }
+            return assorted.toString();
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return script;
+        }
+    }
+
+    private static void writeBlockRecursive(TsBlock block, StringBuilder sb, Set<TsBlock> writed, Map<String, TsBlock> all){
+        if(writed.contains(block))
+            return;
+        List<String> deps = block.getDeps();
+        while(!CollectionUtils.isEmpty(deps)){
+            String cd = deps.remove(0);
+            TsBlock depBlock = all.get(cd);
+            if(depBlock!=null){
+                writeBlockRecursive(depBlock, sb, writed, all);
+            }
+        }
+        sb.append(block.getBody()).append("\n");
+        writed.add(block);
+    }
 
     public static Map<String, TsBlock> parseTScript(String code) throws Exception {
         Swc4j swc4j = new Swc4j();
@@ -261,7 +295,7 @@ public class TsBlockParser {
         }
     }
 
-    private static void detectDepsForTypeAnn(ISwc4jAstTsType typeAnn, List<String> deps,String script){
+    private static void detectDepsForTypeAnn(ISwc4jAstTsType typeAnn, List<String> deps, String script){
         if(typeAnn instanceof Swc4jAstTsTypeRef){
             String sym = getSym(typeAnn.getSpan(), script);
             deps.add(sym);

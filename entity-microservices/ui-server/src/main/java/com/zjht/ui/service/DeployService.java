@@ -10,6 +10,7 @@ import com.zjht.ui.entity.UiPage;
 import com.zjht.ui.utils.IpPortExtractor;
 import com.zjht.ui.utils.NoQuotesJsonUtils;
 import com.zjht.ui.utils.PackageLockChecker;
+import com.zjht.ui.utils.TsBlockParser;
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.util.*;
@@ -548,7 +549,9 @@ public class DeployService {
             imports.forEach(i->{
                 pf.append(i).append("\n");
             });
-            pf.append(sParts.getKey());
+            String assured = sParts.getKey();
+//            String assured = TsBlockParser.assortScript(sParts.getKey());
+            pf.append(assured);
             pf.append("\n</script>").append("\n");
         });
 
