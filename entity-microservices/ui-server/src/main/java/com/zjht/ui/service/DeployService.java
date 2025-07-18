@@ -549,8 +549,8 @@ public class DeployService {
             imports.forEach(i->{
                 pf.append(i).append("\n");
             });
-            String assured = sParts.getKey();
-//            String assured = TsBlockParser.assortScript(sParts.getKey());
+//            String assured = sParts.getKey();
+            String assured = TsBlockParser.assortScript(sParts.getKey());
             pf.append(assured);
             pf.append("\n</script>").append("\n");
         });

@@ -68,7 +68,7 @@ public class TsBlockParser {
                 .setMediaType(Swc4jMediaType.TypeScript)
                 // Set capture ast.
                 .setCaptureAst(true)
-                .setParseMode(Swc4jParseMode.Module);
+                .setCaptureComments( true);
         Swc4jParseOutput output = swc4j.parse(code, options);
         ISwc4jAstProgram<? extends ISwc4jAst> ast = output.getProgram();
         String script = code;
@@ -362,6 +362,13 @@ public class TsBlockParser {
     }
 
     private static String getSym(Swc4jSpan span, String script){
-        return script.substring(span.getStart(), span.getEnd());
+        if(span.getEnd()>=script.length()){
+            return script.substring(span.getStart());
+        }
+        char endChar = script.charAt(span.getEnd()-1);
+        if(endChar==';'||endChar=='\n'){
+            return script.substring(span.getStart(), span.getEnd());
+        }else
+            return script.substring(span.getStart(), span.getEnd()+1);
     }
 }
