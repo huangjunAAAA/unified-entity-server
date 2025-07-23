@@ -126,7 +126,11 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
         Map<String,Object> sEquals = null;
         if(equals!=null&&equals.size()>0)
             sEquals=equals.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), Map.Entry::getValue));
-        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(clazzDef.getTbl(), cols, sEquals);
+        String tbl=clazzDef.getTbl();
+        if(StringUtils.isBlank(tbl)){
+            tbl=StringUtils.toUnderScoreCase(clazzDef.getName());
+        }
+        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(tbl, cols, sEquals);
 
         if(like!=null&&like.size()>0) {
             Map<String,String> sLikes = like.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), v -> {

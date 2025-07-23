@@ -1,5 +1,6 @@
 package com.zjht.unified.service.v8exec;
 
+
 import com.caoccao.javet.annotations.V8Function;
 import com.caoccao.javet.exceptions.JavetException;
 import com.caoccao.javet.interop.V8Runtime;
@@ -7,6 +8,7 @@ import com.caoccao.javet.interop.converters.JavetProxyConverter;
 import com.caoccao.javet.values.V8Value;
 import com.caoccao.javet.values.reference.V8ValueArray;
 import com.caoccao.javet.values.reference.V8ValueObject;
+import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.domain.composite.ClazzDefCompositeDO;
 import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.jsengine.v8.utils.V8BeanUtils;
@@ -58,6 +60,9 @@ public class RecordUtils {
 
         // Step 2: Construct the SQL query
         String tableName = clazzDef.getTbl();
+        if(StringUtils.isBlank(tableName)){
+            tableName = StringUtils.toUnderScoreCase(clsName);
+        }
         String sql = "SELECT * FROM " + tableName + " WHERE " + whereClause;
 
         // Step 3: Execute the query using RemoteStore
