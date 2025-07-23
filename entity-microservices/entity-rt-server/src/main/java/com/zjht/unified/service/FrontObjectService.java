@@ -173,7 +173,7 @@ public class FrontObjectService {
                     continue;
                 }
                 for (FieldDefCompositeDO field : cls.getClazzIdFieldDefList()) {
-                    if(Objects.equals(field.getModifier().toLowerCase(), "private") && !includePrivate)
+                    if("private".equalsIgnoreCase(field.getModifier()) && !includePrivate)
                         continue;
                     Object val = objectStorageService.getObjectAttrValue(taskContext, obj.getGuid(), field.getName(), obj.getPrjGuid(), obj.getPrjVer());
                     if (val != null) {
