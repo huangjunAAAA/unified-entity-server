@@ -11,6 +11,7 @@ public class FieldConstants {
     public static final String CLAZZ_GUID="clazz_guid";
     public static final String DRIVER_ID="driver_id";
     public static final String DATATIME="data_time";
+    public static final String DATACREATED="create_time";
     public static final String DATACOUNT="kount";
     public static final String DATATYPE="data_type";
     public static final String SIMPLE_NUMERIC_DATA="numeric_data";
@@ -19,7 +20,7 @@ public class FieldConstants {
     public static final String SIMPLE_DATA_TABLE="raw_data";
     public static final String ADMIN_REGION="admin_region";
     public static final String REFERENCE_ID="ref_id";
-    public static final String STATUS="status";
+    public static final String ACTIVE_STATUS ="active_status";
 
     public static final String PROJECT_GUID="prjGuid";
     public static final String PROJECT_VER="prjVer";

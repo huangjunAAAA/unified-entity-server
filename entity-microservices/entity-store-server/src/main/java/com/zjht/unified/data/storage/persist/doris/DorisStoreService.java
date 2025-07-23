@@ -54,6 +54,9 @@ public class DorisStoreService extends AbstractStoreService {
     public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver) {
         MysqlDDLUtils.setJdbcType(colDef,vals);
         MysqlDDLUtils.addUpdateConditionColumns(colDef);
+        if(!vals.containsKey(FieldConstants.DATATIME)){
+            vals.put(FieldConstants.DATATIME,DateUtil.formatDateTime(new Date()));
+        }
         String updateSql = dorisDDLService.update(tbl, vals, colDef);
         log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
         JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);

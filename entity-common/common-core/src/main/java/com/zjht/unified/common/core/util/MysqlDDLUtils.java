@@ -256,7 +256,10 @@ public class MysqlDDLUtils {
         return Arrays.asList(
                 new TblCol(FieldConstants.PROJECT_ID, "项目ID", "Long", "bigint", 0, 0),
                 new TblCol(FieldConstants.GUID, "guid", "String", "varchar(255)", 0, 0),
-                new TblCol(FieldConstants.CLAZZ_GUID, "类guid", "String", "varchar(255)", 0, 0)
+                new TblCol(FieldConstants.CLAZZ_GUID, "类guid", "String", "varchar(255)", 0, 0),
+                new TblCol(FieldConstants.DATATIME, "数据时间戳", "Date", "datetime", 0, 1),
+                new TblCol(FieldConstants.ACTIVE_STATUS, "状态", "Integer", "int(11)", 0, 0),
+                new TblCol(FieldConstants.DATACREATED, "数据创建时间", "Date", "datetime", 0, 0)
         );
     }
 
@@ -268,7 +271,7 @@ public class MysqlDDLUtils {
             planCol.setNameEn(FieldConstants.GUID);
             planCol.setType("String");
             planCol.setJdbcType("varchar(255)");
-            planCol.setNameZh("guid");
+            planCol.setNameZh(FieldConstants.GUID);
             planCol.setIsTempstamp(0);
             planCol.setIsPK(1);
             validColList.add(planCol);
@@ -305,11 +308,11 @@ public class MysqlDDLUtils {
             vc.addValue(AliDruidUtils.convertTblColToSQLObject(val, colDef));
         });
 
-        if(!actualData.containsKey("data_time")) {
-            insert.addColumn(new SQLIdentifierExpr("data_time"));
+        if(!actualData.containsKey(FieldConstants.DATATIME)) {
+            insert.addColumn(new SQLIdentifierExpr(FieldConstants.DATATIME));
             Optional<TblCol> tmpTs = preDefLst.stream().filter(c -> c.getIsTempstamp() == 1).findFirst();
             TblCol dtCol = new TblCol();
-            dtCol.setNameEn("data_time");
+            dtCol.setNameEn(FieldConstants.DATATIME);
             if (!tmpTs.isPresent()) {
                 dtCol.setJdbcType("datetime");
                 vc.addValue(AliDruidUtils.convertTblColToSQLObject(new Date(), dtCol));
@@ -318,6 +321,7 @@ public class MysqlDDLUtils {
                 vc.addValue(AliDruidUtils.convertTblColToSQLObject(actualData.get(dtName), tmpTs.get()));
             }
         }
+        actualData.put(FieldConstants.DATACREATED,DateUtil.formatDateTime(new Date()));
         return insert.toString();
     }
 
@@ -326,6 +330,7 @@ public class MysqlDDLUtils {
     public static String update(String tbl, Map<String, Object> actualData, List<TblCol> preDefLst) {
         MySqlUpdateStatement update=new MySqlUpdateStatement();
         update.setTableSource(new SQLExprTableSource(tbl));
+        actualData.put(FieldConstants.DATATIME,DateUtil.formatDateTime(new Date()));
         for (Iterator<TblCol> iterator = preDefLst.iterator(); iterator.hasNext(); ) {
             TblCol col =  iterator.next();
             if(col.getIsPK()==1){

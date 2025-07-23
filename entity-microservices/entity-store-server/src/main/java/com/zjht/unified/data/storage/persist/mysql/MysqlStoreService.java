@@ -33,9 +33,6 @@ public class MysqlStoreService extends AbstractStoreService {
     public Long saveObject(Map<String,Object> data, String tbl, List<TblCol> def, List<TblIndex> indices, Long colpId,String ver){
         createObjectTable(data,tbl,def,indices,ver);
         MysqlDDLUtils.setJdbcType(def,data);
-//        data.put(FieldConstants.SYSTEM_ID,ref.getSystemId());
-//        data.put(FieldConstants.DEVICE_ID,ref.getDeviceId());
-//        data.put(FieldConstants.POINT_ID,ref.getPointId());
         if (!data.containsKey(FieldConstants.PROJECT_ID) && !data.containsKey(FieldConstants.PROJECT_ID_CAMEL)) {
             data.put(FieldConstants.PROJECT_ID,colpId);
         }
