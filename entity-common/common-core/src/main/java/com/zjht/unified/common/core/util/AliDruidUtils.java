@@ -1,21 +1,16 @@
 package com.zjht.unified.common.core.util;
 
 import cn.hutool.core.util.StrUtil;
-import com.third.support.alidruid.DbType;
-import com.third.support.alidruid.sql.SQLUtils;
+
 import com.third.support.alidruid.sql.ast.*;
 import com.third.support.alidruid.sql.ast.expr.*;
 import com.third.support.alidruid.sql.ast.statement.*;
 import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
-import com.third.support.alidruid.sql.parser.SQLExprParser;
-import com.third.support.alidruid.sql.parser.SQLParserFeature;
-import com.third.support.alidruid.sql.parser.SQLParserUtils;
 import com.wukong.core.weblog.utils.DateUtil;
 
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;

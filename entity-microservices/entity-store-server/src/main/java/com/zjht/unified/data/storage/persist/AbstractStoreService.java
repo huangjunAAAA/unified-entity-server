@@ -118,34 +118,49 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
     @Override
     public List<Map<String,Object>> queryEntity(String ver,ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
                                          Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in){
-        List<String> cols = clazzDef.getClazzIdFieldDefList().stream().map(f -> StringUtils.toUnderScoreCase(f.getName())).collect(Collectors.toList());
-        MysqlDDLUtils.getExtraReferenceColumns().forEach(c -> cols.add(c.getNameEn()));
+        List<String> allCols = clazzDef.getClazzIdFieldDefList().stream().map(f -> StringUtils.toUnderScoreCase(f.getName())).collect(Collectors.toList());
+        MysqlDDLUtils.getExtraReferenceColumns().forEach(c -> allCols.add(c.getNameEn()));
         Map<String,Object> sEquals = null;
-        if(equals!=null&&equals.size()>0)
-            sEquals=equals.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), Map.Entry::getValue));
+        if(equals!=null&&equals.size()>0){
+            for (Iterator<String> iterator = equals.keySet().iterator(); iterator.hasNext(); ) {
+                String kc =  iterator.next();
+                String nkc=StringUtils.toUnderScoreCase(kc);
+                if(allCols.contains(nkc)){
+                    sEquals.put(nkc,equals.get(kc));
+                }
+            }
+        }
+
         String tbl=clazzDef.getTbl();
         if(StringUtils.isBlank(tbl)){
             tbl=StringUtils.toUnderScoreCase(clazzDef.getName());
         }
-        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(tbl, cols, sEquals);
+        MySqlSelectQueryBlock sQuery = AliDruidUtils.createGeneralValueSQLFromTable(tbl, allCols, sEquals);
 
         if(like!=null&&like.size()>0) {
-            Map<String,String> sLikes = like.entrySet().stream().collect(Collectors.toMap(k -> StringUtils.toUnderScoreCase(k.getKey()), v -> {
-                String val = v.getValue();
-                if (!val.startsWith("%") && !val.endsWith("%")) {
-                    val = "%" + val + "%";
+            Map<String,String> sLikes = new HashMap<>();
+            for (Iterator<String> iterator = like.keySet().iterator(); iterator.hasNext(); ) {
+                String kc =  iterator.next();
+                String nkc=StringUtils.toUnderScoreCase(kc);
+                if(allCols.contains(nkc)){
+                    String val=like.get(kc);
+                    if (!val.startsWith("%") && !val.endsWith("%")) {
+                        val = "%" + val + "%";
+                    }
+                    sLikes.put(nkc,val);
                 }
-                return val;
-            }));
+            }
             AliDruidUtils.createQueryLikesFromTable(sQuery, sLikes);
         }
 
         if(in!=null&&in.size()>0){
             for (Map.Entry<String, List<Object>> entry : in.entrySet()) {
                 String k = StringUtils.toUnderScoreCase(entry.getKey());
-                List<Object> vals = entry.getValue();
-                if(vals!=null&&vals.size()>0){
-                    AliDruidUtils.createQueryInFromTable(sQuery, k,vals);
+                if(allCols.contains(k)) {
+                    List<Object> vals = entry.getValue();
+                    if (vals != null && vals.size() > 0) {
+                        AliDruidUtils.createQueryInFromTable(sQuery, k, vals);
+                    }
                 }
             }
         }
