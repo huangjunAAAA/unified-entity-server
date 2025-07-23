@@ -245,36 +245,19 @@ public class MysqlDDLUtils {
 
     public static void addEntityReferenceColumns(List<TblCol> validColList){
         Set<String> cSet = validColList.stream().map(c -> c.getNameEn()).collect(Collectors.toSet());
+        List<TblCol> extraCols = getExtraReferenceColumns();
+        extraCols.forEach(c -> {
+            if(!cSet.contains(c.getNameEn()))
+                validColList.add(c);
+        });
+    }
 
-        if(!cSet.contains(FieldConstants.PROJECT_ID) && !cSet.contains(FieldConstants.PROJECT_ID_CAMEL)) {
-            TblCol planCol = new TblCol();
-            planCol.setNameEn(FieldConstants.PROJECT_ID);
-            planCol.setType("Long");
-            planCol.setJdbcType("bigint");
-            planCol.setNameZh("项目ID");
-            planCol.setIsTempstamp(0);
-            validColList.add(planCol);
-        }
-
-        if(!cSet.contains(FieldConstants.GUID)) {
-            TblCol planCol = new TblCol();
-            planCol.setNameEn(FieldConstants.GUID);
-            planCol.setType("String");
-            planCol.setJdbcType("varchar(255)");
-            planCol.setNameZh("guid");
-            planCol.setIsTempstamp(0);
-            validColList.add(planCol);
-        }
-
-        if(!cSet.contains(FieldConstants.CLAZZ_GUID)) {
-            TblCol planCol = new TblCol();
-            planCol.setNameEn(FieldConstants.CLAZZ_GUID);
-            planCol.setType("String");
-            planCol.setJdbcType("varchar(255)");
-            planCol.setNameZh("类guid");
-            planCol.setIsTempstamp(0);
-            validColList.add(planCol);
-        }
+    public static List<TblCol> getExtraReferenceColumns(){
+        return Arrays.asList(
+                new TblCol(FieldConstants.PROJECT_ID, "项目ID", "Long", "bigint", 0, 0),
+                new TblCol(FieldConstants.GUID, "guid", "String", "varchar(255)", 0, 0),
+                new TblCol(FieldConstants.CLAZZ_GUID, "类guid", "String", "varchar(255)", 0, 0)
+        );
     }
 
     public static void addUpdateConditionColumns(List<TblCol> validColList){
