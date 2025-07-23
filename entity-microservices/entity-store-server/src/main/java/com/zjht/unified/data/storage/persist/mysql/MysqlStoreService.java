@@ -2,6 +2,7 @@ package com.zjht.unified.data.storage.persist.mysql;
 
 import cn.hutool.core.util.StrUtil;
 import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import com.zjht.unified.common.core.domain.ddl.TblIndex;
@@ -36,6 +37,8 @@ public class MysqlStoreService extends AbstractStoreService {
         if (!data.containsKey(FieldConstants.PROJECT_ID) && !data.containsKey(FieldConstants.PROJECT_ID_CAMEL)) {
             data.put(FieldConstants.PROJECT_ID,colpId);
         }
+        data.put(FieldConstants.DATACREATED,new Date());
+        data.put(FieldConstants.ACTIVE_STATUS,Integer.parseInt(Constants.YES));
 //        data.put(FieldConstants.DRIVER_ID,driverId);
         String insertSQL = mysqlDDLService.insert(tbl, data, def)+";";
         log.info("insertSQL===========================:{}",insertSQL);
