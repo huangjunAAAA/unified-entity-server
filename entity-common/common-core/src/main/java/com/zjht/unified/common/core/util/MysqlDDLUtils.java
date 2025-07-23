@@ -282,6 +282,9 @@ public class MysqlDDLUtils {
 
     public static String insert(String tbl, Map<String, Object> actualData, List<TblCol> preDefLst) {
         Map<String, TblCol> colMap = preDefLst.stream().collect(Collectors.toMap(d -> d.getNameEn(), Function.identity()));
+        MysqlDDLUtils.getExtraReferenceColumns().forEach(dtCol -> {
+            colMap.put(dtCol.getNameEn(),dtCol);
+        });
         log.info("colmap =============== :{}",colMap);
         MySqlInsertStatement insert = new MySqlInsertStatement();
         insert.setTableName(new SQLIdentifierExpr(StrUtil.toUnderlineCase(tbl)));
@@ -292,9 +295,7 @@ public class MysqlDDLUtils {
             insert.addColumn(new SQLIdentifierExpr(StrUtil.toUnderlineCase(e.getKey())));
             TblCol colDef = colMap.get(e.getKey());
             Object val = e.getValue();
-            if(colDef==null)
-                System.out.println();
-            if(colDef.getJdbcType().equals("datetime")&&val instanceof String){
+            if("datetime".equals(colDef.getJdbcType())&&val instanceof String){
                 String k=tbl+"."+colDef.getNameEn();
                 String dmt=timeFmt.get(k);
                 if(dmt==null) {
