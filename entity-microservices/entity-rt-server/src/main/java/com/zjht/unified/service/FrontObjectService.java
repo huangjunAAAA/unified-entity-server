@@ -204,6 +204,10 @@ public class FrontObjectService {
 
 
     public List<Map<String, Object>> listAllObject(TaskContext ctx, QueryAllObjectDTO param){
+        ClazzDefCompositeDO baseCls = entityDepService.getClsDefByGuid(ctx, param.getClazzGuid());
+        if(baseCls==null){
+            return new ArrayList<>();
+        }
         BaseQueryDTO<QueryObjectDTO> baseQueryDTO=new BaseQueryDTO<>();
         QueryObjectDTO queryObjectDTO=new QueryObjectDTO();
         queryObjectDTO.setClazzGuid(param.getClazzGuid());
@@ -215,7 +219,6 @@ public class FrontObjectService {
         baseQueryDTO.setPage(1);
         List<Map<String, Object>> data1 = listObject(ctx, baseQueryDTO);
         if(param.getIncludeInherited()&&param.getClazzGuid()!=null){
-            ClazzDefCompositeDO baseCls = entityDepService.getClsDefByGuid(ctx, param.getClazzGuid());
             if(baseCls!=null&&baseCls.getParentGuid()!=null) {
                 ClazzDefCompositeDO parentCls = entityDepService.getClsDefByGuid(ctx, baseCls.getParentGuid());
                 while (parentCls != null) {
