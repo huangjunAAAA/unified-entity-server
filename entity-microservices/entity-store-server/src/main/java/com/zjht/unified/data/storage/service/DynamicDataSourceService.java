@@ -80,7 +80,7 @@ public class DynamicDataSourceService {
         String baseUrl = dataSourceProperties.getUrl();
         String jdbcPrefix = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1);
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(jdbcPrefix + dbName + "?characterEncoding=utf8&useSSL=false");
+        config.setJdbcUrl(jdbcPrefix + dbName + "?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai");
         config.setUsername(dataSourceProperties.getUsername());
         config.setPassword(dataSourceProperties.getPassword());
         config.setMaximumPoolSize(10);
