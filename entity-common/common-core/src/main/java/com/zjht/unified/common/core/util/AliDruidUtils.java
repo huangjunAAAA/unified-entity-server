@@ -1,10 +1,15 @@
 package com.zjht.unified.common.core.util;
 
 import cn.hutool.core.util.StrUtil;
+import com.third.support.alidruid.DbType;
+import com.third.support.alidruid.sql.SQLUtils;
 import com.third.support.alidruid.sql.ast.*;
 import com.third.support.alidruid.sql.ast.expr.*;
 import com.third.support.alidruid.sql.ast.statement.*;
 import com.third.support.alidruid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.third.support.alidruid.sql.parser.SQLExprParser;
+import com.third.support.alidruid.sql.parser.SQLParserFeature;
+import com.third.support.alidruid.sql.parser.SQLParserUtils;
 import com.wukong.core.weblog.utils.DateUtil;
 
 import com.zjht.unified.common.core.constants.Constants;
@@ -388,7 +393,7 @@ public class AliDruidUtils {
     public static MySqlSelectQueryBlock createGeneralValueSQLFromTable(String tbl, List<String> cols, Map<String,Object> fullCondition){
         MySqlSelectQueryBlock sQuery = createQueryEqualsFromTable(tbl, fullCondition);
         if(CollectionUtils.isEmpty(cols)){
-            sQuery.addSelectItem(new SQLAllExpr());
+            sQuery.addSelectItem(new SQLAllColumnExpr());
         }else {
             for (Iterator<String> iterator = cols.iterator(); iterator.hasNext(); ) {
                 String c = iterator.next();
@@ -397,7 +402,5 @@ public class AliDruidUtils {
         }
         return sQuery;
     }
-
-
 
 }
