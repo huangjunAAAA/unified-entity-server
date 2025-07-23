@@ -102,6 +102,13 @@ public class StoreUtil {
         }
     }
 
+    /**
+     * 获取存储消息
+     * @param clsAll 整个类系，包括继承的类
+     * @param taskContext
+     * @param kvMap
+     * @return
+     */
     public static EntityStoreMessageDO getStoreMessageDO(List<ClazzDefCompositeDO> clsAll, TaskContext taskContext , Map<String, Object> kvMap) {
         if(CollectionUtil.isEmpty(clsAll))
             return null;

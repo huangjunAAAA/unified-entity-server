@@ -253,6 +253,15 @@ public class FrontObjectService {
             log.error("class not found:"+(param.getCondition().getClazzName()==null?param.getCondition().getClazzGuid():param.getCondition().getClazzName()));
             return new ArrayList<>();
         }
+
+        if(def.getParentGuid()!=null){
+            ClazzDefCompositeDO tmp = def;
+            while(tmp.getParentGuid()!=null){
+                tmp = entityDepService.getClsDefByGuid(ctx, tmp.getParentGuid());
+                def.getClazzIdFieldDefList().addAll(tmp.getClazzIdFieldDefList());
+            }
+        }
+
         QueryClass storeQuery = new QueryClass();
         BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
         query.setCondition(storeQuery);
