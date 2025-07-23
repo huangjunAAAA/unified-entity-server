@@ -188,7 +188,8 @@ public class AliDruidUtils {
     public static MySqlSelectQueryBlock setOrderByAndLimit(MySqlSelectQueryBlock sQuery,Integer page, Integer size,String orderby,String asc){
         if(page!=null&&size!=null) {
             SQLLimit limit = new SQLLimit();
-            limit.setOffset(page * size);
+            if(page>1)
+                limit.setOffset((page-1)* size);
             limit.setRowCount(size);
             sQuery.setLimit(limit);
         }
