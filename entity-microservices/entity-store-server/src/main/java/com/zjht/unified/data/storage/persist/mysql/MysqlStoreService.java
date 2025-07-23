@@ -50,10 +50,13 @@ public class MysqlStoreService extends AbstractStoreService {
     }
 
     @Override
-    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver
-    ) {
+    public int updateObject(Map<String, Object> vals, String tbl, List<TblCol> colDef,String ver) {
         MysqlDDLUtils.setJdbcType(colDef,vals);
         MysqlDDLUtils.addUpdateConditionColumns(colDef);
+        MysqlDDLUtils.getExtraReferenceColumns().forEach(col -> {
+            if(!col.getNameEn().equals(FieldConstants.ACTIVE_STATUS))
+                vals.remove(StringUtils.toUnderScoreCase(col.getNameEn()));
+        });
         String updateSql = mysqlDDLService.update(tbl, vals, colDef);
         log.info(" table name :  {}  generate update sql :{}",tbl,updateSql);
         JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
