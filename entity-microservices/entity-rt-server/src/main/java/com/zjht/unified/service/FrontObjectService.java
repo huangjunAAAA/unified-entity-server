@@ -247,11 +247,22 @@ public class FrontObjectService {
             def=entityDepService.getClsDefByGuid(ctx, param.getCondition().getClazzGuid());
         } else if(param.getCondition().getClazzName()!=null)
             def=entityDepService.getClsByName(ctx, param.getCondition().getClazzName());
-        if(def==null)
+        if(def==null){
+            log.error("class not found:"+(param.getCondition().getClazzName()==null?param.getCondition().getClazzGuid():param.getCondition().getClazzName()));
             return new ArrayList<>();
+        }
         QueryClass storeQuery = new QueryClass();
         BaseQueryDTO<QueryClass> query = new BaseQueryDTO<>();
         query.setCondition(storeQuery);
+        storeQuery.setVer(param.getCondition().getVer());
+        storeQuery.setPrjId(param.getCondition().getPrjId());
+        storeQuery.setClassDef(def);
+        query.setSize(param.getSize());
+        query.setPage(param.getPage());
+        storeQuery.setEquals(param.getCondition().getEquals());
+        storeQuery.setLike(param.getCondition().getLike());
+        storeQuery.setInCondition(param.getCondition().getInCondition());
+
         R<List<Map<String, Object>>> result = remoteStore.query(query);
         if(result.getData()!=null){
             ClazzDefCompositeDO cls=def;

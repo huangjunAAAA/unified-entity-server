@@ -228,6 +228,8 @@ public class ExecController {
         if(ctx==null){
             return R.fail("task not found:"+param.getCondition().getVer());
         }
+        if((param.getCondition().getClazzGuid()==null && param.getCondition().getClazzName()==null))
+            return R.fail("class guid or name can not both be null");
         List<Map<String, Object>> result = frontObjectService.listObject(ctx,param);
         return R.ok(result);
     }
