@@ -64,7 +64,8 @@ public class DynamicDataSourceService {
         return null;
     }
 
-    private DataSource createDataSourceIfNotExists(String dbName) {
+
+    public DataSource createDataSourceIfNotExists(String dbName) {
         try (Connection conn = defaultDataSource.getConnection()) {
             String createSql = "CREATE DATABASE IF NOT EXISTS `" + dbName + "`" ;
             if (persistConfig.getEngine().equals(Constants.STORE_ENGINE_MYSQL)) {

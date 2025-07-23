@@ -2,17 +2,16 @@ package com.zjht.unified.service;
 
 import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.domain.R;
-import com.zjht.unified.common.core.util.SpringUtils;
 import com.zjht.unified.common.core.util.StringUtils;
 import com.zjht.unified.feign.RemoteStore;
 import com.zjht.unified.service.ctx.TaskContext;
 import com.zjht.unified.service.v8exec.model.ColumnMeta;
 import com.zjht.unified.service.v8exec.model.IndexMeta;
 import com.zjht.unified.service.v8exec.model.TableMeta;
+import com.zjht.unified.service.v8exec.model.DataViewInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,20 +26,20 @@ public class DbMetaService {
     public TableMeta getTableMeta(String dbName, String tableName, TaskContext taskContext) {
         TableMeta meta = new TableMeta();
         if (StringUtils.isBlank(dbName)) {
-            dbName = "uui_store_" + taskContext.getVer();
+            dbName = Constants.STORE_DBNAME_PREFIX + taskContext.getVer();
         }
+        log.info("获取表结构：{}.{}", dbName, tableName);
         meta.setDbName(dbName);
         meta.setTableName(tableName);
         String ver = taskContext.getVer();
         Long prjId = taskContext.getPrjInfo().getPrjId();
 
-        // ---------- 1. 查询字段信息 ----------
         String columnSql = String.format(
                 "SELECT COLUMN_NAME, COLUMN_TYPE, COLUMN_COMMENT " +
                         "FROM information_schema.columns " +
                         "WHERE table_schema = '%s' AND table_name = '%s' ORDER BY ORDINAL_POSITION", dbName, tableName
         );
-        List<Map<String, Object>> columnList = remoteStore.query(ver, String.valueOf(prjId), columnSql);
+        List<Map<String, Object>> columnList = query(columnSql);
 
         List<ColumnMeta> columns = new ArrayList<>();
         for (Map<String, Object> row : columnList) {
@@ -52,14 +51,13 @@ public class DbMetaService {
         }
         meta.setColumns(columns);
 
-        // ---------- 2. 查询索引信息 ----------
         String indexSql = String.format(
                 "SELECT INDEX_NAME, COLUMN_NAME, INDEX_TYPE " +
                         "FROM information_schema.statistics " +
                         "WHERE table_schema = '%s' AND table_name = '%s' " +
                         "ORDER BY INDEX_NAME, SEQ_IN_INDEX", dbName, tableName
         );
-        List<Map<String, Object>> indexList = remoteStore.query(ver, String.valueOf(prjId), indexSql);
+        List<Map<String, Object>> indexList = query(indexSql);
 
         Map<String, IndexMeta> indexMap = new LinkedHashMap<>();
         for (Map<String, Object> row : indexList) {
@@ -80,8 +78,8 @@ public class DbMetaService {
         return meta;
     }
 
-    public void executeSql(String sql) {
-        R<Object> result = remoteStore.execute( sql);
+    public void executeSql(String sql,boolean initFlag,String dbName) {
+        R<Object> result = remoteStore.execute( sql,initFlag,dbName);
         if (result.getCode() == Constants.SUCCESS) {
             log.info("SQL执行成功: {}", sql);
         } else {
@@ -97,4 +95,24 @@ public class DbMetaService {
             return remoteStore.queryWithArgs( sql, Arrays.asList(args));
         }
     }
+
+    public List<DataViewInfo> listViewsWithSql(String dbName) {
+        String sql = "SELECT TABLE_NAME, VIEW_DEFINITION " +
+                "FROM information_schema.views " +
+                "WHERE table_schema = '" + dbName + "'";
+
+        List<DataViewInfo> views = new ArrayList<>();
+
+        List<Map<String, Object>> rows = remoteStore.query("","",sql);
+        log.info("rows:{}",rows);
+        for (Map<String, Object> row : rows) {
+            String viewName = (String) row.get("TABLE_NAME");
+            String viewDef = (String) row.get("VIEW_DEFINITION");
+            views.add(new DataViewInfo(viewName, dbName, viewDef));
+        }
+        log.info("views:{}",views);
+
+        return views;
+    }
+
 }

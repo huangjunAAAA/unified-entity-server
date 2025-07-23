@@ -5,6 +5,7 @@ import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.data.storage.persist.GeneralStoreService;
 import com.zjht.unified.common.core.domain.dto.QueryClass;
+import com.zjht.unified.data.storage.service.DynamicDataSourceService;
 import io.swagger.annotations.Api;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,9 @@ public class QueryController {
     @Resource
     private GeneralStoreService generalStoreService;
 
+    @Resource
+    private DynamicDataSourceService dynamicDataSourceService;
+
     @PostMapping("/store/query-class")
     public R<List<Map<String, Object>>> query(@RequestBody BaseQueryDTO<QueryClass> queryDTO) {
 
@@ -42,8 +46,11 @@ public class QueryController {
     }
 
     @PostMapping("/store/execute")
-    public R<Object> executeSql( @RequestParam String sql) {
+    public R<Object> executeSql( @RequestParam String sql,@RequestParam boolean initFlag,@RequestParam String dbName) {
         try {
+            if (initFlag) {
+                dynamicDataSourceService.createDataSourceIfNotExists(dbName);
+            }
             jdbcTemplate.execute(sql);
             return R.ok();
         } catch (Exception e) {

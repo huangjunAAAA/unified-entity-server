@@ -7,15 +7,16 @@ import com.zjht.unified.service.v8exec.SchemaUtils;
 
 import java.util.*;
 
-public class V8Table{
+public class TableInfo {
 
 
     public String name;
     public String dbname;
     public List<SchemaUtils.V8Column> columns;
     public List<SchemaUtils.V8Index> indices;
+    public List<String> methodNames;
 
-    public V8Table(String dbname, String name, List<SchemaUtils.V8Column> columns, List<SchemaUtils.V8Index> indices) {
+    public TableInfo(String dbname, String name, List<SchemaUtils.V8Column> columns, List<SchemaUtils.V8Index> indices) {
         this.dbname = dbname;
         this.name = name;
         this.columns = columns;
@@ -28,7 +29,7 @@ public class V8Table{
         String sql = String.format("ALTER TABLE `%s`.`%s` MODIFY COLUMN `%s` %s",
                 dbname, name, colName, newType);
         DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
-        dbMetaService.executeSql(sql);
+        dbMetaService.executeSql(sql,false,"");
     }
 
     @V8Function(name = "alterColumnTypeByIdx")
@@ -45,7 +46,7 @@ public class V8Table{
         String sql = String.format("ALTER TABLE `%s`.`%s` CHANGE COLUMN `%s` `%s` %s",
                 dbname, name, oldName, newName, type);
         DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
-        dbMetaService.executeSql(sql);
+        dbMetaService.executeSql(sql,false,"");
     }
 
     @V8Function(name = "alterColumnNameByIdx")
@@ -59,7 +60,7 @@ public class V8Table{
         String sql = String.format("ALTER TABLE `%s`.`%s` DROP INDEX `%s`",
                 dbname, name, idxName);
         DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
-        dbMetaService.executeSql(sql);
+        dbMetaService.executeSql(sql,false,"");
     }
 
     @V8Function(name = "createIdx")
@@ -69,7 +70,7 @@ public class V8Table{
                 type.toUpperCase(), idxName, dbname, name, cols);
         DbMetaService dbMetaService = SpringUtils.getBean(DbMetaService.class);
 
-        dbMetaService.executeSql(sql);
+        dbMetaService.executeSql(sql,false,"");
     }
 
     @V8Function(name = "filter")

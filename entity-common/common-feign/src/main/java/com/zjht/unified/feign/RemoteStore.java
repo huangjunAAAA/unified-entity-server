@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(value = "entity-store-server", configuration = IgnoreValidateFormDataConfiguration.class)
+@FeignClient(value = "entity-store-server-local", configuration = IgnoreValidateFormDataConfiguration.class)
 public interface RemoteStore {
     @PostMapping("/store/query-class")
     R<List<Map<String, Object>>> query(@RequestBody BaseQueryDTO<QueryClass> queryDTO);
@@ -21,7 +21,7 @@ public interface RemoteStore {
     List<Map<String,Object>> query(@RequestParam String ver, @RequestParam String prjId,  @RequestParam String sql);
 
     @PostMapping("/store/execute")
-    R<Object> execute( @RequestParam String sql);
+    R<Object> execute( @RequestParam String sql,@RequestParam boolean initFlag,@RequestParam String dbName);
 
     @PostMapping("/store/queryWithArgs")
     List<Map<String, Object>> queryWithArgs(@RequestParam String sql, @RequestBody List<Object> args);

@@ -1,6 +1,7 @@
 package com.zjht.unified.controller;
 
 
+import com.caoccao.javet.annotations.V8Function;
 import com.zjht.unified.common.core.domain.R;
 import com.zjht.unified.common.core.domain.dto.BaseQueryDTO;
 import com.zjht.unified.common.core.domain.dto.GetParam;
@@ -19,15 +20,21 @@ import com.zjht.unified.service.IScriptEngine;
 import com.zjht.unified.service.RtContextService;
 import com.zjht.unified.service.TaskService;
 import com.zjht.unified.service.ctx.TaskContext;
+import com.zjht.unified.service.v8exec.SchemaUtils;
+import com.zjht.unified.service.v8exec.model.TableInfo;
+import com.zjht.unified.service.v8exec.model.DataViewInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *  控制器
@@ -257,4 +264,86 @@ public class ExecController {
         Integer ret = frontObjectService.deleteTree(ctx,param.getGuid());
         return R.ok(ret);
     }
+    @ApiOperation("获取数据库表对象")
+    @PostMapping("/get-table")
+    public R<TableInfo> getTable(@RequestBody SchemaActionParam param) {
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if (ctx == null) return R.fail("task not found: " + param.getVer());
+        SchemaUtils utils = SchemaUtils.getSchemaUtils(ctx);
+        TableInfo table = utils.getTableObj("", param.getTableName());
+        Method[] methods = TableInfo.class.getDeclaredMethods();
+        //数据库表对象支持的方法
+        table.methodNames = (Arrays.stream(methods)
+                .filter(m -> m.isAnnotationPresent(V8Function.class))
+                .map(Method::getName)
+                .collect(Collectors.toList()));
+        return R.ok(table);
+    }
+
+    @ApiOperation("执行数据库表对象的方法")
+    @PostMapping("/table-exec")
+    public R<Object> execTableObjMethod(@RequestBody SchemaActionParam param) {
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if (ctx == null) return R.fail("task not found: " + param.getVer());
+        SchemaUtils utils = SchemaUtils.getSchemaUtils(ctx);
+        TableInfo table = utils.getTableObj("", param.getTableName());
+
+        if (table == null) {
+            return R.fail("TableInfo not found: " + param.getTableName());
+        }
+        try {
+            Object[] args = param.getParams() == null ? new Object[0] : param.getParams();
+            Method method = findMethodByName(TableInfo.class, param.getMethodName());
+            if (method == null) return R.fail("Method not found or argument mismatch: " + param.getMethodName());
+            method.setAccessible(true);
+            Object result = method.invoke(table, args);
+            return R.ok(result);
+
+        } catch (Exception e) {
+            log.error("执行数据表对象方法失败: method={}, table={}, error={}", param.getMethodName(), param.getTableName(), e.getMessage(), e);
+            return R.fail("执行失败: " + e.getMessage());
+        }
+    }
+
+    private Method findMethodByName(Class<?> clazz, String methodName) {
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+
+    @ApiOperation("创建视图")
+    @PostMapping("/create-view")
+    public R<DataViewInfo> createView(@RequestBody SchemaActionParam param) {
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if (ctx == null) return R.fail("task not found: " + param.getVer());
+        SchemaUtils utils = SchemaUtils.getSchemaUtils(ctx);
+        DataViewInfo view = utils.createDataViewObj(param.getViewSql(), param.getViewName());
+        return R.ok(view);
+    }
+
+    @ApiOperation("列出视图列表")
+    @PostMapping("/list-view")
+    public R<List<DataViewInfo>> listViews(@RequestBody SchemaActionParam param) {
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if (ctx == null) return R.fail("task not found: " + param.getVer());
+        SchemaUtils utils = SchemaUtils.getSchemaUtils(ctx);
+        List<DataViewInfo> views = utils.listDVObj();
+        return R.ok(views);
+    }
+
+    @ApiOperation("删除视图")
+    @PostMapping("/drop-view")
+    public R<Boolean> dropView(@RequestBody SchemaActionParam param) {
+        TaskContext ctx = rtContextService.getRunningContext(param.getVer());
+        if (ctx == null) return R.fail("task not found: " + param.getVer());
+        SchemaUtils utils = SchemaUtils.getSchemaUtils(ctx);
+        boolean result = utils.dropDVObj(param.getViewName());
+        return R.ok(result);
+    }
+
+
 }
