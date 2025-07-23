@@ -58,6 +58,7 @@ public class MysqlDDLUtils {
         javaToJdbcType.put("Double", "double(32,8)");
         javaToJdbcType.put("double", "double(32,8)");
         javaToJdbcType.put("String", "varchar(255)");
+        javaToJdbcType.put("string", "varchar(255)");
         javaToJdbcType.put("Date","datetime");
     }
 
@@ -115,6 +116,10 @@ public class MysqlDDLUtils {
             if(col.getJdbcType()!=null)
                 continue;
             String jType = javaToJdbcType.get(col.getType());
+            //处理部分field_def未定义type情况
+            if (Objects.isNull(jType)) {
+                jType = javaToJdbcType.get("String");
+            }
             if(actualData!=null) {
                 if (jType.equals("varchar(255)")) {
                     Object actualVal = actualData.get(col.getNameEn());
