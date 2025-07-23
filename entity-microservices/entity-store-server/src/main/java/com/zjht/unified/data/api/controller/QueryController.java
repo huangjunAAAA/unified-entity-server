@@ -34,7 +34,7 @@ public class QueryController {
     public R<List<Map<String, Object>>> query(@RequestBody BaseQueryDTO<QueryClass> queryDTO) {
 
         // 查询数据库中的记录
-        List<Map<String, Object>> result = generalStoreService.queryEntity(queryDTO.getCondition().getClassDef(), queryDTO.getPage(), queryDTO.getSize(), queryDTO.getOrderBy(), queryDTO.getAsc()
+        List<Map<String, Object>> result = generalStoreService.queryEntity(queryDTO.getCondition().getVer(),queryDTO.getCondition().getClassDef(), queryDTO.getPage(), queryDTO.getSize(), queryDTO.getOrderBy(), queryDTO.getAsc()
                 , queryDTO.getCondition().getEquals(), queryDTO.getCondition().getLike(), queryDTO.getCondition().getInCondition());
         return R.ok(result);
     }

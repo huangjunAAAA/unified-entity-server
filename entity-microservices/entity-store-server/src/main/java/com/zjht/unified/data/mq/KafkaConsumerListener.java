@@ -50,7 +50,7 @@ public class KafkaConsumerListener implements ConsumerSeekAware {
             List<Integer> integers = storeService.updateEntity(sMsg);
             log.info("table : {} update object  return  {} " ,sMsg.getTblName(), integers);
         } else if (kMsg.getTable().equals(Constants.CMD_DELETE_ENTITY)) {
-            storeService.deleteEntity(sMsg.getTblName(),(String)sMsg.getData(),null);
+            storeService.deleteEntity(sMsg.getVer(),sMsg.getTblName(),(String)sMsg.getData(),null);
         } else if (kMsg.getTable().equals(Constants.CMD_ENTITY_DELETE_FIELD)) {
             storeService.removeEntityFieldByGuid(sMsg);
         }

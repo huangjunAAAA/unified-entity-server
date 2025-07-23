@@ -14,10 +14,10 @@ public interface IObjectEntityStore {
 
     List<Integer> updateEntity(EntityStoreMessageDO val);
 
-    List<Map<String,Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
+    List<Map<String,Object>> queryEntity(String ver,ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
                                          Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in);
 
-    void deleteEntity(String table, String guid, Long id);
+    void deleteEntity(String ver,String table, String guid, Long id);
 
     Map<String,Object>getEntityByGuid(String guid);
 

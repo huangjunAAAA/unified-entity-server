@@ -26,9 +26,6 @@ import java.util.stream.Collectors;
 public abstract class AbstractStoreService implements IObjectEntityStore {
 
 
-    @Resource
-    protected JdbcTemplate jdbcTemplate;
-
     protected TableDDLService ddlService;
 
     @Resource
@@ -120,7 +117,7 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
     }
 
     @Override
-    public List<Map<String,Object>> queryEntity(ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
+    public List<Map<String,Object>> queryEntity(String ver,ClazzDefCompositeDO clazzDef, Integer page, Integer size, String orderby, String asc,
                                          Map<String, Object> equals, Map<String, String> like, Map<String, List<Object>> in){
         List<String> cols = clazzDef.getClazzIdFieldDefList().stream().map(f -> StringUtils.toUnderScoreCase(f.getName())).collect(Collectors.toList());
         Map<String,Object> sEquals = null;
@@ -154,12 +151,14 @@ public abstract class AbstractStoreService implements IObjectEntityStore {
         }
 
         AliDruidUtils.setOrderByAndLimit(sQuery,page,size,orderby,asc);
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sQuery.toString());
         return list;
     }
 
     @Override
-    public void deleteEntity(String table, String guid, Long id) {
+    public void deleteEntity(String ver,String table, String guid, Long id) {
+        JdbcTemplate jdbcTemplate = dynamicDataSourceService.getJdbcTemplateForVersion(ver);
         if(id!=null)
             jdbcTemplate.update("delete from "+table+" where id=?",id);
         else if(guid!=null)
