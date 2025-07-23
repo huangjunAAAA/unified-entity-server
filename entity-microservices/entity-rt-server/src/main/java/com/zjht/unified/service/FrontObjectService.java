@@ -214,21 +214,23 @@ public class FrontObjectService {
         baseQueryDTO.setSize(Integer.MAX_VALUE);
         baseQueryDTO.setPage(1);
         List<Map<String, Object>> data1 = listObject(ctx, baseQueryDTO);
-        if(param.getIncludeInherited()){
+        if(param.getIncludeInherited()&&param.getClazzGuid()!=null){
             ClazzDefCompositeDO baseCls = entityDepService.getClsDefByGuid(ctx, param.getClazzGuid());
-            ClazzDefCompositeDO parentCls=entityDepService.getClsDefByGuid(ctx, baseCls.getParentGuid());
-            while(parentCls!=null){
-                BaseQueryDTO<QueryObjectDTO> parentQueryDTO=new BaseQueryDTO<>();
-                QueryObjectDTO parentCondition = new QueryObjectDTO();
-                parentCondition.setClazzGuid(parentCls.getGuid());
-                parentCondition.setPrjId(param.getPrjId());
-                parentCondition.setVer(param.getVer());
-                parentQueryDTO.setCondition(parentCondition);
-                parentQueryDTO.setSize(Integer.MAX_VALUE);
-                parentQueryDTO.setPage(1);
-                List<Map<String, Object>> data2 = listObject(ctx, parentQueryDTO);
-                data1.addAll(data2);
-                parentCls=entityDepService.getClsDefByGuid(ctx, parentCls.getParentGuid());
+            if(baseCls!=null&&baseCls.getParentGuid()!=null) {
+                ClazzDefCompositeDO parentCls = entityDepService.getClsDefByGuid(ctx, baseCls.getParentGuid());
+                while (parentCls != null) {
+                    BaseQueryDTO<QueryObjectDTO> parentQueryDTO = new BaseQueryDTO<>();
+                    QueryObjectDTO parentCondition = new QueryObjectDTO();
+                    parentCondition.setClazzGuid(parentCls.getGuid());
+                    parentCondition.setPrjId(param.getPrjId());
+                    parentCondition.setVer(param.getVer());
+                    parentQueryDTO.setCondition(parentCondition);
+                    parentQueryDTO.setSize(Integer.MAX_VALUE);
+                    parentQueryDTO.setPage(1);
+                    List<Map<String, Object>> data2 = listObject(ctx, parentQueryDTO);
+                    data1.addAll(data2);
+                    parentCls = entityDepService.getClsDefByGuid(ctx, parentCls.getParentGuid());
+                }
             }
         }
 
