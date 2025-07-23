@@ -11,6 +11,7 @@ import com.zjht.unified.common.core.constants.Constants;
 import com.zjht.unified.common.core.constants.FieldConstants;
 import com.zjht.unified.common.core.domain.ddl.TblCol;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -386,9 +387,13 @@ public class AliDruidUtils {
      */
     public static MySqlSelectQueryBlock createGeneralValueSQLFromTable(String tbl, List<String> cols, Map<String,Object> fullCondition){
         MySqlSelectQueryBlock sQuery = createQueryEqualsFromTable(tbl, fullCondition);
-        for (Iterator<String> iterator = cols.iterator(); iterator.hasNext(); ) {
-            String c =  iterator.next();
-            sQuery.addSelectItem(new SQLIdentifierExpr(c));
+        if(CollectionUtils.isEmpty(cols)){
+            sQuery.addSelectItem(new SQLAllExpr());
+        }else {
+            for (Iterator<String> iterator = cols.iterator(); iterator.hasNext(); ) {
+                String c = iterator.next();
+                sQuery.addSelectItem(new SQLIdentifierExpr(c));
+            }
         }
         return sQuery;
     }
