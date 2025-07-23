@@ -363,6 +363,11 @@ public class FrontObjectService {
             equals.put("root", guid);
             equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
             equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
+            treeQuery.setEquals(equals);
+            treeQuery.setPrjId(ctx.getPrjInfo().getPrjId()+"");
+            treeQuery.setVer(ctx.getVer());
+            query.setPage(1);
+            query.setSize(Integer.MAX_VALUE);
             R<List<Map<String, Object>>> result = remoteStore.query(query);
             if(result.getData()!=null){
                 ret.addAll(result.getData());
@@ -380,6 +385,11 @@ public class FrontObjectService {
                 equals.put("parent", tGuid);
                 equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
                 equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
+                treeQuery.setEquals(equals);
+                treeQuery.setPrjId(ctx.getPrjInfo().getPrjId()+"");
+                treeQuery.setVer(ctx.getVer());
+                query.setPage(1);
+                query.setSize(Integer.MAX_VALUE);
                 R<List<Map<String, Object>>> result = remoteStore.query(query);
                 if(result.getData()!=null){
                     ret.addAll(result.getData());
@@ -399,6 +409,10 @@ public class FrontObjectService {
         equals.put(FieldConstants.CLAZZ_GUID,CoreClazzDef.CLAZZ_TREE_NODE);
         equals.put(FieldConstants.PROJECT_GUID,ctx.getPrjInfo().getPrjGuid());
         treeQuery.setEquals(equals);
+        treeQuery.setPrjId(ctx.getPrjInfo().getPrjId()+"");
+        query.setPage(1);
+        query.setSize(Integer.MAX_VALUE);
+        treeQuery.setVer(ctx.getVer());
         R<List<Map<String, Object>>> result = remoteStore.query(query);
         List<TNodeDO> ret=new ArrayList<>();
         if(result.getData()!=null){
